@@ -22,7 +22,6 @@ export default class RnsSDK {
 
         this.network = network;
         this.initGateway({ gateway });
-        this.getdAppEntities();
 
     }
 
@@ -39,10 +38,16 @@ export default class RnsSDK {
 
     }
 
-    async getdAppEntities() {
+    async dAppEntities() {
 
         try {
-            this.entities = parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }));
+
+            if (!this.entities) {
+                this.entities = parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }));
+            }
+
+            return this.entities;
+
         } catch (e) {
             console.log(e);
             return null;
@@ -52,7 +57,7 @@ export default class RnsSDK {
 
     async getDomainStatus(domainName: string) {
 
-        return await getDomainProperties(domainName, { state: this.state, entities: this.entities });
+        return await getDomainProperties(domainName, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
@@ -64,6 +69,6 @@ export default class RnsSDK {
 //         network: 'stokenet'
 //     });
 
-//     const status = rns.getDomainStatus('beem.xrd');
+//     const status = await rns.getDomainStatus('beem.xrd');
 
 // })();
