@@ -1,6 +1,6 @@
 export enum DomainStatus {
-    Unclaimed,
-    InSettlement,
-    InAuction,
-    Claimed
+    Unclaimed = 'Available',
+    InSettlement = 'In Settlement',
+    InAuction = 'In Auction',
+    Claimed = 'Unavailable'
 }

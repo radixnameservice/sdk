@@ -2,10 +2,10 @@ import { EntityMetadataItem, MetadataStringValue, StateEntityDetailsVaultRespons
 import { AddressMapT, NameMapKeysT, nameMappings } from "../mappings/entities";
 import { parsePricingTiers } from "./pricing.utils";
 
-function parseComponent(acc: AddressMapT, entity: StateEntityDetailsVaultResponseItem) {
+function parseComponent(entity: StateEntityDetailsVaultResponseItem) {
 
     if (entity.details?.type !== 'Component') {
-        return acc;
+        return {};
     }
 
     const state = entity.details?.state as { fields: any[] };
@@ -17,7 +17,6 @@ function parseComponent(acc: AddressMapT, entity: StateEntityDetailsVaultRespons
     const minimumPremium = state.fields.find(f => f.field_name === 'minimum_premium')?.value;
 
     return {
-        ...acc,
         [nameMappings[entity.details.blueprint_name as NameMapKeysT]]: entity.address,
         ...(biddersVaultId && { biddersVaultId }),
         ...(settlementVaultId && { settlementVaultId }),
@@ -29,13 +28,13 @@ function parseComponent(acc: AddressMapT, entity: StateEntityDetailsVaultRespons
 
 }
 
-function parseNonFungResource(items: EntityMetadataItem[], acc: AddressMapT, entity: StateEntityDetailsVaultResponseItem) {
+function parseNonFungResource(items: EntityMetadataItem[], entity: StateEntityDetailsVaultResponseItem) {
 
     const resourceValue = (items[0].value.typed as MetadataStringValue).value;
     const key = nameMappings[resourceValue as NameMapKeysT];
 
     if (key) {
-        return { ...acc, [key]: entity.address };
+        return { [key]: entity.address };
     }
 
 }
@@ -44,8 +43,8 @@ export function parseEntityDetails(entities: StateEntityDetailsVaultResponseItem
 
     return entities.reduce((acc, entity) => {
 
-        if (entity.details?.type === 'Component') return parseComponent(acc, entity); // Entity is Component.
-        if (entity.details?.type === 'NonFungibleResource') return parseNonFungResource(entity.explicit_metadata?.items, acc, entity); //Entity is Non Fungible Resource.
+        if (entity.details?.type === 'Component') return { ...acc, ...parseComponent(entity) }; // Entity is Component.
+        if (entity.details?.type === 'NonFungibleResource') return { ...acc, ...parseNonFungResource(entity.explicit_metadata?.items, entity) }; //Entity is Non Fungible Resource.
 
         return acc; //Entity is Fungible Resource.
 

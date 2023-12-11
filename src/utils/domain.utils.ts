@@ -1,6 +1,6 @@
-import { State, StateKeyValueStoreDataResponse, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
-import { DomainStatus } from "../mappings/status";
+import { StateKeyValueStoreDataResponse, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 
+import { DomainStatus } from "../mappings/status";
 import { InstancePropsI } from "../common/types";
 
 export interface DomainPropertiesI {
@@ -8,7 +8,7 @@ export interface DomainPropertiesI {
     status: DomainStatus;
     settlement?: {
         id: string;
-        endTime: number;
+        endTimestamp: number;
     };
     auction?: {
         id: string;
@@ -16,14 +16,14 @@ export interface DomainPropertiesI {
         initialBid: string;
         leaderBadgeId: string;
         originatorId: string;
-        endTime: number;
+        endTimestamp: number;
     };
 
 }
 
 type AuctionIdT = string | null;
 
-async function domainToNonFungId(name: string) {
+export async function domainToNonFungId(name: string) {
 
     const encoder = new TextEncoder();
     const data = encoder.encode(name);
@@ -40,22 +40,7 @@ async function domainToNonFungId(name: string) {
 
 }
 
-export async function getDomainProperties(domainName: string, instance: InstancePropsI) {
-
-    const domainId = await domainToNonFungId(domainName);
-
-    const settlementStore = await instance.state.innerClient.keyValueStoreData({
-        stateKeyValueStoreDataRequest: {
-            key_value_store_address: instance.entities.settlementVaultId,
-            keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
-        }
-    });
-
-    return await determineStatus(settlementStore, instance);
-
-}
-
-async function determineStatus(settlementStore: StateKeyValueStoreDataResponse, instance: InstancePropsI): Promise<DomainPropertiesI> {
+export async function determineStatus(settlementStore: StateKeyValueStoreDataResponse, instance: InstancePropsI): Promise<DomainPropertiesI> {
 
     const settlementExpiry = parseSettlementExpiry(settlementStore);
     const auctionId = parseAuctionId(settlementStore);
@@ -74,12 +59,11 @@ async function determineStatus(settlementStore: StateKeyValueStoreDataResponse, 
             status: DomainStatus.InSettlement,
             settlement: {
                 id: 'n/a',
-                endTime: settlementExpiry
+                endTimestamp: settlementExpiry
             }
         };
 
     }
-
 
     if (isInAuction(settlementExpiry, auctionId)) {
 
@@ -188,7 +172,7 @@ function parseAuction(auction: StateNonFungibleDetailsResponseItem) {
                 initialBid: auctionData.initial_bid_amount,
                 leaderBadgeId: auctionData.highest_bidder,
                 originatorId: auctionData.original_buyer,
-                endTime: auctionData.end_timestamp
+                endTimestamp: auctionData.end_timestamp
             }
         };
 
