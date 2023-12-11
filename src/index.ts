@@ -2,8 +2,8 @@ import { GatewayApiClient, GatewayStatusResponse, State } from '@radixdlt/babylo
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
-import { AddressMapT } from './mappings/entities';
-import { getDomainProperties } from './utils/domain.utils';
+import { requestDomainStatus } from './requests/domain/status';
+import { requestRecords } from './requests/domain/records';
 
 interface RnsSDKI {
 
@@ -16,7 +16,7 @@ export default class RnsSDK {
 
     network: NetworkT;
     state: State;
-    entities: AddressMapT;
+    entities: any;
 
     constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
 
@@ -57,7 +57,13 @@ export default class RnsSDK {
 
     async getDomainStatus(domainName: string) {
 
-        return await getDomainProperties(domainName, { state: this.state, entities: await this.dAppEntities() });
+        return await requestDomainStatus(domainName, { state: this.state, entities: await this.dAppEntities() });
+
+    }
+
+    async getRecords(domainName: string) {
+
+        return await requestRecords(domainName, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
@@ -69,6 +75,7 @@ export default class RnsSDK {
 //         network: 'stokenet'
 //     });
 
-//     const status = await rns.getDomainStatus('beem.xrd');
-
+//     const status = await rns.getDomainStatus('nft.xrd');
+//     const records = await rns.getRecords('nft.xrd');
+    
 // })();
