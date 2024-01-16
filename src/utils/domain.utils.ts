@@ -36,7 +36,7 @@ export async function domainToNonFungId(name: string) {
         .reverse()
         .join('');
 
-    return `${hexString}`;
+    return `[${hexString}]`;
 
 }
 
