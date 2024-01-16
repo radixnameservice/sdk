@@ -75,11 +75,7 @@ export default class RnsSDK {
         network: 'stokenet'
     });
 
-    //const status = await rns.getDomainStatus('wylie.xrd');
-
+    const status = await rns.getDomainStatus('wylie.xrd');
     const records = await rns.getRecords('james2.xrd');
-    //console.log(records);
-
-    //console.log(records)
 
 })();
