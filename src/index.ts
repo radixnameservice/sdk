@@ -43,7 +43,7 @@ export default class RnsSDK {
         try {
 
             if (!this.entities) {
-                this.entities = parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }));
+                this.entities = parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }), this.state);
             }
 
             return this.entities;
@@ -69,13 +69,17 @@ export default class RnsSDK {
 
 }
 
-// (async () => {
+(async () => {
 
-//     const rns = new RnsSDK({
-//         network: 'stokenet'
-//     });
+    const rns = new RnsSDK({
+        network: 'stokenet'
+    });
 
-//     const status = await rns.getDomainStatus('nft.xrd');
-//     const records = await rns.getRecords('nft.xrd');
-    
-// })();
+    //const status = await rns.getDomainStatus('wylie.xrd');
+
+    const records = await rns.getRecords('james2.xrd');
+    //console.log(records);
+
+    //console.log(records)
+
+})();
