@@ -66,3 +66,18 @@ export async function requestRecords(domainName: string, { state, entities }: In
         });
 
 }
+
+export async function resolveRecord(recordId: string, { state, entities }: InstancePropsI) {
+    const nft = await state.getNonFungibleData(entities.resolverRecordResource, recordId)
+
+    if (nft.data?.programmatic_json.kind === 'Tuple') {
+        return nft.data?.programmatic_json.fields.filter(field => {
+            return (field.field_name === 'value' && field.kind === 'Enum')
+        }).map((field) => {
+            if (field.field_name === 'value' && field.kind === 'Enum') {
+                const value = (('fields' in field.fields[0] && 'value' in field.fields[0].fields[0] && field.fields[0].fields[0].value) || null) as string | null;
+                return value;
+            }
+        })[0];
+    }
+}
