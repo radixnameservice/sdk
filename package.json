@@ -15,7 +15,7 @@
         "dist"
     ],
     "peerDependencies": {
-        "@radixdlt/babylon-gateway-api-sdk": "^1.2.0"
+        "@radixdlt/babylon-gateway-api-sdk": "^1.2.6"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
