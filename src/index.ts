@@ -5,7 +5,7 @@ import { parseEntityDetails } from './utils/entity.utils';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { domainToNonFungId } from './utils/domain.utils';
-import { RecordResultsT } from './common/records.types';
+import { requestAccountDomains } from './requests/address/domains';
 
 interface RnsSDKI {
 
@@ -73,11 +73,17 @@ export default class RnsSDK {
 
         const domainId = await domainToNonFungId(domainName);
         const parsedContext = context ? `-${context}` : '';
-        const parsedDirective = directive? `-${directive}` : '';
-        const parsedPlatformIdentifier = platformIdentifier? `-${platformIdentifier}` : '';
+        const parsedDirective = directive ? `-${directive}` : '';
+        const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
         const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
 
         return await resolveRecord(recordId, { state: this.state, entities: await this.dAppEntities() });
+
+    }
+
+    async getAccountDomains(accountAddress: string) {
+
+        return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
@@ -92,5 +98,6 @@ export default class RnsSDK {
     //const status = await rns.getDomainStatus('wylie.xrd');
     //const records = await rns.getRecords('james2.xrd');
     //const resolvedRecord = await rns.resolveRecord('sooomlooongdomainboidamn.xrd', 'navigation', undefined, 'xrd.domains:navigation.web3');
+    //const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
 
 })();
