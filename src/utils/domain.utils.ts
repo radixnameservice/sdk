@@ -1,7 +1,7 @@
 import { StateKeyValueStoreDataResponse, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { DomainStatus } from "../mappings/status";
-import { InstancePropsI } from "../common/types";
+import { InstancePropsI } from "../common/entities.types";
 
 export interface DomainPropertiesI {
 

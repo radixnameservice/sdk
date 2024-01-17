@@ -1,4 +1,4 @@
-import { InstancePropsI } from "../../common/types";
+import { InstancePropsI } from "../../common/entities.types";
 import { determineStatus, domainToNonFungId } from "../../utils/domain.utils";
 
 export async function requestDomainStatus(domainName: string, instance: InstancePropsI) {

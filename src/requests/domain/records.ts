@@ -1,5 +1,5 @@
 import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
-import { InstancePropsI } from "../../common/types";
+import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { RecordItem } from "../../mappings/records";
 
