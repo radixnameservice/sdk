@@ -7,7 +7,7 @@ export function matchObjectTypes(obj, schema) {
             const expectedType = schema[key];
             const receivedValue = obj[key];
 
-            if (typeof receivedValue !== typeof expectedType) {
+            if (typeof receivedValue !== expectedType) {
                 return false;
             }
 
