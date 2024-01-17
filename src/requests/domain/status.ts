@@ -1,20 +1,20 @@
-import { InstancePropsI } from "../../common/types";
+import { InstancePropsI } from "../../common/entities.types";
 import { determineStatus, domainToNonFungId } from "../../utils/domain.utils";
 
-export async function requestDomainStatus(domainName: string, instance: InstancePropsI) {
+export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
 
     const domainId = await domainToNonFungId(domainName);
 
     try {
 
-        const settlementStore = await instance.state.innerClient.keyValueStoreData({
+        const settlementStore = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: instance.entities.settlementVaultId,
+                key_value_store_address: entities.settlementVaultId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
             }
         });
 
-        return await determineStatus(settlementStore, instance);
+        return await determineStatus(settlementStore, { state, entities });
 
     } catch (e) {
 

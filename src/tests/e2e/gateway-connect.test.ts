@@ -7,7 +7,7 @@ describe('RnsKit', () => {
 
     networks.forEach(network => {
 
-        const rnsKit = new RnsKit({ network });
+        const rns = new RnsKit({ network });
 
         it(`should return a corresponding base path for ${network} (if undefined set default to mainnet)`, () => {
 
@@ -27,7 +27,7 @@ describe('RnsKit', () => {
 
         it('gateway check should return ledger state and info properties', async () => {
 
-            const result = await rnsKit.initGateway({});
+            const result = await rns.initGateway({});
             expect(result).toHaveProperty(["ledger_state"]);
             expect(result).toHaveProperty(["release_info"]);
 
