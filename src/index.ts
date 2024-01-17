@@ -5,6 +5,7 @@ import { parseEntityDetails } from './utils/entity.utils';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { domainToNonFungId } from './utils/domain.utils';
+import { RecordResultsT } from './common/records.types';
 
 interface RnsSDKI {
 
@@ -69,6 +70,7 @@ export default class RnsSDK {
     }
 
     async resolveRecord(domainName: string, context?: string, directive?: string, platformIdentifier?: string) {
+
         const domainId = await domainToNonFungId(domainName);
         const parsedContext = context ? `-${context}` : '';
         const parsedDirective = directive? `-${directive}` : '';
@@ -76,6 +78,7 @@ export default class RnsSDK {
         const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
 
         return await resolveRecord(recordId, { state: this.state, entities: await this.dAppEntities() });
+
     }
 
 }
@@ -86,8 +89,8 @@ export default class RnsSDK {
         network: 'stokenet'
     });
 
-    const status = await rns.getDomainStatus('wylie.xrd');
-    const records = await rns.getRecords('james2.xrd');
-    const resolvedRecord = await rns.resolveRecord('sooomlooongdomainboidamn.xrd', 'navigation', undefined, 'xrd.domains:navigation.web3');
+    //const status = await rns.getDomainStatus('wylie.xrd');
+    //const records = await rns.getRecords('james2.xrd');
+    //const resolvedRecord = await rns.resolveRecord('sooomlooongdomainboidamn.xrd', 'navigation', undefined, 'xrd.domains:navigation.web3');
 
 })();
