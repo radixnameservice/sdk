@@ -7,7 +7,6 @@ import { requestRecords, resolveRecord } from './requests/domain/records';
 import { domainToNonFungId } from './utils/domain.utils';
 import { requestAccountDomains } from './requests/address/domains';
 import { requestAuctionsForDomain } from './requests/domain/auctions';
-import { requestBids } from './requests/domain/bids';
 
 interface RnsSDKI {
 
