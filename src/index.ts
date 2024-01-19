@@ -1,4 +1,4 @@
-import { GatewayApiClient, GatewayStatusResponse, State } from '@radixdlt/babylon-gateway-api-sdk';
+import { GatewayApiClient, GatewayStatusResponse, State, Status } from '@radixdlt/babylon-gateway-api-sdk';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
@@ -6,6 +6,8 @@ import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { domainToNonFungId } from './utils/domain.utils';
 import { requestAccountDomains } from './requests/address/domains';
+import { requestAuctionsForDomain } from './requests/domain/auctions';
+import { requestBids } from './requests/domain/bids';
 
 interface RnsSDKI {
 
@@ -18,6 +20,7 @@ export default class RnsSDK {
 
     network: NetworkT;
     state: State;
+    status: Status;
     entities: any;
 
     constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
@@ -35,6 +38,7 @@ export default class RnsSDK {
         });
 
         this.state = state;
+        this.status = status;
 
         return status.getCurrent();
 
@@ -89,6 +93,11 @@ export default class RnsSDK {
 
     }
 
+    async getAuctions(domainName: string) {
+        const domainId = await domainToNonFungId(domainName, false);
+        return await requestAuctionsForDomain(domainId, { state: this.state, entities: await this.dAppEntities() });
+    }
+
 }
 
 (async () => {
@@ -100,6 +109,7 @@ export default class RnsSDK {
     //const status = await rns.getDomainStatus('wylie.xrd');
     //const records = await rns.getRecords('james2.xrd');
     //const resolvedRecord = await rns.resolveRecord('sooomlooongdomainboidamn.xrd', 'navigation', undefined, 'xrd.domains:navigation.web3');
+    // const auctions = await rns.getAuctions('wylie.xrd');
     //const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
 
 })();
