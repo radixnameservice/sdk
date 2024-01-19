@@ -25,7 +25,7 @@ export interface DomainPropertiesI {
 
 type AuctionIdT = string | null;
 
-export async function domainToNonFungId(name: string) {
+export async function domainToNonFungId(name: string, isByteId = true) {
 
     const encoder = new TextEncoder();
     const data = encoder.encode(name);
@@ -38,7 +38,7 @@ export async function domainToNonFungId(name: string) {
         .reverse()
         .join('');
 
-    return `[${hexString}]`;
+    return isByteId ? `[${hexString}]` : hexString;
 
 }
 

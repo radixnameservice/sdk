@@ -52,7 +52,8 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
             const settlementVaultId = state.fields.find(f => f.field_name === 'domain_settlement_periods')?.value;
             const subdomainVaults = state.fields.find(f => f.field_name === 'subdomain_vaults')?.value;
             const recordServiceVaultId = state.fields.find(f => f.field_name === 'record_vaults')?.value;
-            const latestAuctionId = +state.fields.find(f => f.field_name === 'auction_id')?.value;
+            const latestAuctionId = state.fields.find(f => f.field_name === 'auction_id')?.value;
+            const latestBidId = state.fields.find(f => f.field_name === 'bid_id')?.value;
             const priceMap = parsePricingTiers(state.fields.find(f => f.field_name === 'price_mapping'));
             const minimumPremium = state.fields.find(f => f.field_name === 'minimum_premium')?.value;
 
@@ -64,6 +65,7 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
                 ...(settlementVaultId && { settlementVaultId }),
                 ...(recordServiceVaultId && { recordServiceVaultId }),
                 ...(latestAuctionId && { latestAuctionId }),
+                ...(latestBidId && { latestBidId }),
                 ...(priceMap && { priceMap }),
                 ...(minimumPremium && { minimumPremium })
             };
