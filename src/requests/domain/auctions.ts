@@ -3,8 +3,16 @@ import { InstancePropsI } from "../../common/entities.types";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { stringToUint } from "../../utils/string.utils";
 
+export interface Auction {
+    id: string;
+    bid_amount: string;
+    initial_bid_amount: string;
+    highest_bidder: string;
+    original_buyer: string;
+    end_timestamp: number;
+}
+
 export async function requestAuctionsForDomain(domainId: string, { state, entities }: InstancePropsI) {
-    console.log(entities.latestAuctionId);
     const latestAuctionId = +((await state.innerClient.keyValueStoreData({
         stateKeyValueStoreDataRequest: {
             key_value_store_address: entities.latestAuctionId,
@@ -37,8 +45,7 @@ export async function requestAuctionsForDomain(domainId: string, { state, entiti
                 }
 
                 return acc;
-            }, { id: auction.non_fungible_id } as { id: string, bid_amount: string; initial_bid_amount: string, highest_bidder: string, original_buyer: string, end_timestamp: number });
+            }, { id: auction.non_fungible_id } as Auction);
         }
     });
 }
-

@@ -73,9 +73,11 @@ export default class RnsSDK {
 
     }
 
-    async resolveRecord(domainName: string, context?: string, directive?: string, platformIdentifier?: string) {
+    async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }) {
 
-        const domainId = await domainToNonFungId(domainName);
+        const platformIdentifier = `xrd.domains:${context}:${directive}`
+
+        const domainId = await domainToNonFungId(domain);
         const parsedContext = context ? `-${context}` : '';
         const parsedDirective = directive ? `-${directive}` : '';
         const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
