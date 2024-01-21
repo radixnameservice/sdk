@@ -1,26 +1,96 @@
 import { InstancePropsI } from "../../common/entities.types";
-import { determineStatus, domainToNonFungId } from "../../utils/domain.utils";
+import { DomainStatus, mapStatusInt } from "../../mappings/status";
+import { domainToNonFungId } from "../../utils/domain.utils";
 
 export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
 
+    const properties = await requestDomainProperties(domainName, { state, entities });
+    return mapStatusInt(properties?.status);
+
+}
+
+async function requestDomainProperties(domainName: string, { state, entities }: InstancePropsI) {
+
     const domainId = await domainToNonFungId(domainName);
 
-    try {
+    const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
+        stateKeyValueStoreDataRequest: {
+            key_value_store_address: entities.settlementVaultId,
+            keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `${domainId}` } }]
+        }
+    });
 
-        const settlementStore = await state.innerClient.keyValueStoreData({
-            stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.settlementVaultId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+    let auctionId = null;
+
+    const settlementExpiry = settlementKvStoreResponse.entries.map(kv => {
+        if (kv.value.programmatic_json.kind === 'Tuple') {
+            if (kv.value.programmatic_json.fields[3].kind === 'Enum'
+                && kv.value.programmatic_json.fields[3].variant_name === 'Some'
+                && kv.value.programmatic_json.fields[3].fields[0].kind === 'NonFungibleLocalId'
+            ) {
+                auctionId = kv.value.programmatic_json.fields[3].fields[0].value;
             }
-        });
 
-        return await determineStatus(settlementStore, { state, entities });
+            if (kv.value.programmatic_json.fields[1].kind === 'I64') {
+                return +kv.value.programmatic_json.fields[1].value * 1000
+            }
+        }
+    })[0];
 
-    } catch (e) {
+    if (auctionId) {
+        const auction = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionId);
 
-        console.log(e);
-        return null;
+        if (auction.data?.programmatic_json.kind === 'Tuple') {
+            const auctionData = auction.data.programmatic_json.fields.reduce((acc, field) => {
 
+                if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
+                    return { ...acc, [field.field_name]: +field.value * 1000 };
+                }
+
+                if (field.kind === 'I64' || field.kind === 'Decimal' || field.kind === 'NonFungibleLocalId') {
+                    if (field.field_name) {
+                        return { ...acc, [field.field_name]: field.value };
+                    }
+                }
+
+                return acc;
+            }, { id: auction.non_fungible_id } as { id: string, bid_amount: string; initial_bid_amount: string, highest_bidder: string, original_buyer: string, end_timestamp: number });
+
+            if (new Date().getTime() >= auctionData.end_timestamp) {
+                return {
+                    status: DomainStatus.Claimed
+                }
+            } else {
+                return {
+                    status: DomainStatus.InAuction,
+                    auction: {
+                        id: auction.non_fungible_id,
+                        currentBid: auctionData.bid_amount,
+                        initialBid: auctionData.initial_bid_amount,
+                        leaderBadgeId: auctionData.highest_bidder,
+                        originatorId: auctionData.original_buyer,
+                        endTime: auctionData.end_timestamp
+                    }
+                }
+            }
+        }
+    } else if (settlementExpiry && new Date().getTime() >= settlementExpiry) {
+        return {
+            status: DomainStatus.Claimed
+        }
+    } else if (settlementExpiry && !auctionId) {
+
+        return {
+            status: DomainStatus.InSettlement,
+            settlement: {
+                id: 'n/a',
+                endTime: settlementExpiry
+            }
+        }
+    }
+
+    return {
+        status: DomainStatus.Unclaimed
     }
 
 }
