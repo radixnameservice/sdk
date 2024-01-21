@@ -15,7 +15,8 @@
         "dist"
     ],
     "peerDependencies": {
-        "@radixdlt/babylon-gateway-api-sdk": "^1.2.6"
+        "@radixdlt/babylon-gateway-api-sdk": "^1.2.6",
+        "@radixdlt/radix-engine-toolkit": "^1.0.3"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
@@ -25,8 +26,5 @@
         "ts-jest": "^29.1.1",
         "tsup": "^8.0.1",
         "typescript": "^5.3.3"
-    },
-    "dependencies": {
-        "@radixdlt/radix-engine-toolkit": "^1.0.3"
     }
 }
