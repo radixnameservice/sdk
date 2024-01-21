@@ -2,6 +2,7 @@ import { ProgrammaticScryptoSborValueI64 } from "@radixdlt/babylon-gateway-api-s
 import { InstancePropsI } from "../../common/entities.types";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { stringToUint } from "../../utils/string.utils";
+import { domainToNonFungId } from "../../utils/domain.utils";
 
 export interface Auction {
     id: string;
@@ -12,7 +13,10 @@ export interface Auction {
     end_timestamp: number;
 }
 
-export async function requestAuctionsForDomain(domainId: string, { state, entities }: InstancePropsI) {
+export async function requestAuctionsForDomain(domain: string, { state, entities }: InstancePropsI) {
+
+    const domainId = await domainToNonFungId(domain, false);
+
     const latestAuctionId = +((await state.innerClient.keyValueStoreData({
         stateKeyValueStoreDataRequest: {
             key_value_store_address: entities.latestAuctionId,
