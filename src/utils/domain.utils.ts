@@ -3,8 +3,6 @@ import { StateKeyValueStoreDataResponse, StateNonFungibleDetailsResponseItem } f
 import { DomainStatus } from "../mappings/status";
 import { InstancePropsI } from "../common/entities.types";
 
-import { webcrypto } from 'crypto';
-
 export interface DomainPropertiesI {
 
     status: DomainStatus;
@@ -30,7 +28,7 @@ export async function domainToNonFungId(name: string, isByteId = true) {
     const encoder = new TextEncoder();
     const data = encoder.encode(name);
 
-    const hashBuffer = await webcrypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
     const truncatedHashBuffer = hashBuffer.slice(0, 16);
 
     const hexString = Array.from(new Uint8Array(truncatedHashBuffer))
