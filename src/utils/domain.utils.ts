@@ -3,6 +3,8 @@ import { StateKeyValueStoreDataResponse, StateNonFungibleDetailsResponseItem } f
 import { DomainStatus } from "../mappings/status";
 import { InstancePropsI } from "../common/entities.types";
 
+import * as crypto from 'crypto';
+
 export interface DomainPropertiesI {
 
     status: DomainStatus;
