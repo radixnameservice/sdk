@@ -60,41 +60,68 @@ export default class RnsSDK {
 
     }
 
-    async getDomainStatus(domainName: string) {
+    async getDomainStatus(domain: string) {
 
-        return await requestDomainStatus(domainName, { state: this.state, entities: await this.dAppEntities() });
+        try {
+            return await requestDomainStatus(domain, { state: this.state, entities: await this.dAppEntities() });
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
 
     }
 
-    async getRecords(domainName: string) {
+    async getRecords(domain: string) {
 
-        return await requestRecords(domainName, { state: this.state, entities: await this.dAppEntities() });
+        try {
+            return await requestRecords(domain, { state: this.state, entities: await this.dAppEntities() });
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
 
     }
 
     async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }) {
 
-        const platformIdentifier = `xrd.domains:${context}:${directive}`
+        try {
 
-        const domainId = await domainToNonFungId(domain);
-        const parsedContext = context ? `-${context}` : '';
-        const parsedDirective = directive ? `-${directive}` : '';
-        const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
-        const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
+            const platformIdentifier = `xrd.domains:${context}.${directive}`;
+            const domainId = await domainToNonFungId(domain);
+            const parsedContext = context ? `-${context}` : '';
+            const parsedDirective = directive ? `-${directive}` : '';
+            const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
+            const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
 
-        return await resolveRecord(recordId, { state: this.state, entities: await this.dAppEntities() });
+            return await resolveRecord(recordId, { state: this.state, entities: await this.dAppEntities() });
+
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
 
     }
 
     async getAccountDomains(accountAddress: string) {
 
-        return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
+        try {
+            return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
 
     }
 
-    async getAuctions(domainName: string) {
-        const domainId = await domainToNonFungId(domainName, false);
-        return await requestAuctionsForDomain(domainId, { state: this.state, entities: await this.dAppEntities() });
+    async getAuctions(domain: string) {
+
+        try {
+            return await requestAuctionsForDomain(domain, { state: this.state, entities: await this.dAppEntities() });
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
+
     }
 
 }
@@ -107,7 +134,13 @@ export default class RnsSDK {
 
     //const status = await rns.getDomainStatus('james2.xrd');
     //const records = await rns.getRecords('james2.xrd');
-    //const resolvedRecord = await rns.resolveRecord('sooomlooongdomainboidamn.xrd', 'navigation', undefined, 'xrd.domains:navigation.web3');
+
+    // const resolvedRecord = await rns.resolveRecord({
+    //     domain: 'test-records-present.xrd',
+    //     context: 'funnels',
+    //     directive: 'xrd'
+    //  });
+
     //const auctions = await rns.getAuctions('wylie.xrd');
     //const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
 
