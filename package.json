@@ -1,6 +1,6 @@
 {
     "name": "@radixnameservice/rns-sdk",
-    "version": "0.3.6",
+    "version": "0.3.7",
     "description": "The official toolkit for the Radix Name Service",
     "scripts": {
         "test": "jest",
@@ -16,7 +16,8 @@
     ],
     "peerDependencies": {
         "@radixdlt/babylon-gateway-api-sdk": "^1.2.6",
-        "@radixdlt/radix-engine-toolkit": "^1.0.3"
+        "@radixdlt/radix-engine-toolkit": "^1.0.3",
+        "crypto-browserify": "^3.12.0"
     },
     "devDependencies": {
         "@types/jest": "^29.5.11",
@@ -26,8 +27,5 @@
         "ts-jest": "^29.1.1",
         "tsup": "^8.0.1",
         "typescript": "^5.3.3"
-    },
-    "dependencies": {
-        "node-polyfill-webpack-plugin": "^3.0.0"
     }
 }
