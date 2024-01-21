@@ -68,9 +68,11 @@ export async function requestRecords(domainName: string, { state, entities }: In
 }
 
 export async function resolveRecord(recordId: string, { state, entities }: InstancePropsI) {
-    const nft = await state.getNonFungibleData(entities.resolverRecordResource, recordId)
 
-    if (nft.data?.programmatic_json.kind === 'Tuple') {
+    const nft = await state.getNonFungibleData(entities.resolverRecordResource, recordId);
+
+    if (nft?.data?.programmatic_json.kind === 'Tuple') {
+
         return nft.data?.programmatic_json.fields.filter(field => {
             return (field.field_name === 'value' && field.kind === 'Enum')
         }).map((field) => {
@@ -79,5 +81,9 @@ export async function resolveRecord(recordId: string, { state, entities }: Insta
                 return value;
             }
         })[0];
+
     }
+
+    return null;
+
 }
