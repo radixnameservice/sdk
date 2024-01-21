@@ -11,6 +11,7 @@ const recordsSchema = {
     value: 'string'
 };
 
+
 describe('RnsKit', () => {
 
     const rns = new RnsKit({ network: 'stokenet' });
@@ -23,7 +24,6 @@ describe('RnsKit', () => {
         expect(records.length).toBeGreaterThan(0);
         expect(records.every(record => matchObjectTypes(record, recordsSchema))).toBe(true);
 
-
     });
 
     it('should return a empty array', async () => {
@@ -35,11 +35,16 @@ describe('RnsKit', () => {
 
     });
 
-    // it('should return a specific stokenet address', async () => {
-        
-    //     const resolvedRecord = await rns.resolveRecord('test-records-present.xrd', 'navigation', undefined, 'xrd.domains:navigation.web3');
-    //     expect(resolvedRecord).toBe('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
+    it('should return a specific stokenet address', async () => {
 
-    // });
+        const resolvedRecord = await rns.resolveRecord({
+            domain: 'test-records-present.xrd',
+            context: 'funnels',
+            directive: 'xrd'
+        });
+
+        expect(resolvedRecord).toBe('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
+
+    });
 
 });
