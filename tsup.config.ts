@@ -1,3 +1,4 @@
+import NodePolyfillPlugin from "node-polyfill-webpack-plugin";
 import { defineConfig } from "tsup";
 
 export default defineConfig({
@@ -7,4 +8,5 @@ export default defineConfig({
     splitting: false,
     sourcemap: true,
     clean: true,
+    plugins: [new NodePolyfillPlugin() as any],
 });
