@@ -1,6 +1,6 @@
 {
     "name": "@radixnameservice/rns-sdk",
-    "version": "0.3.8",
+    "version": "0.3.9",
     "description": "The official toolkit for the Radix Name Service",
     "scripts": {
         "test": "jest",
@@ -14,7 +14,7 @@
     "files": [
         "dist"
     ],
-    "peerDependencies": {
+    "dependencies": {
         "@radixdlt/babylon-gateway-api-sdk": "^1.2.6",
         "@radixdlt/radix-engine-toolkit": "^1.0.3",
         "crypto-browserify": "^3.12.0"
