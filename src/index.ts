@@ -63,7 +63,6 @@ export default class RnsSDK {
     async getDomainAttributes(domain: string) {
 
         const normalisedDomain = normaliseDomain(domain);
-        console.log(normalisedDomain)
         const domainValidation = validateDomainEntity(normalisedDomain);
 
         if(!domainValidation.valid){
