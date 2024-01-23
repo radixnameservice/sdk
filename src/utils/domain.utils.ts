@@ -1,22 +1,5 @@
 import crypto from 'crypto-browserify';
 
-// export async function domainToNonFungId(name: string, isByteId = true) {
-
-//     const encoder = new TextEncoder();
-//     const data = encoder.encode(name);
-
-//     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-//     const truncatedHashBuffer = hashBuffer.slice(0, 16);
-
-//     const hexString = Array.from(new Uint8Array(truncatedHashBuffer))
-//         .map(byte => byte.toString(16).padStart(2, '0'))
-//         .reverse()
-//         .join('');
-
-//     return isByteId ? `[${hexString}]` : hexString;
-
-// }
-
 export async function domainToNonFungId(name: string, isByteId = true) {
 
     const encoder = new TextEncoder();
