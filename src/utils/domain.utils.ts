@@ -36,3 +36,9 @@ export async function domainToNonFungId(name: string, isByteId = true) {
     return isByteId ? `[${hexString}]` : hexString;
 
 }
+
+export function stripExtension(domain: string) {
+
+    return domain.split('.')[0];
+
+}
