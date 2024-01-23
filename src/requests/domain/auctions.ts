@@ -13,7 +13,7 @@ export interface Auction {
     end_timestamp: number;
 }
 
-export async function requestAuctionsForDomain(domain: string, { state, entities }: InstancePropsI) {
+export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI) {
 
     const domainId = await domainToNonFungId(domain, false);
 
