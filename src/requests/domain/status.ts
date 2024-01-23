@@ -7,7 +7,7 @@ export async function requestDomainStatus(domainName: string, { state, entities 
     const properties = await requestDomainProperties(domainName, { state, entities });
 
     return {
-        status: mapStatusInt(domainName, properties?.status)
+        ...mapStatusInt(domainName, properties?.status)
     }
 
 }
