@@ -3,6 +3,7 @@ import { InstancePropsI } from "../../common/entities.types";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { stringToUint } from "../../utils/string.utils";
 import { domainToNonFungId } from "../../utils/domain.utils";
+import { RawAuctionResultI, formatAuction } from "../../utils/auction.utils";
 
 export interface Auction {
     id: string;
@@ -24,7 +25,11 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
                 key_value_store_address: entities.latestAuctionId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
             }
-        })).entries[0].value.programmatic_json as ProgrammaticScryptoSborValueI64).value;
+        })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueI64)?.value;
+
+        if(isNaN(latestAuctionId)) {
+            return null;
+        }
 
         const auctionIds = Array(latestAuctionId + 1).fill(0).map((_, i) => {
             return `[${Convert.Uint8Array.toHexString(
@@ -37,7 +42,7 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
 
         const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
 
-        return auctionNfts.map((auction) => {
+        const auctionMap = auctionNfts.map((auction) => {
             if (auction.data?.programmatic_json.kind === 'Tuple') {
                 return auction.data.programmatic_json.fields.reduce((acc, field) => {
                     if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
@@ -54,6 +59,12 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
                 }, { id: auction.non_fungible_id } as Auction);
             }
         });
+
+        const auction = auctionMap[auctionMap.length-1] as RawAuctionResultI;
+
+        if(!auction) return null;
+
+        return formatAuction(auction);
 
     } catch (e) {
 
