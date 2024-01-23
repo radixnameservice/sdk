@@ -79,7 +79,7 @@ export function priceFromXrd(xrd: any) {
 
     return {
         usd: xrdToUsd(normalisedXrd),
-        xrd: normalisedXrd.toFixed(2)
+        xrd: formatXrd(normalisedXrd)
     };
 
 }
