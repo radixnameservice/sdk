@@ -6,7 +6,7 @@ import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains } from './requests/address/domains';
 import { requestAuctionDetails } from './requests/domain/auctions';
-import { normaliseDomain, validateDomain, validateDomainEntity, validateSubdomain } from './utils/domain.utils';
+import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
 interface RnsSDKI {
 
@@ -63,6 +63,7 @@ export default class RnsSDK {
     async getDomainAttributes(domain: string) {
 
         const normalisedDomain = normaliseDomain(domain);
+        console.log(normalisedDomain)
         const domainValidation = validateDomainEntity(normalisedDomain);
 
         if(!domainValidation.valid){
