@@ -96,3 +96,25 @@ export default class RnsSDK {
     }
 
 }
+
+(async () => {
+
+    const rns = new RnsSDK({
+        network: 'stokenet'
+    });
+
+    // const status = await rns.getDomainStatus('james2.xrd');
+    // const records = await rns.getRecords('james2.xrd');
+
+    // const resolvedRecord = await rns.resolveRecord({
+    //     domain: 'test-records-present.xrd',
+    //     context: 'funnels',
+    //     directive: 'xrd'
+    //  });
+
+    const auction = await rns.getAuction('nft.xrd');
+    console.log(auction);
+
+    //const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
+
+})();
