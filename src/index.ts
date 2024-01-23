@@ -4,9 +4,9 @@ import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { domainToNonFungId } from './utils/domain.utils';
 import { requestAccountDomains } from './requests/address/domains';
-import { requestAuctionsForDomain } from './requests/domain/auctions';
+import { requestAuctionDetails } from './requests/domain/auctions';
+import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
 interface RnsSDKI {
 
@@ -60,88 +60,53 @@ export default class RnsSDK {
 
     }
 
-    async getDomainStatus(domain: string) {
+    async getDomainAttributes(domain: string) {
 
-        try {
-            return await requestDomainStatus(domain, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
+        const normalisedDomain = normaliseDomain(domain);
+        console.log(normalisedDomain)
+        const domainValidation = validateDomainEntity(normalisedDomain);
+
+        if(!domainValidation.valid){
+
+            return {
+                status: 'invalid',
+                verbose: domainValidation.message
+            };
+
         }
+
+        return await requestDomainStatus(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async getRecords(domain: string) {
 
-        try {
-            return await requestRecords(domain, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        const normalisedDomain = normaliseDomain(domain);
+
+        return await requestRecords(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }) {
 
-        try {
+        const normalisedDomain = normaliseDomain(domain);
 
-            const platformIdentifier = `xrd.domains:${context}.${directive}`;
-            const domainId = await domainToNonFungId(domain);
-            const parsedContext = context ? `-${context}` : '';
-            const parsedDirective = directive ? `-${directive}` : '';
-            const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
-            const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
-
-            return await resolveRecord(recordId, { state: this.state, entities: await this.dAppEntities() });
-
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return await resolveRecord(normalisedDomain, { context, directive }, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async getAccountDomains(accountAddress: string) {
 
-        try {
-            return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
-    async getAuctions(domain: string) {
+    async getAuction(domain: string) {
 
-        try {
-            return await requestAuctionsForDomain(domain, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        const normalisedDomain = normaliseDomain(domain);
+
+        return await requestAuctionDetails(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
 }
-
-(async () => {
-
-    const rns = new RnsSDK({
-        network: 'stokenet'
-    });
-
-    //const status = await rns.getDomainStatus('james2.xrd');
-    //const records = await rns.getRecords('james2.xrd');
-
-    // const resolvedRecord = await rns.resolveRecord({
-    //     domain: 'test-records-present.xrd',
-    //     context: 'funnels',
-    //     directive: 'xrd'
-    //  });
-
-    //const auctions = await rns.getAuctions('wylie.xrd');
-    //const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
-
-})();

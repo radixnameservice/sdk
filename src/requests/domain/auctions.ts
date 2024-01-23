@@ -3,6 +3,7 @@ import { InstancePropsI } from "../../common/entities.types";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { stringToUint } from "../../utils/string.utils";
 import { domainToNonFungId } from "../../utils/domain.utils";
+import { RawAuctionResultI, formatAuction } from "../../utils/auction.utils";
 
 export interface Auction {
     id: string;
@@ -13,43 +14,63 @@ export interface Auction {
     end_timestamp: number;
 }
 
-export async function requestAuctionsForDomain(domain: string, { state, entities }: InstancePropsI) {
+export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI) {
 
-    const domainId = await domainToNonFungId(domain, false);
+    try {
 
-    const latestAuctionId = +((await state.innerClient.keyValueStoreData({
-        stateKeyValueStoreDataRequest: {
-            key_value_store_address: entities.latestAuctionId,
-            keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+        const domainId = await domainToNonFungId(domain, false);
+
+        const latestAuctionId = +((await state.innerClient.keyValueStoreData({
+            stateKeyValueStoreDataRequest: {
+                key_value_store_address: entities.latestAuctionId,
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+            }
+        })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueI64)?.value;
+
+        if(isNaN(latestAuctionId)) {
+            return null;
         }
-    })).entries[0].value.programmatic_json as ProgrammaticScryptoSborValueI64).value;
 
-    const auctionIds = Array(latestAuctionId + 1).fill(0).map((_, i) => {
-        return `[${Convert.Uint8Array.toHexString(
-            new Uint8Array([
-                ...Convert.HexString.toUint8Array(domainId),
-                ...stringToUint(`${i}`),
-            ]),
-        )}]`;
-    });
+        const auctionIds = Array(latestAuctionId + 1).fill(0).map((_, i) => {
+            return `[${Convert.Uint8Array.toHexString(
+                new Uint8Array([
+                    ...Convert.HexString.toUint8Array(domainId),
+                    ...stringToUint(`${i}`),
+                ]),
+            )}]`;
+        });
 
-    const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
+        const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
 
-    return auctionNfts.map((auction) => {
-        if (auction.data?.programmatic_json.kind === 'Tuple') {
-            return auction.data.programmatic_json.fields.reduce((acc, field) => {
-                if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
-                    return { ...acc, [field.field_name]: +field.value * 1000 };
-                }
-
-                if (field.kind === 'I64' || field.kind === 'Decimal' || field.kind === 'NonFungibleLocalId') {
-                    if (field.field_name) {
-                        return { ...acc, [field.field_name]: field.value };
+        const auctionMap = auctionNfts.map((auction) => {
+            if (auction.data?.programmatic_json.kind === 'Tuple') {
+                return auction.data.programmatic_json.fields.reduce((acc, field) => {
+                    if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
+                        return { ...acc, [field.field_name]: +field.value * 1000 };
                     }
-                }
 
-                return acc;
-            }, { id: auction.non_fungible_id } as Auction);
-        }
-    });
+                    if (field.kind === 'I64' || field.kind === 'Decimal' || field.kind === 'NonFungibleLocalId') {
+                        if (field.field_name) {
+                            return { ...acc, [field.field_name]: field.value };
+                        }
+                    }
+
+                    return acc;
+                }, { id: auction.non_fungible_id } as Auction);
+            }
+        });
+
+        const auction = auctionMap[auctionMap.length-1] as RawAuctionResultI;
+
+        if(!auction) return null;
+
+        return formatAuction(auction);
+
+    } catch (e) {
+
+        console.log(e);
+        return null;
+
+    }
+
 }
