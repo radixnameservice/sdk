@@ -1,13 +1,12 @@
-import crypto from 'crypto-browserify';
+import { Buffer } from 'buffer';
+import * as CryptoJS from 'crypto-js';
 
 export async function domainToNonFungId(name: string, isByteId = true) {
 
-    const encoder = new TextEncoder();
-    const data = encoder.encode(name);
-    const buffer = Buffer.from(data);
-
-    const hash = crypto.createHash('sha256').update(buffer);
-    const hashBuffer = hash.digest();
+    const data = CryptoJS.enc.Utf8.parse(name);
+    
+    const hash = CryptoJS.SHA256(data);
+    const hashBuffer = Buffer.from(hash.toString(CryptoJS.enc.Hex), 'hex');
 
     const truncatedHashBuffer = hashBuffer.slice(0, 16);
 
