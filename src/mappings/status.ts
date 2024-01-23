@@ -1,6 +1,15 @@
+interface StatusMapsI {
+
+    [key: string]: {
+        status: string;
+        verbose: string;
+    }
+
+}
+
 export function mapStatusInt(domain: string, status: number) {
 
-    const statusMaps: any = {
+    const statusMaps: StatusMapsI = {
         '0': {
             status: 'available',
             verbose: `${domain} is available.`
@@ -14,8 +23,8 @@ export function mapStatusInt(domain: string, status: number) {
             verbose: `${domain} is currently within an auction.`
         },
         '3': {
-            status: 'taken',
-            verbose: `${domain} is taken.`
+            status: 'registered',
+            verbose: `${domain} is registered.`
         },
         '4': {
             status: 'sunrise',
