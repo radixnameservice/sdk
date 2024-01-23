@@ -5,7 +5,10 @@ import { domainToNonFungId } from "../../utils/domain.utils";
 export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
 
     const properties = await requestDomainProperties(domainName, { state, entities });
-    return mapStatusInt(properties?.status);
+
+    return {
+        status: mapStatusInt(domainName, properties?.status)
+    }
 
 }
 
