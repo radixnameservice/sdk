@@ -15,41 +15,51 @@ export interface Auction {
 
 export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI) {
 
-    const domainId = await domainToNonFungId(domain, false);
+    try {
 
-    const latestAuctionId = +((await state.innerClient.keyValueStoreData({
-        stateKeyValueStoreDataRequest: {
-            key_value_store_address: entities.latestAuctionId,
-            keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
-        }
-    })).entries[0].value.programmatic_json as ProgrammaticScryptoSborValueI64).value;
+        const domainId = await domainToNonFungId(domain, false);
 
-    const auctionIds = Array(latestAuctionId + 1).fill(0).map((_, i) => {
-        return `[${Convert.Uint8Array.toHexString(
-            new Uint8Array([
-                ...Convert.HexString.toUint8Array(domainId),
-                ...stringToUint(`${i}`),
-            ]),
-        )}]`;
-    });
+        const latestAuctionId = +((await state.innerClient.keyValueStoreData({
+            stateKeyValueStoreDataRequest: {
+                key_value_store_address: entities.latestAuctionId,
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+            }
+        })).entries[0].value.programmatic_json as ProgrammaticScryptoSborValueI64).value;
 
-    const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
+        const auctionIds = Array(latestAuctionId + 1).fill(0).map((_, i) => {
+            return `[${Convert.Uint8Array.toHexString(
+                new Uint8Array([
+                    ...Convert.HexString.toUint8Array(domainId),
+                    ...stringToUint(`${i}`),
+                ]),
+            )}]`;
+        });
 
-    return auctionNfts.map((auction) => {
-        if (auction.data?.programmatic_json.kind === 'Tuple') {
-            return auction.data.programmatic_json.fields.reduce((acc, field) => {
-                if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
-                    return { ...acc, [field.field_name]: +field.value * 1000 };
-                }
+        const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
 
-                if (field.kind === 'I64' || field.kind === 'Decimal' || field.kind === 'NonFungibleLocalId') {
-                    if (field.field_name) {
-                        return { ...acc, [field.field_name]: field.value };
+        return auctionNfts.map((auction) => {
+            if (auction.data?.programmatic_json.kind === 'Tuple') {
+                return auction.data.programmatic_json.fields.reduce((acc, field) => {
+                    if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
+                        return { ...acc, [field.field_name]: +field.value * 1000 };
                     }
-                }
 
-                return acc;
-            }, { id: auction.non_fungible_id } as Auction);
-        }
-    });
+                    if (field.kind === 'I64' || field.kind === 'Decimal' || field.kind === 'NonFungibleLocalId') {
+                        if (field.field_name) {
+                            return { ...acc, [field.field_name]: field.value };
+                        }
+                    }
+
+                    return acc;
+                }, { id: auction.non_fungible_id } as Auction);
+            }
+        });
+
+    } catch (e) {
+
+        console.log(e);
+        return null;
+
+    }
+
 }

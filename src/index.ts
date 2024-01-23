@@ -73,78 +73,26 @@ export default class RnsSDK {
 
     async getRecords(domain: string) {
 
-        try {
-            return await requestRecords(domain, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return await requestRecords(domain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }) {
 
-        try {
-
-            const platformIdentifier = `xrd.domains:${context}.${directive}`;
-            const domainId = await domainToNonFungId(domain);
-            const parsedContext = context ? `-${context}` : '';
-            const parsedDirective = directive ? `-${directive}` : '';
-            const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
-            const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
-
-            return await resolveRecord(recordId, { state: this.state, entities: await this.dAppEntities() });
-
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return await resolveRecord(domain, { context, directive }, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async getAccountDomains(accountAddress: string) {
 
-        try {
-            return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async getAuction(domain: string) {
 
-        try {
-            return await requestAuctionDetails(domain, { state: this.state, entities: await this.dAppEntities() });
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
+        return await requestAuctionDetails(domain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
 }
-
-(async () => {
-
-    const rns = new RnsSDK({
-        network: 'stokenet'
-    });
-
-    // const status = await rns.getDomainStatus('james2.xrd');
-    // const records = await rns.getRecords('james2.xrd');
-
-    // const resolvedRecord = await rns.resolveRecord({
-    //     domain: 'test-records-present.xrd',
-    //     context: 'funnels',
-    //     directive: 'xrd'
-    //  });
-
-    const auctions = await rns.getAuction('wylie.xrd');
-
-    console.log(auctions);
-
-    //const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
-
-})();
