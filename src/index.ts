@@ -6,6 +6,7 @@ import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains } from './requests/address/domains';
 import { requestAuctionDetails } from './requests/domain/auctions';
+import { normaliseDomain, validateDomain, validateDomainEntity, validateSubdomain } from './utils/domain.utils';
 
 interface RnsSDKI {
 
@@ -59,21 +60,37 @@ export default class RnsSDK {
 
     }
 
-    async getDomainStatus(domain: string) {
+    async getDomainAttributes(domain: string) {
 
-        return await requestDomainStatus(domain, { state: this.state, entities: await this.dAppEntities() });
+        const normalisedDomain = normaliseDomain(domain);
+        const domainValidation = validateDomainEntity(normalisedDomain);
+
+        if(!domainValidation.valid){
+
+            return {
+                status: 'invalid',
+                verbose: domainValidation.message
+            };
+
+        }
+
+        return await requestDomainStatus(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async getRecords(domain: string) {
 
-        return await requestRecords(domain, { state: this.state, entities: await this.dAppEntities() });
+        const normalisedDomain = normaliseDomain(domain);
+
+        return await requestRecords(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
     async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }) {
 
-        return await resolveRecord(domain, { context, directive }, { state: this.state, entities: await this.dAppEntities() });
+        const normalisedDomain = normaliseDomain(domain);
+
+        return await resolveRecord(normalisedDomain, { context, directive }, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
@@ -85,7 +102,9 @@ export default class RnsSDK {
 
     async getAuction(domain: string) {
 
-        return await requestAuctionDetails(domain, { state: this.state, entities: await this.dAppEntities() });
+        const normalisedDomain = normaliseDomain(domain);
+
+        return await requestAuctionDetails(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 
