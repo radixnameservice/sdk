@@ -13,7 +13,7 @@ describe('RnsKit', () => {
 
     it(`should return a 'registered' status.`, async () => {
 
-        const attributes = await rns.getDomainAttributes('wylie.xrd');
+        const attributes = await rns.getDomainAttributes('radixnameservice.xrd');
 
         expect(matchObjectTypes(attributes, attributesSchema)).toBe(true);
         expect(attributes.status).toBe('registered');
