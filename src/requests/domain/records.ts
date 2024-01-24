@@ -87,7 +87,13 @@ export async function resolveRecord(domain: string, { context, directive }: Dock
 
     try {
 
-        const platformIdentifier = `xrd.domains:${context}.${directive}`;
+        let convertedDirective = directive;
+
+        if (directive === 'website') {
+            convertedDirective = 'web2';
+        }
+
+        const platformIdentifier = `xrd.domains:${context}${directive ? '.' + convertedDirective : ''}`;
         const domainId = await domainToNonFungId(domain);
         const parsedContext = context ? `-${context}` : '';
         const parsedDirective = directive ? `-${directive}` : '';
