@@ -39,7 +39,7 @@ describe('RnsKit', () => {
 
         const resolvedRecord = await rns.resolveRecord({
             domain: 'test-records-present.xrd',
-            context: 'funnels',
+            context: 'receivers',
             directive: 'xrd'
         });
 

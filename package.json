@@ -1,6 +1,6 @@
 {
     "name": "@radixnameservice/rns-sdk",
-    "version": "0.4.12",
+    "version": "0.4.13",
     "description": "The official toolkit for the Radix Name Service",
     "scripts": {
         "test": "jest",
