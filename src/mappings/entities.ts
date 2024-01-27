@@ -7,7 +7,7 @@ export const nameMappings = {
     MinimumPremium: 'minimumPremium',
     'RNS User Badge': 'rnsUserBadgeResource',
     'Domain User Badge': 'domainUserBadgeResource',
-    'Domain Name': 'domainNameResource',
+    'Domain': 'domainNameResource',
     'Resolver Record': 'resolverRecordResource',
     'RNS Auction NFT': 'rnsAuctionNftResource',
     'Settlement Badge': 'rnsSettlementBadgeResource',

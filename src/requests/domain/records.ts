@@ -93,12 +93,10 @@ export async function resolveRecord(domain: string, { context, directive }: Dock
             convertedDirective = 'web2';
         }
 
-        const platformIdentifier = `xrd.domains:${context}${directive ? '.' + convertedDirective : ''}`;
         const domainId = await domainToNonFungId(domain);
         const parsedContext = context ? `-${context}` : '';
         const parsedDirective = directive ? `-${directive}` : '';
-        const parsedPlatformIdentifier = platformIdentifier ? `-${platformIdentifier}` : '';
-        const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}${parsedPlatformIdentifier}`);
+        const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}`);
 
         const nft = await state.getNonFungibleData(entities.resolverRecordResource, recordId);
 
