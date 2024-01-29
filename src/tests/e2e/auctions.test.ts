@@ -19,4 +19,13 @@ describe('RnsKit', () => {
 
     });
 
+    it(`should return a paginated auction object.`, async () => {
+
+        const auctions = await rns.getAllAuctions();
+        expect(typeof auctions === 'object' && typeof auctions.data === 'object').toBe(true);
+        expect(auctions.total_count > 0).toBe(true);
+        expect(matchObjectTypes(auctions.data[0], auctionSchema)).toBe(true);
+
+    });
+
 });
