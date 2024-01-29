@@ -8,7 +8,7 @@ export async function domainToNonFungId(name: string, isByteId = true) {
     const hash = CryptoJS.SHA256(data);
     const hashBuffer = Buffer.from(hash.toString(CryptoJS.enc.Hex), 'hex');
 
-    const truncatedHashBuffer = hashBuffer.slice(0, 16);
+    const truncatedHashBuffer = hashBuffer.subarray(0, 16);
 
     const hexString = Array.from(new Uint8Array(truncatedHashBuffer))
         .map(byte => byte.toString(16).padStart(2, '0'))
