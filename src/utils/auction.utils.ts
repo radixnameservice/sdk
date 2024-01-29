@@ -1,20 +1,9 @@
+import { RawAuctionResultI } from '../common/auction.types';
 import { priceFromXrd } from './pricing.utils';
 
 export function stripExtension(domain: string) {
 
     return domain.split('.')[0];
-
-}
-
-export interface RawAuctionResultI {
-
-    id: string;
-    end_timestamp: number;
-    initial_bid_amount: string;
-    bid_amount: string;
-    highest_bidder: string;
-    original_buyer: string;
-    domain_id: string;
 
 }
 

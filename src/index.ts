@@ -1,11 +1,11 @@
-import { GatewayApiClient, GatewayStatusResponse, State, Status } from '@radixdlt/babylon-gateway-api-sdk';
+import { GatewayApiClient, GatewayStatusResponse, State, Status, Stream, Transaction } from '@radixdlt/babylon-gateway-api-sdk';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains } from './requests/address/domains';
-import { requestAuctionDetails } from './requests/domain/auctions';
+import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
 interface RnsSDKI {
@@ -19,7 +19,9 @@ export default class RnsSDK {
 
     network: NetworkT;
     state: State;
+    transaction: Transaction;
     status: Status;
+    stream: Stream;
     entities: any;
 
     constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
@@ -31,13 +33,15 @@ export default class RnsSDK {
 
     initGateway({ gateway }: { gateway?: string; }): Promise<GatewayStatusResponse> {
 
-        const { status, state } = GatewayApiClient.initialize({
+        const { status, state, transaction, stream } = GatewayApiClient.initialize({
             basePath: gateway ?? getBasePath(this.network),
             applicationName: 'The Radix Name Service'
         });
 
         this.state = state;
         this.status = status;
+        this.transaction = transaction;
+        this.stream = stream;
 
         return status.getCurrent();
 
@@ -65,7 +69,7 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if(!domainValidation.valid){
+        if (!domainValidation.valid) {
 
             return {
                 status: 'invalid',
@@ -106,6 +110,17 @@ export default class RnsSDK {
 
         return await requestAuctionDetails(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
+    }
+
+    async getAllAuctions(nextCursor?: string) {
+
+        return await requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities() }, nextCursor);
+
+    }
+
+    async getBidsForAuction(auctionId: string, nextCursor?: string) {
+
+        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, stream: this.stream, entities: await this.dAppEntities() });
     }
 
 }
