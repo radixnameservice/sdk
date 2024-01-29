@@ -4,13 +4,34 @@ export interface BidEvent {
     user_id: string;
 }
 
-export interface Auction {
+export interface RawAuctionResultI {
+
     id: string;
-    bid_amount: string;
+    end_timestamp: number;
     initial_bid_amount: string;
+    bid_amount: string;
     highest_bidder: string;
     original_buyer: string;
-    end_timestamp: number;
+    domain_id: string;
+
+}
+
+interface BidI {
+
+    usd: number;
+    xrd: number;
+
+}
+
+export interface FormattedAuctionResultI {
+    id: string;
+    ends: number;
+    bids: {
+        currentBid: BidI;
+        initialBid: BidI;
+        leaderBadgeId: string;
+        originatorBadgeId: string;
+    }
 }
 
 export interface PaginatedResponse<T> {
@@ -19,6 +40,6 @@ export interface PaginatedResponse<T> {
     total_count: number;
 }
 
-export type AllAuctionsResponse = PaginatedResponse<Auction>;
+export type AllAuctionsResponse = PaginatedResponse<FormattedAuctionResultI>;
 
 export type AuctionBidResponse = PaginatedResponse<BidEvent>;
