@@ -3,8 +3,8 @@ import { InstancePropsI } from "../../common/entities.types";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { stringToUint } from "../../utils/string.utils";
 import { domainToNonFungId } from "../../utils/domain.utils";
-import { RawAuctionResultI, formatAuction } from "../../utils/auction.utils";
-import { AllAuctionsResponse, Auction, AuctionBidResponse, BidEvent } from "../../common/auction.types";
+import { formatAuction } from "../../utils/auction.utils";
+import { AllAuctionsResponse, AuctionBidResponse, BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
 
 export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI) {
 
@@ -48,7 +48,7 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
                     }
 
                     return acc;
-                }, { id: auction.non_fungible_id } as Auction);
+                }, { id: auction.non_fungible_id } as RawAuctionResultI);
             }
         });
 
@@ -74,15 +74,16 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
         stateNonFungibleIdsRequest: {
             resource_address: entities.rnsAuctionNftResource,
             cursor: nextCursor,
-            at_ledger_state: ledgerState.ledger_state
+            at_ledger_state: ledgerState?.ledger_state
         },
     });
 
     const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds.non_fungible_ids.items);
 
-    const data = auctionNfts.map((auction) => {
+    const data: FormattedAuctionResultI[] = auctionNfts.map((auction) => {
         if (auction.data?.programmatic_json.kind === 'Tuple') {
-            return auction.data.programmatic_json.fields.reduce((acc, field) => {
+
+            const rawAuction = auction.data.programmatic_json.fields.reduce((acc, field) => {
                 if (field.field_name === 'end_timestamp' && field.kind === 'I64') {
                     return { ...acc, [field.field_name]: +field.value * 1000 };
                 }
@@ -94,11 +95,14 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
                 }
 
                 return acc;
-            }, { id: auction.non_fungible_id } as Auction);
+            }, { id: auction.non_fungible_id } as RawAuctionResultI);
+
+            return formatAuction(rawAuction);
+
         }
     });
 
-    return { data, next_cursor: auctionIds.non_fungible_ids.next_cursor, total_count: auctionIds.non_fungible_ids.total_count };
+    return { data, next_cursor: auctionIds?.non_fungible_ids?.next_cursor ?? null, total_count: auctionIds?.non_fungible_ids?.total_count ?? 0 };
 }
 
 export async function requestBidsForAuction(
