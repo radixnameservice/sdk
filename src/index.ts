@@ -69,7 +69,7 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if(!domainValidation.valid){
+        if (!domainValidation.valid) {
 
             return {
                 status: 'invalid',
@@ -113,11 +113,14 @@ export default class RnsSDK {
     }
 
     async getAllAuctions(nextCursor?: string) {
+
         return await requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities() }, nextCursor);
+
     }
 
     async getBidsForAuction(auctionId: string, nextCursor?: string) {
 
-        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, stream: this.stream, entities: await this.dAppEntities() }); }
+        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, stream: this.stream, entities: await this.dAppEntities() });
+    }
 
 }
