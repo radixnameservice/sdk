@@ -51,8 +51,7 @@ export async function requestRecords(domainName: string, { state, entities }: In
                         }
 
                         if (field.field_name === 'value' && field.kind === 'Enum') {
-                            const value = (('fields' in field.fields[0] && 'value' in field.fields[0].fields[0] && field.fields[0].fields[0].value) || null) as string | null;
-
+                            const value = (('fields' in field && 'value' in field.fields[0] && field.fields[0].value) || null) as string | null;
                             return { ...acc, [field.field_name]: value }
                         }
 
