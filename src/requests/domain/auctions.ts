@@ -47,6 +47,10 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
                         }
                     }
 
+                    if (field.kind === 'String') {
+                        return {...acc, [field.field_name]: field.value };
+                    }
+
                     return acc;
                 }, { id: auction.non_fungible_id } as RawAuctionResultI);
             }
@@ -92,6 +96,10 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
                     if (field.field_name) {
                         return { ...acc, [field.field_name]: field.value };
                     }
+                }
+
+                if (field.kind === 'String') {
+                    return {...acc, [field.field_name]: field.value };
                 }
 
                 return acc;
