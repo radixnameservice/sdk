@@ -1,5 +1,6 @@
-import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
+import { ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueTuple } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
+import { domainToNonFungId } from "../../utils/domain.utils";
 
 export async function requestAccountDomains(accountAddress: string, { state, entities }: InstancePropsI) {
 
@@ -99,4 +100,40 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
 
     }
 
+}
+
+export interface RawDomainData {
+  id: string,
+  name: string,
+  created_timestamp: number,
+  last_valid_timestamp: number,
+  key_image_url: string
+}
+
+export async function requestDomainDetails(domain: string, { state, entities }: InstancePropsI): Promise<RawDomainData> {
+    const domainId = await domainToNonFungId(domain);
+
+    const nftData = await state.getNonFungibleData(entities.domainNameResource, domainId);
+
+    if (!nftData) return null;
+
+    return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
+        if (field.kind === 'String' && field.field_name === 'name') {
+            return { ...acc, [field.field_name]: field.value };
+        }
+
+        if (field.kind === 'String' && field.field_name) {
+            return { ...acc, [field.field_name]: field.value };
+        }
+
+        if (field.field_name === 'created_timestamp' && field.kind === 'I64') {
+            return { ...acc, [field.field_name]: +field.value * 1000 };
+        }
+
+        if (field.field_name === 'last_valid_timestamp' && field.kind === 'Enum' && field.variant_name !== 'None' && field.fields[0].kind === 'I64') {
+            return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
+        }
+
+        return acc;
+    }, { id: nftData.non_fungible_id } as RawDomainData);
 }

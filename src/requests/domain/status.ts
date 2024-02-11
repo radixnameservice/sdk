@@ -1,6 +1,7 @@
 import { InstancePropsI } from "../../common/entities.types";
 import { DomainStatus, mapStatusInt } from "../../mappings/status";
 import { domainToNonFungId } from "../../utils/domain.utils";
+import { requestDomainDetails } from "../address/domains";
 
 export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
 
@@ -92,6 +93,20 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
                     endTime: settlementExpiry
                 }
             }
+        }
+
+        const domain = await requestDomainDetails(domainName, { state, entities });
+
+        if (domain) {
+            if (new Date().getTime() >= domain.last_valid_timestamp) {
+                return {
+                    status: DomainStatus.Unclaimed
+                }
+            }
+
+            return {
+                status: DomainStatus.Claimed
+            };
         }
 
         return {
