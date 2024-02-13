@@ -12,6 +12,7 @@ export function formatAuction(auction: RawAuctionResultI) {
     return {
         id: auction.id,
         ends: auction.end_timestamp,
+        domain: auction.domain,
         bids: {
             currentBid: priceFromXrd(auction.bid_amount),
             initialBid: priceFromXrd(auction.initial_bid_amount),

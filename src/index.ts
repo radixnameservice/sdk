@@ -4,7 +4,7 @@ import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { requestAccountDomains } from './requests/address/domains';
+import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
@@ -79,6 +79,24 @@ export default class RnsSDK {
         }
 
         return await requestDomainStatus(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
+
+    }
+
+    async getDomainDetails(domain: string) {
+
+        const normalisedDomain = normaliseDomain(domain);
+        const domainValidation = validateDomainEntity(normalisedDomain);
+
+        if (!domainValidation.valid) {
+
+            return {
+                status: 'invalid',
+                verbose: domainValidation.message
+            };
+
+        }
+
+        return await requestDomainDetails(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
 
     }
 

@@ -7,6 +7,7 @@ export interface BidEvent {
 export interface RawAuctionResultI {
 
     id: string;
+    domain: string;
     end_timestamp: number;
     initial_bid_amount: string;
     bid_amount: string;
