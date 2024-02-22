@@ -10,6 +10,10 @@ const domainsSchema = {
     key_image_url: 'string'
 };
 
+const authenticitySchema = {
+    isAuthentic: 'boolean'
+};
+
 describe('RnsKit', () => {
 
     const rns = new RnsKit({ network: 'stokenet' });
@@ -24,5 +28,29 @@ describe('RnsKit', () => {
 
 
     });
-    
+
+    it(`should return as authentic`, async () => {
+
+        const authenticity = await rns.checkAuthenticity({
+            domain: 'radixnameservice.xrd',
+            accountAddress: 'account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7'
+        });
+
+        expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
+        expect(authenticity.isAuthentic).toBe(true);
+
+    });
+
+    it(`should return as inauthentic`, async () => {
+
+        const authenticity = await rns.checkAuthenticity({
+            domain: 'i-do-not-own-this.xrd',
+            accountAddress: 'account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7'
+        });
+
+        expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
+        expect(authenticity.isAuthentic).toBe(false);
+
+    });
+
 });

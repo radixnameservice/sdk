@@ -15,7 +15,6 @@ describe('RnsKit', () => {
     it(`should return a schema match.`, async () => {
 
         const auction = await rns.getAuction('nft.xrd');
-        console.log(auction)
         expect(typeof auction === 'object').toBe(true);
         expect(matchObjectTypes(auction, auctionSchema)).toBe(true);
 
