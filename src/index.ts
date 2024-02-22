@@ -147,7 +147,7 @@ export default class RnsSDK {
 
         if (!domainInterests || domainInterests.length < 1) {
             return {
-                authentic: false
+                isAuthentic: false
             };
         }
 
@@ -157,14 +157,14 @@ export default class RnsSDK {
 
             if (interestDomain.id === domain) {
                 return {
-                    authentic: true
+                    isAuthentic: true
                 };
             }
 
         }
 
         return {
-            authentic: false
+            isAuthentic: false
         };
 
     }
