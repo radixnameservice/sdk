@@ -141,4 +141,32 @@ export default class RnsSDK {
         return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, stream: this.stream, entities: await this.dAppEntities() });
     }
 
+    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }) {
+
+        const domainInterests = await this.getAccountDomains(accountAddress);
+
+        if (!domainInterests || domainInterests.length < 1) {
+            return {
+                authentic: false
+            };
+        }
+
+        for (let i = 0; i < domainInterests.length; i++) {
+
+            const interestDomain = domainInterests[i];
+
+            if (interestDomain.id === domain) {
+                return {
+                    authentic: true
+                };
+            }
+
+        }
+
+        return {
+            authentic: false
+        };
+
+    }
+
 }
