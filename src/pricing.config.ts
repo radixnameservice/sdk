@@ -9,15 +9,15 @@ interface PriceMapI {
 
 const config: PricingConfigI = {
 
-    xrdExchangeRate: 16.666666666666666666,
+    xrdExchangeRate: 22.222222222222222222,
     baseDollarPricing: {
 
         1: 1000000,
         2: 240,
-        3: 160,
+        3: 120,
         4: 40,
         5: 4
-    
+
     }
 
 };
