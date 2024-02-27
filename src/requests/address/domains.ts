@@ -2,6 +2,14 @@ import { ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueTuple } fr
 import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
 
+export interface RawDomainData {
+    id: string,
+    name: string,
+    created_timestamp: number,
+    last_valid_timestamp: number,
+    key_image_url: string
+  }
+
 export async function requestAccountDomains(accountAddress: string, { state, entities }: InstancePropsI) {
 
     if (!accountAddress) return null;
@@ -100,14 +108,6 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
 
     }
 
-}
-
-export interface RawDomainData {
-  id: string,
-  name: string,
-  created_timestamp: number,
-  last_valid_timestamp: number,
-  key_image_url: string
 }
 
 export async function requestDomainDetails(domain: string, { state, entities }: InstancePropsI): Promise<RawDomainData> {
