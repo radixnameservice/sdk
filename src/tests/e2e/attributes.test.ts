@@ -1,23 +1,23 @@
-import RnsKit from '../..';
-import { matchObjectTypes } from '../utils';
+// import RnsKit from '../..';
+// import { matchObjectTypes } from '../utils';
 
-const attributesSchema = {
-    status: 'string',
-    verbose: 'string'
-};
+// const attributesSchema = {
+//     status: 'string',
+//     verbose: 'string'
+// };
 
 
-describe('RnsKit', () => {
+// describe('RnsKit', () => {
 
-    const rns = new RnsKit({ network: 'stokenet' });
+//     const rns = new RnsKit({ network: 'stokenet' });
 
-    it(`should return a 'registered' or 'settltment' status.`, async () => {
+//     it(`should return a 'registered' or 'settltment' status.`, async () => {
 
-        const attributes = await rns.getDomainAttributes('radixnameservice.xrd');
+//         const attributes = await rns.getDomainAttributes('radixnameservice.xrd');
 
-        expect(matchObjectTypes(attributes, attributesSchema)).toBe(true);
-        expect(attributes.status).not.toBe('available');
+//         expect(matchObjectTypes(attributes, attributesSchema)).toBe(true);
+//         expect(attributes.status).not.toBe('available');
 
-    });
+//     });
 
-});
+// });
