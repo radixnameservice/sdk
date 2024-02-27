@@ -31,10 +31,14 @@ export function mapStatusInt(domain: string, status: number) {
             verbose: `${domain} is protected by the RNS Foundation as part of the Sunrise Initiative.`
         },
         '5': {
+            status: 'landrush',
+            verbose: `${domain} is protected by the RNS Foundation as part of the Landrush Initiative.`
+        },
+        '6': {
             status: 'tld',
             verbose: `${domain} is protected by the RNS Foundation as part of Project TLD.`
         },
-        '6': {
+        '7': {
             status: 'genus-substrate',
             verbose: `${domain} is protected by the RNS Foundation as part of the genus substrate program.`
         }
@@ -51,5 +55,8 @@ export enum DomainStatus {
     Unclaimed,
     InSettlement,
     InAuction,
-    Claimed
+    Claimed,
+    Sunrise,
+    Landrush,
+    Tld,
 }
