@@ -42,7 +42,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
         if (domainClaimsResponse.entries.length) {
             const value = domainClaimsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueEnum;
 
-            return ClaimType[value.variant_name];
+            return { status: ClaimType[value.variant_name as keyof typeof ClaimType] };
         }
 
         const tldsResponse = await state.innerClient.keyValueStoreData({
@@ -55,7 +55,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
         if (domainClaimsResponse.entries.length) {
             const value = tldsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueBool;
 
-            if (!value.value) return DomainStatus.Tld;
+            if (!value.value) return { status: DomainStatus.Tld };
         }
 
 
