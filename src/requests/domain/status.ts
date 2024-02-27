@@ -1,3 +1,4 @@
+import { ProgrammaticScryptoSborValueBool, ProgrammaticScryptoSborValueEnum } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { DomainStatus, mapStatusInt } from "../../mappings/status";
 import { domainToNonFungId } from "../../utils/domain.utils";
@@ -13,6 +14,11 @@ export async function requestDomainStatus(domainName: string, { state, entities 
 
 }
 
+const ClaimType = {
+    Landrush: DomainStatus.Landrush,
+    Sunrise: DomainStatus.Sunrise,
+}
+
 async function requestDomainProperties(domainName: string, { state, entities }: InstancePropsI) {
 
     try {
@@ -25,6 +31,33 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `${domainId}` } }]
             }
         });
+
+        const domainClaimsResponse = await state.innerClient.keyValueStoreData({
+            stateKeyValueStoreDataRequest: {
+                key_value_store_address: entities.domainEventClaimsKvId,
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+            }
+        });
+
+        if (domainClaimsResponse.entries.length) {
+            const value = domainClaimsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueEnum;
+
+            return { status: ClaimType[value.variant_name as keyof typeof ClaimType] };
+        }
+
+        const tldsResponse = await state.innerClient.keyValueStoreData({
+            stateKeyValueStoreDataRequest: {
+                key_value_store_address: entities.domainTldKvId,
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+            }
+        });
+
+        if (domainClaimsResponse.entries.length) {
+            const value = tldsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueBool;
+
+            if (!value.value) return { status: DomainStatus.Tld };
+        }
+
 
         let auctionId = null;
 
