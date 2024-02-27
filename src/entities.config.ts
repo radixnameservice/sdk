@@ -14,7 +14,7 @@ const config: EntitiesConfigT = {
 
     stokenet: {
         entities: [
-           
+            "component_tdx_2_1cplldyya27nf9va6y44kdvpvl08rycctravfhwsyzzz6p8fmld7mqr",
             "component_tdx_2_1cp57n9ah8apuhmvwrjnl54h9py7k203a0esvldtpvjem9szhn0aazw",
             "component_tdx_2_1cpu86w80f96f7kvf7ewgs0h8sqe8hntraa27jp9v7ezgk3zxmmq82r",
             "component_tdx_2_1crv3lmrtg67f0j4gjflnfs4wwk9y6m48mjvr5sykvyjef3z9vdssu6",
