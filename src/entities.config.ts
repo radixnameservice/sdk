@@ -39,7 +39,29 @@ const config: EntitiesConfigT = {
     },
 
     mainnet: {
-        entities: [],
+        entities: [
+            "component_rdx1cqjpuxrsdvy7pjjym20h3fd96dpgf3nn8sejyu33kk0djm028gr3pt",
+            "component_rdx1czwr8xllz9ukgn6w3tst9u3ydgyv9yr9u5hs3dvy6thkgspfv2qqev",
+            "component_rdx1czuwlrcxf3pam04q25fxjdxcfczfdvn9z4p5h60upyyzxyle95awe9",
+            "component_rdx1cp2ua070g0wxwf78exl7mdhs3qzwazsqaz65d4j5r4ggjvqfc37a79",
+            "resource_rdx1tkp8ptd9wmac20lt7als4wrdkzf5t60zlnplwdz09200xs2kwcmt8d",
+            "resource_rdx1nf7y38stfprral843wajhpwc9thhehejep64efe0yhrkks5t3wvwk3",
+            "resource_rdx1t5psf5t5hupsuuvuw3ra0m7hgnvm93yaa5aqg2afnex42pqsmcfyec",
+            "resource_rdx1th4j8c00c2escx9g0wcsqhu3p7jh7fu9gh3qdyqqkpdvsdj6xn0g5c",
+            "resource_rdx1ngdf99zn80ytvu443l6kmk448mg9dpk6qt8h0ezxr7c62yemtl5928",
+            "resource_rdx1tkxknmk2j360v2el84hen2k8jkhxlgtw980lfq73kszmjqm9rjxrz2",
+            "resource_rdx1n2aktr583etff2502ek6s6a6sevvnvv63zzgstxgqvx5zh2wg0ckct",
+            "resource_rdx1n2dd0w53zpdlqdz65vpymygj8a60vqnggyuxfpfdldjmy2224x020q",
+            "resource_rdx1nf7lt68zan0fvlfqqrtnxasxjmv877ncnr2kpdl69t076sw4whjc27",
+            "resource_rdx1n2mjeg3z58y8ka8kz6ftpwef5cyfwc5fcvsudpuvxn9jxyn48ff0tn",
+            "resource_rdx1t5v0p43wlsd938zukmlqtwlafa6u8u8utyxfcthp0hq579dfhp6hyk",
+            "resource_rdx1tken5hue8vrf7dp5rmy73296efrw7820jlvu0kgjxlfwphk342km0h",
+            "resource_rdx1t4h39eah5ax0dxu94esg04amnwak49c5xzvthn4k0khhs5dx88qa3s",
+            // "resource_rdx1ng7k3v32y6zyyy98ctdp3deug9sdfhjy0u6f49yqr9m8l3zznrtfx9",
+            "resource_rdx1ng4fj3h59nx6gm90p3xrxkrg2e6xa3epjnwlvaa6ar4a70gcfr23f0",
+            "resource_rdx1nfh6r0p8fy9qxr3arud0twj0v4vuptcxhuxyp0nuagx929wxy0nfz0",
+            "resource_rdx1t4qzvfn32unx3d3cwsf4whc20qzg4xekdut0yrtdvahhj3fd7kxhcs",
+        ],
     }
 
 };
