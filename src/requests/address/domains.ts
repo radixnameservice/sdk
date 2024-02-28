@@ -8,7 +8,7 @@ export interface RawDomainData {
     created_timestamp: number,
     last_valid_timestamp: number,
     key_image_url: string
-  }
+}
 
 export async function requestAccountDomains(accountAddress: string, { state, entities }: InstancePropsI) {
 
@@ -65,7 +65,7 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
                     }
 
                     return acc;
-                }, { id: r.non_fungible_id } as { id: string; name: string });
+                }, { id: r.non_fungible_id } as RawDomainData);
             }
         });
 
@@ -97,7 +97,7 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
                         }
 
                         return acc;
-                    }, { id: r.non_fungible_id });
+                    }, { id: r.non_fungible_id } as RawDomainData);
                 }
             });
 

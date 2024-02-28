@@ -4,8 +4,8 @@ export function matchObjectTypes(obj, schema) {
 
         if (schema.hasOwnProperty(key)) {
 
-            const expectedType = schema[key];
-            const receivedValue = obj[key];
+            const expectedType = schema?.[key];
+            const receivedValue = obj?.[key];
 
             if (typeof receivedValue !== expectedType) {
                 return false;

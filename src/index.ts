@@ -4,7 +4,7 @@ import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
+import { RawDomainData, requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
@@ -155,7 +155,7 @@ export default class RnsSDK {
 
             const interestDomain = domainInterests[i];
 
-            if (interestDomain.id === domain) {
+            if (interestDomain.name === domain) {
                 return {
                     isAuthentic: true
                 };
