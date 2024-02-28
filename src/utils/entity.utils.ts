@@ -56,6 +56,8 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
             const latestBidId = state.fields.find(f => f.field_name === 'bid_id')?.value;
             const priceMap = parsePricingTiers(state.fields.find(f => f.field_name === 'price_mapping'));
             const minimumPremium = state.fields.find(f => f.field_name === 'minimum_premium')?.value;
+            const domainEventClaimsKvId = state.fields.find(f => f.field_name === 'domain_event_claims')?.value;
+            const domainTldKvId = state.fields.find(f => f.field_name === 'domain_mintable')?.value;
 
             return {
                 ...acc,
@@ -67,7 +69,9 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
                 ...(latestAuctionId && { latestAuctionId }),
                 ...(latestBidId && { latestBidId }),
                 ...(priceMap && { priceMap }),
-                ...(minimumPremium && { minimumPremium })
+                ...(minimumPremium && { minimumPremium }),
+                ...(domainEventClaimsKvId && { domainEventClaimsKvId  }),
+                ...(domainTldKvId && { domainTldKvId  }),
             };
         }
 
