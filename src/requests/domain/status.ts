@@ -25,34 +25,35 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
 
         const domainId = await domainToNonFungId(domainName);
 
+        const domainExists = await state.getNonFungibleData(entities.domainNameResource, domainId);
+
         const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.settlementVaultId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `${domainId}` } }]
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
         const domainClaimsResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.domainEventClaimsKvId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
         if (domainClaimsResponse.entries.length) {
             const value = domainClaimsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueEnum;
-
             return { status: ClaimType[value.variant_name as keyof typeof ClaimType] };
         }
 
         const tldsResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.domainTldKvId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
-        if (domainClaimsResponse.entries.length) {
+        if (tldsResponse.entries.length) {
             const value = tldsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueBool;
 
             if (!value.value) return { status: DomainStatus.Tld };
