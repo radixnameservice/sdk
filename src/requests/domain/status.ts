@@ -8,6 +8,7 @@ export async function requestDomainStatus(domainName: string, { state, entities 
 
     const properties = await requestDomainProperties(domainName, { state, entities });
 
+    console.log(properties);
     return {
         ...mapStatusInt(domainName, properties?.status)
     }
@@ -28,14 +29,14 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
         const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.settlementVaultId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `${domainId}` } }]
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
         const domainClaimsResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.domainEventClaimsKvId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
@@ -48,7 +49,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
         const tldsResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.domainTldKvId,
-                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
+                keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
