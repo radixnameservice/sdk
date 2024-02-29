@@ -8,7 +8,6 @@ export async function requestDomainStatus(domainName: string, { state, entities 
 
     const properties = await requestDomainProperties(domainName, { state, entities });
 
-    console.log(properties);
     return {
         ...mapStatusInt(domainName, properties?.status)
     }
@@ -26,6 +25,8 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
 
         const domainId = await domainToNonFungId(domainName);
 
+        const domainExists = await state.getNonFungibleData(entities.domainNameResource, domainId);
+
         const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.settlementVaultId,
@@ -42,7 +43,6 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
 
         if (domainClaimsResponse.entries.length) {
             const value = domainClaimsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueEnum;
-
             return { status: ClaimType[value.variant_name as keyof typeof ClaimType] };
         }
 
@@ -53,7 +53,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
             }
         });
 
-        if (domainClaimsResponse.entries.length) {
+        if (tldsResponse.entries.length) {
             const value = tldsResponse.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueBool;
 
             if (!value.value) return { status: DomainStatus.Tld };
