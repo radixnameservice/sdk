@@ -100,7 +100,7 @@ export async function resolveRecord(domain: string, { context, directive }: Dock
                 return (field.field_name === 'value' && field.kind === 'Enum')
             }).map((field) => {
                 if (field.field_name === 'value' && field.kind === 'Enum') {
-                    const value = (('fields' in field && 'value' in field.fields[0] && field.fields[0].value) || null) as string | null;
+                    const value = (('fields' in field && field.fields.length && 'value' in field.fields[0] && field.fields[0].value) || null) as string | null;
                     return value;
                 }
             })[0];
