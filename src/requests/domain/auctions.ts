@@ -78,7 +78,7 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
         stateNonFungibleIdsRequest: {
             resource_address: entities.rnsAuctionNftResource,
             cursor: nextCursor,
-            at_ledger_state: { state_version: ledgerState.ledger_state.state_version }
+            ...(ledgerState && { at_ledger_state: { state_version: ledgerState.ledger_state.state_version } })
         },
     });
 
@@ -127,7 +127,7 @@ export async function requestBidsForAuction(
                 receipt_events: true
             },
             cursor: nextCursor,
-            at_ledger_state: { state_version: ledgerState.ledger_state.state_version },
+            ...(ledgerState && { at_ledger_state: { state_version: ledgerState.ledger_state.state_version } }),
         }
     }).then(r => {
         const data = r.items
