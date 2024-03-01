@@ -116,7 +116,7 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
 export async function requestBidsForAuction(
     auctionId: string,
     nextCursor: string | undefined,
-    { entities, stream }: InstancePropsI & { stream: Stream }
+    { entities, stream, status }: InstancePropsI & { stream: Stream, status: Status }
 ): Promise<AuctionBidResponse> {
     const ledgerState = nextCursor ? await status.getCurrent() : undefined;
 
