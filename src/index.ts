@@ -138,7 +138,7 @@ export default class RnsSDK {
 
     async getBidsForAuction(auctionId: string, nextCursor?: string) {
 
-        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, stream: this.stream, entities: await this.dAppEntities() });
+        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities() });
     }
 
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }) {
