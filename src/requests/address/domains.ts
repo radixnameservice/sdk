@@ -3,12 +3,16 @@ import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
 
-export interface RawDomainData {
+export interface DomainData {
     id: string,
     name: string,
     created_timestamp: number,
     last_valid_timestamp: number,
     key_image_url: string
+}
+
+export interface CheckAuthenticityResponse {
+    isAuthentic: boolean;
 }
 
 export async function requestAccountDomains(accountAddress: string, { state, entities, status }: InstancePropsI & { status: Status }) {
@@ -78,7 +82,7 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
                     }
 
                     return acc;
-                }, { id: r.non_fungible_id } as RawDomainData);
+                }, { id: r.non_fungible_id } as DomainData);
             }
         });
 
@@ -110,7 +114,7 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
                         }
 
                         return acc;
-                    }, { id: r.non_fungible_id } as RawDomainData);
+                    }, { id: r.non_fungible_id } as DomainData);
                 }
             });
 
@@ -123,7 +127,14 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
 
 }
 
-export async function requestDomainDetails(domain: string, { state, entities }: InstancePropsI): Promise<RawDomainData> {
+interface ErrorWithStatusResponse {
+    status: string;
+    verbose: string;
+}
+
+export type DomainDetailsResponse = DomainData | ErrorWithStatusResponse;
+
+export async function requestDomainDetails(domain: string, { state, entities }: InstancePropsI): Promise<DomainData> {
     const domainId = await domainToNonFungId(domain);
 
     const nftData = await state.getNonFungibleData(entities.domainNameResource, domainId);
@@ -148,7 +159,7 @@ export async function requestDomainDetails(domain: string, { state, entities }: 
         }
 
         return acc;
-    }, { id: nftData.non_fungible_id } as RawDomainData);
+    }, { id: nftData.non_fungible_id } as DomainData);
 }
 
 async function recursiveBalanceDomainIds(

@@ -2,11 +2,18 @@ import { GatewayApiClient, GatewayStatusResponse, State, Status, Stream, Transac
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
-import { requestDomainStatus } from './requests/domain/status';
+import { DomainAttributesResponse, requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { RawDomainData, requestAccountDomains, requestDomainDetails } from './requests/address/domains';
-import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
+import { DomainDetailsResponse, DomainData, requestAccountDomains, requestDomainDetails, CheckAuthenticityResponse } from './requests/address/domains';
+import { AuctionDetailsResponse, requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
+import { RecordItem } from './mappings/records';
+import { AllAuctionsResponse, AuctionBidResponse } from './common/auction.types';
+import { AddressMapT } from './mappings/entities';
+
+export { AllAuctionsResponse, AuctionBidResponse };
+export { DomainAttributesResponse, DomainData, CheckAuthenticityResponse };
+export { RecordItem };
 
 interface RnsSDKI {
 
@@ -22,7 +29,7 @@ export default class RnsSDK {
     transaction: Transaction;
     status: Status;
     stream: Stream;
-    entities: any;
+    entities: AddressMapT;
 
     constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
 
@@ -47,24 +54,7 @@ export default class RnsSDK {
 
     }
 
-    async dAppEntities() {
-
-        try {
-
-            if (!this.entities) {
-                this.entities = parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }), this.state);
-            }
-
-            return this.entities;
-
-        } catch (e) {
-            console.log(e);
-            return null;
-        }
-
-    }
-
-    async getDomainAttributes(domain: string) {
+    async getDomainAttributes(domain: string): Promise<DomainAttributesResponse> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -82,7 +72,7 @@ export default class RnsSDK {
 
     }
 
-    async getDomainDetails(domain: string) {
+    async getDomainDetails(domain: string): Promise<DomainDetailsResponse> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -100,7 +90,7 @@ export default class RnsSDK {
 
     }
 
-    async getRecords(domain: string) {
+    async getRecords(domain: string): Promise<RecordItem[]> {
 
         const normalisedDomain = normaliseDomain(domain);
 
@@ -108,7 +98,7 @@ export default class RnsSDK {
 
     }
 
-    async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }) {
+    async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }): Promise<string> {
 
         const normalisedDomain = normaliseDomain(domain);
 
@@ -116,13 +106,13 @@ export default class RnsSDK {
 
     }
 
-    async getAccountDomains(accountAddress: string) {
+    async getAccountDomains(accountAddress: string): Promise<DomainData[]> {
 
         return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities(), status: this.status });
 
     }
 
-    async getAuction(domain: string) {
+    async getAuction(domain: string): Promise<AuctionDetailsResponse> {
 
         const normalisedDomain = normaliseDomain(domain);
 
@@ -130,18 +120,18 @@ export default class RnsSDK {
 
     }
 
-    async getAllAuctions(nextCursor?: string) {
+    async getAllAuctions(nextCursor?: string): Promise<AllAuctionsResponse> {
 
         return await requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities() }, nextCursor);
 
     }
 
-    async getBidsForAuction(auctionId: string, nextCursor?: string) {
+    async getBidsForAuction(auctionId: string, nextCursor?: string): Promise<AuctionBidResponse> {
 
         return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities() });
     }
 
-    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }) {
+    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponse> {
 
         const domainInterests = await this.getAccountDomains(accountAddress);
 
@@ -166,6 +156,23 @@ export default class RnsSDK {
         return {
             isAuthentic: false
         };
+
+    }
+
+    private async dAppEntities() {
+
+        try {
+
+            if (!this.entities) {
+                this.entities = await parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }), this.state);
+            }
+
+            return this.entities;
+
+        } catch (e) {
+            console.log(e);
+            return null;
+        }
 
     }
 
