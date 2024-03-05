@@ -1,4 +1,4 @@
-import { GatewayApiClient, LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueTuple, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
+import { GatewayApiClient, LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
@@ -145,6 +145,12 @@ export async function requestDomainDetails(domain: string, { state, entities }: 
 
         if (field.field_name === 'last_valid_timestamp' && field.kind === 'Enum' && field.variant_name !== 'None' && field.fields[0].kind === 'I64') {
             return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
+        }
+
+        if (field.field_name === 'address' && field.kind === 'Enum') {
+            const reference = field.fields.find(f => f.kind === 'Reference' && f.value) as ProgrammaticScryptoSborValueReference | undefined;
+
+            return { ...acc, [field.field_name]: reference?.value };
         }
 
         return acc;
