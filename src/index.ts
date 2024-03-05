@@ -118,7 +118,7 @@ export default class RnsSDK {
 
     async getAccountDomains(accountAddress: string) {
 
-        return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities() });
+        return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities(), status: this.status });
 
     }
 

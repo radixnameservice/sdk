@@ -1,6 +1,7 @@
-import { ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple } from "@radixdlt/babylon-gateway-api-sdk";
+import { GatewayApiClient, LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
+import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
 
 export interface RawDomainData {
     id: string,
@@ -10,7 +11,7 @@ export interface RawDomainData {
     key_image_url: string
 }
 
-export async function requestAccountDomains(accountAddress: string, { state, entities }: InstancePropsI) {
+export async function requestAccountDomains(accountAddress: string, { state, entities, status }: InstancePropsI & { status: Status }) {
 
     if (!accountAddress) return null;
 
@@ -18,17 +19,29 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
 
         const accountNfts = await state.getEntityDetailsVaultAggregated(accountAddress);
 
-        const ids = accountNfts.non_fungible_resources.items.find(nft => nft.resource_address === entities.domainNameResource)?.vaults.items[0].items ?? [];
+        const domainBalance = accountNfts.non_fungible_resources.items.find(nft => nft.resource_address === entities.domainNameResource)?.vaults.items[0];
 
-        const subdomainVaultFromKvStore = ids.length ? await state.innerClient.keyValueStoreData({
+        const initialIds = domainBalance?.items ?? [];
+
+        const cursor = domainBalance.next_cursor;
+
+        const ledgerState = cursor ? await status.getCurrent() : null;
+
+        const ids = await recursiveBalanceDomainIds(state, accountAddress, domainBalance?.vault_address, entities.domainNameResource, cursor, ledgerState?.ledger_state, initialIds);
+
+        const batchedSubdomainIds = batchArray(ids, BATCHED_KV_STORE_LIMIT);
+
+        const subdominKvStoreResponses = await Promise.all(batchedSubdomainIds.map((ids) => state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
                 key_value_store_address: entities.subdomainVaults,
                 keys: ids.map(id => ({ key_json: { kind: 'NonFungibleLocalId', value: id } }))
             }
-        }).then(r => r.entries) : [];
+        }).then(r => r.entries)));
 
-        const subdomainVaultIds = subdomainVaultFromKvStore.length
-            ? subdomainVaultFromKvStore.map(kvResponse => (kvResponse.value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)
+        const subdomainKvStoreResponse = subdominKvStoreResponses.reduce((acc, r) => acc.concat(r), [])
+
+        const subdomainVaultIds = subdomainKvStoreResponse.length
+            ? subdomainKvStoreResponse.map(kvResponse => (kvResponse.value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)
             : [];
 
         const subdomainIds = await Promise.all(
@@ -143,3 +156,40 @@ export async function requestDomainDetails(domain: string, { state, entities }: 
         return acc;
     }, { id: nftData.non_fungible_id } as RawDomainData);
 }
+
+async function recursiveBalanceDomainIds(
+    state: State,
+    accountAddress: string,
+    domainVaultId: string,
+    domainNameResource: string,
+    cursor?: string | null | undefined,
+    ledgerState?: LedgerState,
+    ids: string[] = []
+): Promise<string[]> {
+    if (!cursor) {
+        return ids;
+    }
+
+    const response = await state.innerClient.entityNonFungibleIdsPage({
+        stateEntityNonFungibleIdsPageRequest: {
+            address: accountAddress,
+            resource_address: domainNameResource,
+            vault_address: domainVaultId,
+            cursor,
+            ...(cursor && ledgerState && { at_ledger_state: { state_version: ledgerState?.state_version } })
+        }
+    });
+
+    return response.next_cursor
+        ? recursiveBalanceDomainIds(state, accountAddress, domainVaultId, domainNameResource, response.next_cursor, ledgerState, [...ids, ...response.items])
+        : [...ids, ...response.items];
+}
+
+export const batchArray = <T>(arr: T[], batchSize: number) => {
+    const batches: T[][] = [];
+    for (let i = 0; i < arr.length; i += batchSize) {
+        batches.push(arr.slice(i, i + batchSize));
+    }
+    return batches;
+}
+
