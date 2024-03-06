@@ -96,7 +96,27 @@ export default class RnsSDK {
 
         }
 
-        return await requestDomainDetails(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
+        const details = await requestDomainDetails(normalisedDomain, { state: this.state, entities: await this.dAppEntities() });
+
+        if (!details) {
+            return null;
+        }
+
+        const isAuthentic = await this.checkAuthenticity({
+            domain: normalisedDomain,
+            accountAddress: details.address
+        });
+
+        if (!isAuthentic) {
+
+            return {
+                status: 'address-mismatch',
+                verbose: 'The address allocated to this domain has failed the authenticity check.'
+            };
+
+        }
+
+        return details;
 
     }
 
