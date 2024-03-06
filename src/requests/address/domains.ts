@@ -4,6 +4,7 @@ import { domainToNonFungId } from "../../utils/domain.utils";
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
 
 export interface RawDomainData {
+    address: string;
     id: string,
     name: string,
     created_timestamp: number,
