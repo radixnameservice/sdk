@@ -8,7 +8,6 @@ export function matchObjectTypes(obj, schema) {
             const receivedValue = obj?.[key];
 
             if (typeof receivedValue !== expectedType) {
-                console.debug(key, expectedType, receivedValue);
                 return false;
             }
 

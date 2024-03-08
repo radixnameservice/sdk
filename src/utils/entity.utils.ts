@@ -36,8 +36,7 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
                     { key_json: { kind: 'U64', value: v.current_version } },
                 ]
             }
-        }).then(kv => (kv.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)
-                                                                     ));
+        }).then(kv => (kv.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)));
 
         return { radixNameServiceComponent: logicComponents[0], rnsAuctionComponent: logicComponents[1] };
     }

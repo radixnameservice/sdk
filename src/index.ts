@@ -11,9 +11,17 @@ import { RecordItem } from './mappings/records';
 import { AllAuctionsResponse, AuctionBidResponse } from './common/auction.types';
 import { AddressMapT } from './mappings/entities';
 
-export { AllAuctionsResponse, AuctionBidResponse };
-export { DomainAttributesResponse, DomainData, CheckAuthenticityResponse };
-export { RecordItem };
+export {
+    GatewayStatusResponse,
+    DomainAttributesResponse,
+    DomainDetailsResponse,
+    RecordItem,
+    DomainData,
+    AuctionDetailsResponse,
+    AllAuctionsResponse,
+    AuctionBidResponse,
+    CheckAuthenticityResponse,
+};
 
 interface RnsSDKI {
 
@@ -90,7 +98,7 @@ export default class RnsSDK {
 
         if (!details) {
             return null;
-    }
+        }
 
         const isAuthentic = await this.checkAuthenticity({
             domain: normalisedDomain,
@@ -179,7 +187,7 @@ export default class RnsSDK {
 
     }
 
-    private async dAppEntities() {
+    private async dAppEntities(): Promise<AddressMapT> {
 
         try {
 
