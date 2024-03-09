@@ -4,6 +4,11 @@ import { DomainStatus, mapStatusInt } from "../../mappings/status";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { requestDomainDetails } from "../address/domains";
 
+export interface DomainAttributesResponse {
+    status: string;
+    verbose: string;
+}
+
 export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
 
     const properties = await requestDomainProperties(domainName, { state, entities });

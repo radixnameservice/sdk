@@ -2,7 +2,7 @@ import { MetadataStringValue, ProgrammaticScryptoSborValueOwn, ProgrammaticScryp
 import { AddressMapT, NameMapKeysT, nameMappings } from "../mappings/entities";
 import { parsePricingTiers } from "./pricing.utils";
 
-export async function parseEntityDetails(entities: StateEntityDetailsVaultResponseItem[], state: State) {
+export async function parseEntityDetails(entities: StateEntityDetailsVaultResponseItem[], state: State): Promise<AddressMapT> {
 
     const logicVersionStore = entities.find(entity => entity.details?.type === 'Component' && entity.details.blueprint_name === 'RNSUpdatable')?.details as StateEntityDetailsResponseComponentDetails | undefined;
 
@@ -29,16 +29,14 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
             }, {} as { versions: string, current_version: string });
         });
 
-        const logicComponents = await Promise.all(versionManagers.map(v => {
-            return state.innerClient.keyValueStoreData({
-                stateKeyValueStoreDataRequest: {
-                    key_value_store_address: v.versions,
-                    keys: [
-                        { key_json: { kind: 'U64', value: v.current_version } },
-                    ]
-                }
-            }).then(kv => (kv.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)
-        }));
+        const logicComponents = await Promise.all(versionManagers.map(v => state.innerClient.keyValueStoreData({
+            stateKeyValueStoreDataRequest: {
+                key_value_store_address: v.versions,
+                keys: [
+                    { key_json: { kind: 'U64', value: v.current_version } },
+                ]
+            }
+        }).then(kv => (kv.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)));
 
         return { radixNameServiceComponent: logicComponents[0], rnsAuctionComponent: logicComponents[1] };
     }

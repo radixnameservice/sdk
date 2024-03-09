@@ -6,7 +6,25 @@ import { domainToNonFungId } from "../../utils/domain.utils";
 import { formatAuction } from "../../utils/auction.utils";
 import { AllAuctionsResponse, AuctionBidResponse, BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
 
-export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI) {
+export interface AuctionDetailsResponse {
+    id: string;
+    ends: number;
+    domain: string;
+    bids: {
+        currentBid: {
+            usd: number;
+            xrd: number;
+        };
+        initialBid: {
+            usd: number;
+            xrd: number;
+        };
+        leaderBadgeId: string;
+        originatorBadgeId: string;
+    };
+};
+
+export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI): Promise<AuctionDetailsResponse> {
 
     try {
 
