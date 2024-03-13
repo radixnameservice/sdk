@@ -12,7 +12,6 @@ import { AllAuctionsResponse, AuctionBidResponse } from './common/auction.types'
 import { AddressMapT } from './mappings/entities';
 
 export {
-    GatewayStatusResponse,
     DomainAttributesResponse,
     DomainDetailsResponse,
     RecordItem,
