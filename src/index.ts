@@ -168,21 +168,11 @@ export default class RnsSDK {
             };
         }
 
-        for (let i = 0; i < domainInterests.length; i++) {
-
-            const interestDomain = domainInterests[i];
-
-            if (interestDomain.name === domain) {
-                return {
-                    isAuthentic: true
-                };
-            }
-
-        }
+        const isAuthentic = domainInterests.find((interestDomain) => interestDomain.name === domain)?.address === accountAddress;
 
         return {
-            isAuthentic: false
-        };
+            isAuthentic
+        }
 
     }
 
