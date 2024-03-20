@@ -114,6 +114,12 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
                             return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
                         }
 
+
+                        if (field.kind === 'Enum' && field.field_name === 'address') {
+                            const value = field.variant_name === 'Some' ? field.fields[0].kind === 'Reference' && field.fields[0].value : null;
+
+                            return { ...acc, [field.field_name]: value };
+                        }
                         return acc;
                     }, { id: r.non_fungible_id } as DomainData);
                 }
