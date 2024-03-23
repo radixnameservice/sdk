@@ -4,7 +4,7 @@ import * as CryptoJS from 'crypto-js';
 export async function domainToNonFungId(name: string, isByteId = true) {
 
     const data = CryptoJS.enc.Utf8.parse(name);
-    
+
     const hash = CryptoJS.SHA256(data);
     const hashBuffer = Buffer.from(hash.toString(CryptoJS.enc.Hex), 'hex');
 
@@ -147,5 +147,21 @@ export function validateDomainEntity(domain: string) {
 export function normaliseDomain(domain: string) {
 
     return domain.trim().toLowerCase();
+
+}
+
+export function deriveRootDomain(subdomain: string) {
+
+    const domainParts = subdomain.split('.');
+
+    const secondToLastDotIndex = domainParts.length - 2;
+
+    const rootDomain = domainParts.slice(secondToLastDotIndex).join('.');
+
+    if (rootDomain.includes('.')) {
+        return rootDomain;
+    }
+
+    return null;
 
 }
