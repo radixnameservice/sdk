@@ -1,6 +1,6 @@
 import { LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
-import { domainToNonFungId } from "../../utils/domain.utils";
+import { deriveRootDomain, domainToNonFungId } from "../../utils/domain.utils";
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
 
 export interface DomainData {
@@ -98,7 +98,12 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
                 if (r.data?.programmatic_json.kind === 'Tuple') {
                     return r.data?.programmatic_json.fields.reduce((acc, field) => {
                         if (field.kind === 'String' && field.field_name === 'name') {
-                            const filteredSubdomain = subdomains.filter(s => s?.name.includes(field.value))
+
+                            const filteredSubdomain = subdomains.filter((s) => {
+                                const rootDomain = deriveRootDomain(s?.name ?? '');
+                                return rootDomain === field.value;
+                            });
+
                             return { ...acc, [field.field_name]: field.value, subdomains: filteredSubdomain };
                         }
 
