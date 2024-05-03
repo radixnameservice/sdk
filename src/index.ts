@@ -3,7 +3,7 @@ import { NetworkT, getBasePath } from './utils/gateway.utils';
 import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
 import { DomainAttributesResponse, requestDomainStatus } from './requests/domain/status';
-import { requestRecords, resolveRecord } from './requests/domain/records';
+import { ResolvedRecordResponse, requestRecords, resolveRecord } from './requests/domain/records';
 import { DomainDetailsResponse, DomainData, requestAccountDomains, requestDomainDetails, CheckAuthenticityResponse } from './requests/address/domains';
 import { AuctionDetailsResponse, requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
@@ -20,6 +20,7 @@ export {
     AllAuctionsResponse,
     AuctionBidResponse,
     CheckAuthenticityResponse,
+    ResolvedRecordResponse,
 };
 
 interface RnsSDKI {
@@ -125,11 +126,11 @@ export default class RnsSDK {
 
     }
 
-    async resolveRecord({ domain, context, directive }: { domain: string; context?: string; directive?: string; }): Promise<string> {
+    async resolveRecord({ domain, context, directive, proven }: { domain: string; context?: string; directive?: string; proven?: boolean }): Promise<ResolvedRecordResponse> {
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return await resolveRecord(normalisedDomain, { context, directive }, { state: this.state, entities: await this.dAppEntities() });
+        return await resolveRecord(normalisedDomain, { context, directive, proven }, { state: this.state, entities: await this.dAppEntities() });
 
     }
 

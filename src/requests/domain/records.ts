@@ -1,7 +1,8 @@
-import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
+import { ProgrammaticScryptoSborValueOwn, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { RecordItem } from "../../mappings/records";
+import { requestDomainDetails } from "../address/domains";
 
 export async function requestRecords(domainName: string, { state, entities }: InstancePropsI) {
 
@@ -80,10 +81,16 @@ interface DocketPropsI {
 
     context?: string;
     directive?: string;
+    proven?: boolean;
 
 }
 
-export async function resolveRecord(domain: string, { context, directive }: DocketPropsI, { state, entities }: InstancePropsI) {
+export interface ResolvedRecordResponse {
+    value: string,
+    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
+}
+
+export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { state, entities }: InstancePropsI): Promise<ResolvedRecordResponse> {
 
     try {
 
@@ -96,7 +103,7 @@ export async function resolveRecord(domain: string, { context, directive }: Dock
 
         if (nft?.data?.programmatic_json.kind === 'Tuple') {
 
-            return nft.data?.programmatic_json.fields.filter(field => {
+            const value = nft.data?.programmatic_json.fields.filter(field => {
                 return (field.field_name === 'value' && field.kind === 'Enum')
             }).map((field) => {
                 if (field.field_name === 'value' && field.kind === 'Enum') {
@@ -105,6 +112,69 @@ export async function resolveRecord(domain: string, { context, directive }: Dock
                 }
             })[0];
 
+            if (!proven) {
+                return { value };
+            }
+
+            if (!value.startsWith('(') || !value.endsWith(')')) {
+                return null;
+            }
+
+            const provenResources = value.match(/\(\"(.+)\"\)/);
+
+            if (!provenResources) {
+                return null;
+            }
+
+            const domainDetails = await requestDomainDetails(domain, { state, entities });
+
+            const accountAddress = domainDetails.address;
+
+            const provenResourcesList: { resourceAddress: string, ids?: string[] }[] = provenResources[1].split(',').reduce((acc, resource) => {
+                const [resourceAddress, id] = resource.split(':');
+
+                const foundResourceIndex = acc.findIndex(a => a.resourceAddress === resourceAddress);
+
+                if (foundResourceIndex === -1) {
+                    acc.push({ resourceAddress, ...(id && { ids: [id] }) });
+                    return acc;
+                } else {
+                    if (id) {
+                        acc[foundResourceIndex].ids.push(id);
+                    }
+
+                    return acc;
+                }
+
+            }, []);
+
+            const fungibleResources = provenResourcesList.filter(r =>!r.ids).map(r => r.resourceAddress);
+
+            const accountNonFungibleVaultIds = await state.getEntityDetailsVaultAggregated(accountAddress).then(r => {
+                const nonFungibleVaultIds = new Set(r.non_fungible_resources.items.map(v => v.vaults.items[0].vault_address));
+
+                const areAllResourcesProven = fungibleResources.every(resource => r.fungible_resources.items.find(v => v.resource_address === resource && parseFloat(v.vaults.items[0].amount) > 0));
+
+                if (!areAllResourcesProven) {
+                    return null;
+                }
+
+                return new Set(nonFungibleVaultIds);
+            });
+
+            const nonFungibleLocationResponse = await Promise.all(provenResourcesList.filter(r => r.ids).map(resource => state.getNonFungibleLocation(resource.resourceAddress, resource.ids)));
+
+            const requiredVaultIds = [...new Set(nonFungibleLocationResponse.flatMap(r => r).map(r => r.owning_vault_address))];
+
+            const areAllNftsProven = requiredVaultIds.every(vaultId => accountNonFungibleVaultIds.has(vaultId));
+
+            if (!areAllNftsProven) {
+                return null;
+            }
+
+            const nftDataList = await Promise.all(provenResourcesList.map(r => state.getNonFungibleData(r.resourceAddress, r.ids)));
+
+            return { value, nonFungibleDataList: nftDataList.flatMap(r => r) };
         }
 
         return null;
