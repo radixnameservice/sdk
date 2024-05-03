@@ -11,6 +11,11 @@ const recordsSchema = {
     value: 'string'
 };
 
+const resolvedRecordSchema = {
+    value: 'string',
+    nonFungibleDataList: 'object'
+};
+
 
 describe('RnsKit', () => {
 
@@ -43,8 +48,22 @@ describe('RnsKit', () => {
             directive: 'xrd'
         });
 
-        expect(resolvedRecord).toBe('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
+        expect(resolvedRecord.value).toBe('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
 
+    });
+
+
+    it('should return proven resource nfts', async () => {
+
+        const record = await rns.resolveRecord({
+            domain: 'beem.xrd',
+            context: 'social',
+            directive: 'selfi:pfps',
+            proven: true
+        });
+
+        expect(Array.isArray(record.nonFungibleDataList)).toBe(true);
+        expect(matchObjectTypes(record, resolvedRecordSchema)).toBe(true);
     });
 
 });
