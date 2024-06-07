@@ -3,6 +3,7 @@
 
 ---
 
+[![Jest E2E](https://github.com/radixnameservice/sdk/actions/workflows/run-e2e-tests.yml/badge.svg?branch=main)](https://github.com/radixnameservice/sdk/actions/workflows/run-e2e-tests.yml)
 
 ### Compatibility
 
