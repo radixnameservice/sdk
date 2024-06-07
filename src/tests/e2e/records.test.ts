@@ -45,10 +45,10 @@ describe('RnsKit', () => {
         const resolvedRecord = await rns.resolveRecord({
             domain: 'test-records-present.xrd',
             context: 'receivers',
-            directive: 'xrd'
+            directive: '*'
         });
 
-        expect(resolvedRecord.value).toBe('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
+        expect(resolvedRecord.value).toBe('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
 
     });
 
@@ -56,7 +56,7 @@ describe('RnsKit', () => {
     it('should return proven resource nfts', async () => {
 
         const record = await rns.resolveRecord({
-            domain: 'beem.xrd',
+            domain: 'test-records-present.xrd',
             context: 'social',
             directive: 'selfi:pfps',
             proven: true

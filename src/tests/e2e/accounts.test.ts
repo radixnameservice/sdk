@@ -21,7 +21,7 @@ describe('RnsKit', () => {
 
     it(`should return all domains within an account`, async () => {
 
-        const ownerDomains = await rns.getAccountDomains('account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7');
+        const ownerDomains = await rns.getAccountDomains('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
 
         expect(Array.isArray(ownerDomains)).toBe(true);
         expect(ownerDomains.length).toBeGreaterThan(0);
@@ -34,7 +34,7 @@ describe('RnsKit', () => {
 
         const authenticity = await rns.checkAuthenticity({
             domain: 'radixnameservice.xrd',
-            accountAddress: 'account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7'
+            accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
         expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
@@ -46,7 +46,7 @@ describe('RnsKit', () => {
 
         const authenticity = await rns.checkAuthenticity({
             domain: 'i-do-not-own-this.xrd',
-            accountAddress: 'account_tdx_2_1298zn26mlsyc0gsx507cc83y7x8veyp90axzh6aefqhxxq9l7y03c7'
+            accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
         expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
