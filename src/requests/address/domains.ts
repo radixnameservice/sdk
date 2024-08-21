@@ -28,7 +28,7 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
 
         const initialIds = domainBalance?.items ?? [];
 
-        const cursor = domainBalance.next_cursor;
+        const cursor = domainBalance?.next_cursor;
 
         const ledgerState = cursor ? await status.getCurrent() : null;
 
