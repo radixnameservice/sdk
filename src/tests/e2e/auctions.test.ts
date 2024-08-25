@@ -1,12 +1,7 @@
 import RnsKit from '../..';
+import { auctionSchema } from '../schemas';
 import { matchObjectTypes } from '../utils';
 
-const auctionSchema = {
-    id: 'string',
-    ends: 'number',
-    domain: 'string',
-    bids: 'object'
-};
 
 describe('RnsKit', () => {
 

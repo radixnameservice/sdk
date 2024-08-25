@@ -1,20 +1,6 @@
 import RnsKit from '../..';
+import { recordsSchema, resolvedRecordSchema } from '../schemas';
 import { matchObjectTypes } from '../utils';
-
-const recordsSchema = {
-    record_id: 'string',
-    id_additions: 'object',
-    domain_id: 'string',
-    context: 'string',
-    directive: 'string',
-    platform_identifier: 'string',
-    value: 'string'
-};
-
-const resolvedRecordSchema = {
-    value: 'string',
-    nonFungibleDataList: 'object'
-};
 
 
 describe('RnsKit', () => {

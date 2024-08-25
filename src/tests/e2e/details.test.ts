@@ -1,15 +1,6 @@
 import RnsKit from '../..';
+import { detailsSchema } from '../schemas';
 import { matchObjectTypes } from '../utils';
-
-const detailsSchema = {
-    id: 'string',
-    name: 'string',
-    address: 'string',
-    created_timestamp: 'number',
-    last_valid_timestamp: 'number',
-    key_image_url: 'string'
-}
-
 
 describe('RnsKit', () => {
 

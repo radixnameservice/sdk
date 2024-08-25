@@ -1,10 +1,6 @@
 import RnsKit from '../..';
+import { attributesSchema } from '../schemas';
 import { matchObjectTypes } from '../utils';
-
-const attributesSchema = {
-    status: 'string',
-    verbose: 'string'
-};
 
 
 describe('RnsKit', () => {

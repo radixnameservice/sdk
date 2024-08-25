@@ -1,6 +1,7 @@
 import RnsKit from '../..';
 import { Network, NetworkT, getBasePath } from '../../utils/gateway.utils';
 
+
 describe('RnsKit', () => {
 
     const networks: Array<NetworkT | undefined> = [undefined, 'mainnet', 'stokenet'];
