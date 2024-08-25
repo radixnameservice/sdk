@@ -4,7 +4,7 @@ import config from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
 import { DomainAttributesResponse, requestDomainStatus } from './requests/domain/status';
 import { ResolvedRecordResponse, requestRecords, resolveRecord } from './requests/domain/records';
-import { DomainDetailsResponse, DomainData, requestAccountDomains, requestDomainDetails, CheckAuthenticityResponse } from './requests/address/domains';
+import { DomainDetailsResponse, DomainData, requestAccountDomains, requestDomainDetails, CheckAuthenticityResponse, requestPrimaryDomain } from './requests/address/domains';
 import { AuctionDetailsResponse, requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 import { RecordItem } from './mappings/records';
@@ -137,6 +137,37 @@ export default class RnsSDK {
     async getAccountDomains(accountAddress: string): Promise<DomainData[]> {
 
         return await requestAccountDomains(accountAddress, { state: this.state, entities: await this.dAppEntities(), status: this.status });
+
+    }
+
+    async getAccountPrimaryDomain(accountAddress: string): Promise<DomainDetailsResponse> {
+
+        const assignedPrimaryDomain = await requestPrimaryDomain(accountAddress, { state: this.state, entities: await this.dAppEntities(), status: this.status });
+
+        if (!assignedPrimaryDomain) {
+
+            return {
+                status: 'unset',
+                verbose: 'No discoverable domain has been set for this account address.'
+            };
+
+        }
+
+        const isAuthentic = await this.checkAuthenticity({
+            domain: assignedPrimaryDomain.name,
+            accountAddress: accountAddress
+        });
+
+        if (!isAuthentic) {
+
+            return {
+                status: 'address-mismatch',
+                verbose: 'The address allocated to this domain has failed the authenticity check.'
+            };
+
+        }
+
+        return assignedPrimaryDomain;
 
     }
 

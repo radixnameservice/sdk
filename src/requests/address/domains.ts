@@ -139,6 +139,12 @@ export async function requestAccountDomains(accountAddress: string, { state, ent
 
 }
 
+export async function requestPrimaryDomain(accountAddress: string, { state, entities, status }: InstancePropsI & { status: Status }): Promise<DomainData | null> {
+
+    return null;
+
+}
+
 interface ErrorWithStatusResponse {
     status: string;
     verbose: string;

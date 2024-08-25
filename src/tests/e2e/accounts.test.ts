@@ -1,19 +1,7 @@
 import RnsKit from '../..';
+import { authenticitySchema, domainsSchema } from '../schemas';
 import { matchObjectTypes } from '../utils';
 
-const domainsSchema = {
-    id: 'string',
-    name: 'string',
-    subdomains: 'object',
-    created_timestamp: 'number',
-    last_valid_timestamp: 'number',
-    key_image_url: 'string',
-    address: 'string'
-};
-
-const authenticitySchema = {
-    isAuthentic: 'boolean'
-};
 
 describe('RnsKit', () => {
 
@@ -29,6 +17,18 @@ describe('RnsKit', () => {
 
 
     });
+
+    /* ENABLE POST IMPLEMENTATION / CONFIG */
+
+    // it(`should return primary-domain.xrd`, async () => {
+
+    //     const primaryDomain = await rns.getAccountPrimaryDomain('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
+    //     expect(matchObjectTypes(primaryDomain, detailsSchema)).toBe(true);
+
+    //     const typedPrimaryDomain = primaryDomain as DomainData;
+    //     expect(typedPrimaryDomain?.name).toBe('primary-domain.xrd');
+     
+    // });
 
     it(`should return as authentic`, async () => {
 
