@@ -88,7 +88,8 @@ export default class RnsSDK {
 
             return {
                 status: 'invalid',
-                verbose: domainValidation.message
+                verbose: domainValidation.message,
+                price: null
             };
 
         }
