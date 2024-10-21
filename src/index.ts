@@ -46,7 +46,14 @@ export default class RnsSDK {
 
         this.network = network;
         this.initGateway({ gateway });
-        this.resolveDependencies();
+        this.preload();
+
+    }
+
+    async preload(): Promise<void> {
+
+        await this.dAppEntities(); // Preload entities
+        await this.dAppDependencies(); // Preload dependencies
 
     }
 
@@ -64,17 +71,15 @@ export default class RnsSDK {
 
     }
 
-    async resolveDependencies(): Promise<void> {
-
-        this.dependencies = {
-            rates: {
-                usdXrd: await requestXRDExchangeRate({ state: this.state, status: this.status, entities: this.entities })
-            }
-        };
-
+    private checkInitialized(): void {
+        if (!this.state || !this.status || !this.transaction || !this.stream) {
+            throw new Error('The RNS SDK is not fully initialized.');
+        }
     }
 
     async getDomainAttributes(domain: string): Promise<DomainAttributesResponse> {
+
+        this.checkInitialized();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -88,12 +93,14 @@ export default class RnsSDK {
 
         }
 
-        return await requestDomainStatus(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        return await requestDomainStatus(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
     async getDomainDetails(domain: string): Promise<DomainDetailsResponse> {
 
+        this.checkInitialized();
+
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
@@ -106,7 +113,7 @@ export default class RnsSDK {
 
         }
 
-        const details = await requestDomainDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        const details = await requestDomainDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
         if (!details) {
             return null;
@@ -132,47 +139,61 @@ export default class RnsSDK {
 
     async getRecords(domain: string): Promise<RecordItem[]> {
 
+        this.checkInitialized();
+
         const normalisedDomain = normaliseDomain(domain);
 
-        return await requestRecords(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        return await requestRecords(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
     async resolveRecord({ domain, context, directive, proven }: { domain: string; context?: string; directive?: string; proven?: boolean }): Promise<ResolvedRecordResponse> {
 
+        this.checkInitialized();
+
         const normalisedDomain = normaliseDomain(domain);
 
-        return await resolveRecord(normalisedDomain, { context, directive, proven }, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        return await resolveRecord(normalisedDomain, { context, directive, proven }, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
     async getAccountDomains(accountAddress: string): Promise<DomainData[]> {
 
-        return await requestAccountDomains(accountAddress, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        this.checkInitialized();
+
+        return await requestAccountDomains(accountAddress, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
     async getAuction(domain: string): Promise<AuctionDetailsResponse> {
 
+        this.checkInitialized();
+
         const normalisedDomain = normaliseDomain(domain);
 
-        return await requestAuctionDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        return await requestAuctionDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
     async getAllAuctions(nextCursor?: string): Promise<AllAuctionsResponse> {
 
-        return await requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: this.dependencies }, nextCursor);
+        this.checkInitialized();
+
+        return await requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() }, nextCursor);
 
     }
 
     async getBidsForAuction(auctionId: string, nextCursor?: string): Promise<AuctionBidResponse> {
 
-        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities(), dependencies: this.dependencies });
+        this.checkInitialized();
+
+        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponse> {
+
+        this.checkInitialized();
 
         const domainInterests = await this.getAccountDomains(accountAddress);
 
@@ -200,9 +221,38 @@ export default class RnsSDK {
 
             return this.entities;
 
-        } catch (e) {
-            console.log(e);
-            return null;
+        } catch (error) {
+
+            throw new Error(`Could not fetch RNS (dApp component) entities: ${error}`);
+
+        }
+
+    }
+
+    private async dAppDependencies(): Promise<DependenciesI> {
+
+        try {
+
+            if (!this.dependencies) {
+
+                this.dependencies = {
+                    rates: {
+                        usdXrd: await requestXRDExchangeRate({
+                            state: this.state,
+                            status: this.status,
+                            entities: this.entities,
+                        }),
+                    },
+                };
+
+            }
+
+            return this.dependencies;
+
+        } catch (error) {
+
+            throw new Error(`Could not fetch RNS (dApp component) dependencies: ${error}`);
+
         }
 
     }
