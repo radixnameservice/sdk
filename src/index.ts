@@ -190,14 +190,6 @@ export default class RnsSDK {
 
     }
 
-    // async getDomainPrice(domain: string) {
-
-    //     const usdExchangeRate = await getXRDExchangeRate({ state: this.state, status: this.status, tokenUsdPriceKvStore: (await this.dAppEntities()).tokenUsdPriceKvStore });
-    //     return usdExchangeRate;
-
-
-    // }
-
     private async dAppEntities(): Promise<AddressMapT> {
 
         try {
