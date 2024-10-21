@@ -1,6 +1,7 @@
 import { MetadataStringValue, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueTuple, State, StateEntityDetailsResponseComponentDetails, StateEntityDetailsVaultResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
-import { AddressMapT, NameMapKeysT, nameMappings } from "../mappings/entities";
+import { nameMappings } from "../mappings/entities";
 import { parsePricingTiers } from "./pricing.utils";
+import { AddressMapT, NameMapKeysT } from "../common/entities.types";
 
 export async function parseEntityDetails(entities: StateEntityDetailsVaultResponseItem[], state: State): Promise<AddressMapT> {
 
