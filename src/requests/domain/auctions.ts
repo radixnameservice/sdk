@@ -4,27 +4,11 @@ import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { stringToUint } from "../../utils/string.utils";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { formatAuction } from "../../utils/auction.utils";
-import { AllAuctionsResponse, AuctionBidResponse, BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
+import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
 
-export interface AuctionDetailsResponse {
-    id: string;
-    ends: number;
-    domain: string;
-    bids: {
-        currentBid: {
-            usd: number;
-            xrd: number;
-        };
-        initialBid: {
-            usd: number;
-            xrd: number;
-        };
-        leaderBadgeId: string;
-        originatorBadgeId: string;
-    };
-};
+export async function requestAuctionDetails(domain: string, { state, entities, dependencies }: InstancePropsI): Promise<AuctionDetailsResponse> {
 
-export async function requestAuctionDetails(domain: string, { state, entities }: InstancePropsI): Promise<AuctionDetailsResponse> {
+    if (!dependencies.rates.usdXrd) return null;
 
     try {
 
@@ -37,7 +21,7 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueI64)?.value;
 
-        if(isNaN(latestAuctionId)) {
+        if (isNaN(latestAuctionId)) {
             return null;
         }
 
@@ -66,7 +50,7 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
                     }
 
                     if (field.kind === 'String') {
-                        return {...acc, [field.field_name]: field.value };
+                        return { ...acc, [field.field_name]: field.value };
                     }
 
                     return acc;
@@ -74,11 +58,10 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
             }
         });
 
-        const auction = auctionMap[auctionMap.length-1] as RawAuctionResultI;
+        const auction = auctionMap[auctionMap.length - 1] as RawAuctionResultI;
+        if (!auction) return null;
 
-        if(!auction) return null;
-
-        return formatAuction(auction);
+        return formatAuction(auction, dependencies.rates.usdXrd);
 
     } catch (e) {
 
@@ -89,7 +72,10 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
 
 }
 
-export async function requestAuctions({ state, entities, status }: InstancePropsI & { status: Status }, nextCursor: string): Promise<AllAuctionsResponse> {
+export async function requestAuctions({ state, entities, status, dependencies }: InstancePropsI & { status: Status }, nextCursor: string): Promise<AllAuctionsResponse> {
+    
+    if (!dependencies.rates.usdXrd) return null;
+    
     const ledgerState = nextCursor ? await status.getCurrent() : undefined;
 
     const auctionIds = await state.innerClient.nonFungibleIds({
@@ -117,13 +103,13 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
                 }
 
                 if (field.kind === 'String') {
-                    return {...acc, [field.field_name]: field.value };
+                    return { ...acc, [field.field_name]: field.value };
                 }
 
                 return acc;
             }, { id: auction.non_fungible_id } as RawAuctionResultI);
 
-            return formatAuction(rawAuction);
+            return formatAuction(rawAuction, dependencies.rates.usdXrd);
 
         }
     });
@@ -153,14 +139,14 @@ export async function requestBidsForAuction(
             .map((bids) => {
                 return (bids ?? []).reduce((acc, field) => {
                     if (field.field_name && 'value' in field) {
-                        return {...acc, [field.field_name]: field.value };
+                        return { ...acc, [field.field_name]: field.value };
                     }
 
                     return acc;
-                }, {} as  BidEvent)
+                }, {} as BidEvent)
             })
             .filter(b => b.auction_id === auctionId);
 
-            return { data, next_cursor: r.next_cursor, total_count: r.total_count };
+        return { data, next_cursor: r.next_cursor, total_count: r.total_count };
     });
 }

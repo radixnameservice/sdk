@@ -16,7 +16,7 @@ export interface CheckAuthenticityResponse {
     isAuthentic: boolean;
 }
 
-export async function requestAccountDomains(accountAddress: string, { state, entities, status }: InstancePropsI & { status: Status }) {
+export async function requestAccountDomains(accountAddress: string, { state, entities, status }: InstancePropsI) {
 
     if (!accountAddress) return null;
 

@@ -90,7 +90,7 @@ export interface ResolvedRecordResponse {
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
 }
 
-export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { state, entities }: InstancePropsI): Promise<ResolvedRecordResponse> {
+export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { state, status, entities, dependencies }: InstancePropsI): Promise<ResolvedRecordResponse> {
 
     try {
 
@@ -126,7 +126,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
                 return null;
             }
 
-            const domainDetails = await requestDomainDetails(domain, { state, entities });
+            const domainDetails = await requestDomainDetails(domain, { state, status, entities, dependencies });
 
             const accountAddress = domainDetails.address;
 

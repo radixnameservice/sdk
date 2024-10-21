@@ -18,7 +18,7 @@ export type NameMapKeysT = keyof typeof nameMappings;
 export type NameMapValuesT = (typeof nameMappings)[NameMapKeysT];
 
 export type AddressMapT = Record<
-    NameMapValuesT | 'settlementVaultId' | 'biddersVaultId' | 'recordServiceVaultId' | 'subdomainVaults' | 'rnsStorage' | 'domainEventClaimsKvId' | 'domainTldKvId',
+    NameMapValuesT | 'settlementVaultId' | 'biddersVaultId' | 'recordServiceVaultId' | 'subdomainVaults' | 'rnsStorage' | 'domainEventClaimsKvId' | 'domainTldKvId' | 'tokenUsdPriceKvStore',
     string
 > & { latestAuctionId: string, latestBidId: string, priceMap: Record<PriceTier, string> } | null;
 

@@ -17,10 +17,22 @@ export interface RawAuctionResultI {
 
 }
 
-interface BidI {
+export interface AuctionDetailsResponse {
+    id: string;
+    ends: number;
+    domain: string;
+    bids: {
+        currentBid: BidI;
+        initialBid: BidI;
+        leaderBadgeId: string;
+        originatorBadgeId: string;
+    };
+};
 
-    usd: number;
-    xrd: number;
+export interface BidI {
+
+    usd: string;
+    xrd: string;
 
 }
 

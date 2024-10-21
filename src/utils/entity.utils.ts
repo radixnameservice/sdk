@@ -56,6 +56,7 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
             const minimumPremium = state.fields.find(f => f.field_name === 'minimum_premium')?.value;
             const domainEventClaimsKvId = state.fields.find(f => f.field_name === 'domain_event_claims')?.value;
             const domainTldKvId = state.fields.find(f => f.field_name === 'domain_mintable')?.value;
+            const tokenUsdPriceKvStore = state.fields.find(f => f.field_name === 'token_usd_price')?.value;
 
             return {
                 ...acc,
@@ -70,6 +71,7 @@ export async function parseEntityDetails(entities: StateEntityDetailsVaultRespon
                 ...(minimumPremium && { minimumPremium }),
                 ...(domainEventClaimsKvId && { domainEventClaimsKvId  }),
                 ...(domainTldKvId && { domainTldKvId  }),
+                ...(tokenUsdPriceKvStore && { tokenUsdPriceKvStore: tokenUsdPriceKvStore }),
             };
         }
 

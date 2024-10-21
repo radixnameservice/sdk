@@ -1,20 +1,27 @@
-import { ProgrammaticScryptoSborValueBool, ProgrammaticScryptoSborValueEnum } from "@radixdlt/babylon-gateway-api-sdk";
+import { ProgrammaticScryptoSborValueBool, ProgrammaticScryptoSborValueEnum, ProgrammaticScryptoSborValueOwn, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { DomainStatus, mapStatusInt } from "../../mappings/status";
 import { domainToNonFungId } from "../../utils/domain.utils";
 import { requestDomainDetails } from "../address/domains";
+import { getBasePrice } from "../../utils/pricing.utils";
 
 export interface DomainAttributesResponse {
     status: string;
     verbose: string;
 }
 
-export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
+export async function requestDomainStatus(domainName: string, { state, status, entities, dependencies }: InstancePropsI) {
 
-    const properties = await requestDomainProperties(domainName, { state, entities });
+    if (!dependencies.rates.usdXrd) {
+        return null;
+    }
+
+    const properties = await requestDomainProperties(domainName, { state, status, entities, dependencies });
+    const price = getBasePrice(domainName, dependencies.rates.usdXrd);
 
     return {
-        ...mapStatusInt(domainName, properties?.status)
+        ...mapStatusInt(domainName, properties?.status),
+        ...{ price }
     }
 
 }
@@ -24,7 +31,7 @@ const ClaimType = {
     Sunrise: DomainStatus.Sunrise,
 }
 
-async function requestDomainProperties(domainName: string, { state, entities }: InstancePropsI) {
+async function requestDomainProperties(domainName: string, { state, status, entities, dependencies }: InstancePropsI) {
 
     try {
 
@@ -134,7 +141,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
             }
         }
 
-        const domain = await requestDomainDetails(domainName, { state, entities });
+        const domain = await requestDomainDetails(domainName, { state, status, entities, dependencies });
 
         if (domain) {
             if (new Date().getTime() >= domain.last_valid_timestamp) {
