@@ -8,11 +8,12 @@ import { DomainDetailsResponse, requestAccountDomains, requestDomainDetails } fr
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
-import { AddressMapT } from './mappings/entities';
-import { DependenciesI } from './common/dependencies.types';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
+
+import { DependenciesI } from './common/dependencies.types';
 import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
 import { RecordItem, ResolvedRecordResponse } from './common/records.types';
+import { AddressMapT } from './common/entities.types';
 
 export {
     DomainAttributesResponse,

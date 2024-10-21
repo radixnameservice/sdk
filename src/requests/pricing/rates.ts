@@ -1,8 +1,10 @@
 
-import Decimal from "decimal.js";
-import { convertToDecimal } from "../../utils/decimal.utils";
 import { ProgrammaticScryptoSborValueOwn, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
-import { AddressMapT } from "../../mappings/entities";
+import Decimal from "decimal.js";
+
+import { convertToDecimal } from "../../utils/decimal.utils";
+
+import { AddressMapT } from "../../common/entities.types";
 
 export async function requestXRDExchangeRate({ state, status, entities }: { state: State, status: Status, entities: AddressMapT }): Promise<Decimal> {
 

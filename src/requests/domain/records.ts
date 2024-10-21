@@ -1,7 +1,9 @@
 import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
-import { InstancePropsI } from "../../common/entities.types";
-import { domainToNonFungId } from "../../utils/domain.utils";
+
 import { requestDomainDetails } from "../address/domains";
+import { domainToNonFungId } from "../../utils/domain.utils";
+
+import { InstancePropsI } from "../../common/entities.types";
 import { DocketPropsI, RecordItem, ResolvedRecordResponse } from "../../common/records.types";
 
 export async function requestRecords(domainName: string, { state, entities }: InstancePropsI) {

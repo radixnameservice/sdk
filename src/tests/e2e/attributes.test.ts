@@ -1,7 +1,7 @@
 import RnsKit from '../..';
-import { convertToDecimal } from '../../utils/decimal.utils';
-import { matchObjectTypes } from '../utils';
 import Decimal from 'decimal.js';
+import { matchObjectTypes } from '../utils';
+import { convertToDecimal } from '../../utils/decimal.utils';
 
 const attributesSchema = {
     status: 'string',

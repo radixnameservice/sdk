@@ -1,9 +1,11 @@
 import { ProgrammaticScryptoSborValueBool, ProgrammaticScryptoSborValueEnum } from "@radixdlt/babylon-gateway-api-sdk";
-import { InstancePropsI } from "../../common/entities.types";
+
 import { DomainStatus, mapStatusInt } from "../../mappings/status";
-import { domainToNonFungId } from "../../utils/domain.utils";
 import { requestDomainDetails } from "../address/domains";
 import { getBasePrice } from "../../utils/pricing.utils";
+import { domainToNonFungId } from "../../utils/domain.utils";
+
+import { InstancePropsI } from "../../common/entities.types";
 
 export async function requestDomainStatus(domainName: string, { state, status, entities, dependencies }: InstancePropsI) {
 
