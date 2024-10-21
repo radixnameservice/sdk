@@ -2,19 +2,7 @@ import { LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborVa
 import { InstancePropsI } from "../../common/entities.types";
 import { deriveRootDomain, domainToNonFungId } from "../../utils/domain.utils";
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
-
-export interface DomainData {
-    id: string,
-    name: string,
-    created_timestamp: number,
-    last_valid_timestamp: number,
-    key_image_url: string,
-    address: string | null,
-}
-
-export interface CheckAuthenticityResponse {
-    isAuthentic: boolean;
-}
+import { DomainData } from "../../common/domain.types";
 
 export async function requestAccountDomains(accountAddress: string, { state, entities, status }: InstancePropsI) {
 

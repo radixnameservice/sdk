@@ -2,16 +2,17 @@ import { GatewayApiClient, State, Status, Stream, Transaction } from '@radixdlt/
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import entityConfig from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
-import { DomainAttributesResponse, requestDomainStatus } from './requests/domain/status';
-import { ResolvedRecordResponse, requestRecords, resolveRecord } from './requests/domain/records';
-import { DomainDetailsResponse, DomainData, requestAccountDomains, requestDomainDetails, CheckAuthenticityResponse } from './requests/address/domains';
+import { requestDomainStatus } from './requests/domain/status';
+import { requestRecords, resolveRecord } from './requests/domain/records';
+import { DomainDetailsResponse, requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
-import { RecordItem } from './mappings/records';
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
 import { AddressMapT } from './mappings/entities';
 import { DependenciesI } from './common/dependencies.types';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
+import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
+import { RecordItem, ResolvedRecordResponse } from './common/records.types';
 
 export {
     DomainAttributesResponse,

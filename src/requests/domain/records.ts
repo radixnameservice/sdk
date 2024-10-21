@@ -1,8 +1,8 @@
-import { ProgrammaticScryptoSborValueOwn, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
+import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { domainToNonFungId } from "../../utils/domain.utils";
-import { RecordItem } from "../../mappings/records";
 import { requestDomainDetails } from "../address/domains";
+import { DocketPropsI, RecordItem, ResolvedRecordResponse } from "../../common/records.types";
 
 export async function requestRecords(domainName: string, { state, entities }: InstancePropsI) {
 
@@ -75,19 +75,6 @@ export async function requestRecords(domainName: string, { state, entities }: In
 
     }
 
-}
-
-interface DocketPropsI {
-
-    context?: string;
-    directive?: string;
-    proven?: boolean;
-
-}
-
-export interface ResolvedRecordResponse {
-    value: string,
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
 }
 
 export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { state, status, entities, dependencies }: InstancePropsI): Promise<ResolvedRecordResponse> {
