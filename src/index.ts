@@ -57,7 +57,7 @@ export default class RnsSDK {
 
     }
 
-    initGateway({ gateway }: { gateway?: string; }): Promise<GatewayStatusResponse> {
+    initGateway({ gateway }: { gateway?: string; }): void {
 
         const { status, state, transaction, stream } = GatewayApiClient.initialize({
             basePath: gateway ?? getBasePath(this.network),
@@ -68,8 +68,6 @@ export default class RnsSDK {
         this.status = status;
         this.transaction = transaction;
         this.stream = stream;
-
-        return status.getCurrent();
 
     }
 
