@@ -1,4 +1,4 @@
-import { LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, Status } from "@radixdlt/babylon-gateway-api-sdk";
+import { LedgerState, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State } from "@radixdlt/babylon-gateway-api-sdk";
 import { InstancePropsI } from "../../common/entities.types";
 import { deriveRootDomain, domainToNonFungId } from "../../utils/domain.utils";
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";

@@ -1,4 +1,4 @@
-import { GatewayApiClient, GatewayStatusResponse, State, Status, Stream, Transaction } from '@radixdlt/babylon-gateway-api-sdk';
+import { GatewayApiClient, State, Status, Stream, Transaction } from '@radixdlt/babylon-gateway-api-sdk';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import entityConfig from './entities.config';
 import { parseEntityDetails } from './utils/entity.utils';
