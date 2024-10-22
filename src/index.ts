@@ -75,7 +75,7 @@ export default class RnsSDK {
 
     private checkInitialized(): void {
         if (!this.state || !this.status || !this.transaction || !this.stream) {
-            throw new Error('The RNS SDK is not fully initialized.');
+            throw new Error('RNS SDK: The RNS SDK is not fully initialized.');
         }
     }
 
@@ -226,7 +226,7 @@ export default class RnsSDK {
 
         } catch (error) {
 
-            throw new Error(`Could not fetch RNS (dApp component) entities: ${error}`);
+            throw new Error(`RNS SDK: Could not fetch RNS (dApp component) entities: ${error}`);
 
         }
 
@@ -254,7 +254,7 @@ export default class RnsSDK {
 
         } catch (error) {
 
-            throw new Error(`Could not fetch RNS (dApp component) dependencies: ${error}`);
+            throw new Error(`RNS SDK: Could not fetch RNS (dApp component) dependencies: ${error}`);
 
         }
 
