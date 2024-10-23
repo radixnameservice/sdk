@@ -14,6 +14,10 @@ import { DependenciesI } from './common/dependencies.types';
 import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
 import { RecordItem, ResolvedRecordResponse } from './common/records.types';
 import { AddressMapT } from './common/entities.types';
+import { dispatchDomainRegistration } from './dispatchers/domain/registration';
+import { RegistrationResponse } from './common/registration.types';
+import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
+import { UserSpecificsI } from './common/user.types';
 
 export {
     DomainAttributesResponse,
@@ -24,7 +28,8 @@ export {
     AuctionBidResponse,
     CheckAuthenticityResponse,
     ResolvedRecordResponse,
-    AuctionDetailsResponse
+    AuctionDetailsResponse,
+    RegistrationResponse
 };
 
 interface RnsSDKI {
@@ -210,7 +215,23 @@ export default class RnsSDK {
 
         return {
             isAuthentic
-        }
+        };
+
+    }
+
+    async registerDomain({ domain, durationYears = 1, rdt, userDetails }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI }): Promise<RegistrationResponse> {
+
+        this.checkInitialized();
+
+        return await dispatchDomainRegistration({
+            domain,
+            state: this.state,
+            status: this.status,
+            entities: await this.dAppEntities(),
+            dependencies: await this.dAppDependencies(),
+            sdkInstance: this
+        });
+
 
     }
 
