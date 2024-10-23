@@ -49,9 +49,10 @@ export async function sendTransaction({ manifest, rdt, transaction, callbacks, m
 
         if (callbacks.onAppApproved) callbacks.onAppApproved({ manifest });
         const intentHash = result.value.transactionIntentHash;
-        if (callbacks.onIntentReceipt) callbacks.onIntentReceipt({ manifest, intentHash });
 
         const transactionStatus = await transaction.getStatus(intentHash);
+        if (callbacks.onIntentReceipt) callbacks.onIntentReceipt({ manifest, intentHash });
+
         const getCommitReceipt = await transaction.getCommittedDetails(intentHash);
         if (callbacks.onSuccess) callbacks.onSuccess(getCommitReceipt);
 
