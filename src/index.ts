@@ -229,6 +229,9 @@ export default class RnsSDK {
             status: this.status,
             entities: await this.dAppEntities(),
             dependencies: await this.dAppDependencies(),
+            durationYears,
+            rdt,
+            userDetails,
             sdkInstance: this
         });
 

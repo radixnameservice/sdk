@@ -1,13 +1,16 @@
-import RnsSDK, { RegistrationResponse } from "../..";
-import { InstancePropsI } from "../../common/entities.types";
+import { RegistrationResponse } from "../..";
+import { RegistrationDispatcherPropsI } from "../../common/registration.types";
 
 
 export async function dispatchDomainRegistration({
     domain,
     entities,
     dependencies,
+    rdt,
+    durationYears,
+    userDetails,
     sdkInstance
-}: InstancePropsI & { domain: string, sdkInstance: RnsSDK }): Promise<RegistrationResponse> {
+}: RegistrationDispatcherPropsI): Promise<RegistrationResponse> {
 
     const details = await sdkInstance.getDomainAttributes(domain);
 
