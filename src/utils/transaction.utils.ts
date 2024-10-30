@@ -7,18 +7,18 @@ interface SendTransactionI {
     manifest: string;
     rdt: RadixDappToolkit;
     transaction: Transaction;
-    callbacks: EventCallbacksI;
+    callbacks?: EventCallbacksI;
     message?: string;
 
 }
 
 export interface EventCallbacksI {
 
-    onInit: Function;
-    onSuccess: Function;
-    onFail: Function;
-    onAppApproved: Function;
-    onIntentReceipt: Function;
+    onInit?: Function;
+    onSuccess?: Function;
+    onFail?: Function;
+    onAppApproved?: Function;
+    onIntentReceipt?: Function;
 
 }
 
@@ -27,11 +27,11 @@ export async function sendTransaction({ manifest, rdt, transaction, callbacks, m
     try {
 
         if (!rdt) {
-            if (callbacks.onFail) callbacks.onFail({ manifest });
+            if (callbacks?.onFail) callbacks.onFail({ manifest });
             throw new Error('RNS SDK: The Radix Dapp Toolkit must be initialized and passed into the sendTransaction method.');
         }
 
-        if (callbacks.onInit) callbacks.onInit({ manifest });
+        if (callbacks?.onInit) callbacks.onInit({ manifest });
 
         const result = await rdt?.walletApi.sendTransaction({
             transactionManifest: manifest,
@@ -40,21 +40,21 @@ export async function sendTransaction({ manifest, rdt, transaction, callbacks, m
 
         if (!result || result.isErr()) {
 
-            if (callbacks.onFail) callbacks.onFail(result);
+            if (callbacks?.onFail) callbacks.onFail(result);
             if (result.isErr()) throw new Error(`RNS SDK: ${result.error}`);
 
             throw new Error(`RNS SDK: ${result}`);
 
         }
 
-        if (callbacks.onAppApproved) callbacks.onAppApproved({ manifest });
+        if (callbacks?.onAppApproved) callbacks.onAppApproved({ manifest });
         const intentHash = result.value.transactionIntentHash;
 
         const transactionStatus = await transaction.getStatus(intentHash);
-        if (callbacks.onIntentReceipt) callbacks.onIntentReceipt({ manifest, intentHash });
+        if (callbacks?.onIntentReceipt) callbacks.onIntentReceipt({ manifest, intentHash });
 
         const getCommitReceipt = await transaction.getCommittedDetails(intentHash);
-        if (callbacks.onSuccess) callbacks.onSuccess(getCommitReceipt);
+        if (callbacks?.onSuccess) callbacks.onSuccess(getCommitReceipt);
 
         return true;
 
