@@ -1,28 +1,27 @@
 import Decimal from "decimal.js";
+import { getWellKnownAddresses } from "../utils/gateway.utils";
+import { UserSpecificsI } from "../common/user.types";
+import RnsSDK from "..";
 
-export default function registerDomain({
+export default async function registerDomainManifest({
+    sdkInstance,
     domain,
-    userAccountAddress,
-    userBadgeId,
-    xrdTokenResource,
-    rnsUserBadgeResource,
-    rnsServiceComponent,
+    userDetails,
     price,
     durationYears
 }: {
+    sdkInstance: RnsSDK;
     domain: string;
-    userAccountAddress: string;
-    userBadgeId: string;
-    xrdTokenResource: string;
-    rnsUserBadgeResource: string;
-    rnsServiceComponent: string;
+    userDetails: UserSpecificsI;
     price: Decimal;
-    durationYears: number
+    durationYears: number;
 }) {
+
+    const xrdTokenResource = (await getWellKnownAddresses(sdkInstance.status)).xrd;
 
     return `
         CALL_METHOD
-            Address("${userAccountAddress}")
+            Address("${userDetails.accountAddress}")
             "withdraw"
             Address("${xrdTokenResource}")
             Decimal("${price}");
@@ -31,24 +30,24 @@ export default function registerDomain({
             Decimal("${price}")
             Bucket("radix_bucket");
         CALL_METHOD
-            Address("${userAccountAddress}")
+            Address("${userDetails.accountAddress}")
             "create_proof_of_non_fungibles"
-            Address("${rnsUserBadgeResource}")
+            Address("${sdkInstance.entities.rnsUserBadgeResource}")
             Array<NonFungibleLocalId>(
-                NonFungibleLocalId("${userBadgeId}")
+                NonFungibleLocalId("${userDetails.badgeId}")
             );
         POP_FROM_AUTH_ZONE
             Proof("user_proof");
         CALL_METHOD
-            Address("${rnsServiceComponent}")
+            Address("${sdkInstance.entities.radixNameServiceComponent}")
             "register_domain"
             "${domain}"
-            Address("${userAccountAddress}")
+            Address("${userDetails.accountAddress}")
             ${durationYears}i64
             Bucket("radix_bucket")
             Proof("user_proof");
         CALL_METHOD
-            Address("${userAccountAddress}")
+            Address("${userDetails.accountAddress}")
             "deposit_batch"
             Expression("ENTIRE_WORKTOP");
     `;

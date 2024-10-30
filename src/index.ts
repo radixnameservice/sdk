@@ -1,23 +1,27 @@
 import { GatewayApiClient, State, Status, Stream, Transaction } from '@radixdlt/babylon-gateway-api-sdk';
-import { NetworkT, getBasePath } from './utils/gateway.utils';
-import entityConfig from './entities.config';
-import { parseEntityDetails } from './utils/entity.utils';
+import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
+
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { DomainDetailsResponse, requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
-import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
-import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
+import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 
+import entityConfig from './entities.config';
+
+import { parseEntityDetails } from './utils/entity.utils';
+import { NetworkT, getBasePath } from './utils/gateway.utils';
+import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
+
+import { RegistrationResponse } from './common/dispatcher.types';
+import { UserSpecificsI } from './common/user.types';
+import { EventCallbacksI } from './common/transaction.types';
+import { AddressMapT } from './common/entities.types';
+import { RecordItem, ResolvedRecordResponse } from './common/records.types';
 import { DependenciesI } from './common/dependencies.types';
 import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
-import { RecordItem, ResolvedRecordResponse } from './common/records.types';
-import { AddressMapT } from './common/entities.types';
-import { dispatchDomainRegistration } from './dispatchers/domain/registration';
-import { RegistrationResponse } from './common/registration.types';
-import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
-import { UserSpecificsI } from './common/user.types';
+import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
 
 export {
     DomainAttributesResponse,
@@ -219,22 +223,18 @@ export default class RnsSDK {
 
     }
 
-    async registerDomain({ domain, durationYears = 1, rdt, userDetails }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI }): Promise<RegistrationResponse> {
+    async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<RegistrationResponse> {
 
         this.checkInitialized();
 
-        return await dispatchDomainRegistration({
+        return dispatchDomainRegistration({
+            sdkInstance: this,
             domain,
-            state: this.state,
-            status: this.status,
-            entities: await this.dAppEntities(),
-            dependencies: await this.dAppDependencies(),
             durationYears,
             rdt,
             userDetails,
-            sdkInstance: this
+            callbacks
         });
-
 
     }
 
