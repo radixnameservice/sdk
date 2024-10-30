@@ -27,7 +27,7 @@ export async function sendTransaction({ manifest, rdt, transaction, callbacks, m
     try {
 
         if (!rdt) {
-            if (callbacks.onInit) callbacks.onFail({ manifest });
+            if (callbacks.onFail) callbacks.onFail({ manifest });
             throw new Error('RNS SDK: The Radix Dapp Toolkit must be initialized and passed into the sendTransaction method.');
         }
 
