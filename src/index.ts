@@ -105,7 +105,7 @@ export default class RnsSDK {
 
         }
 
-        return await requestDomainStatus(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestDomainStatus(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
@@ -155,7 +155,7 @@ export default class RnsSDK {
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return await requestRecords(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestRecords(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
@@ -165,7 +165,7 @@ export default class RnsSDK {
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return await resolveRecord(normalisedDomain, { context, directive, proven }, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return resolveRecord(normalisedDomain, { context, directive, proven }, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
@@ -173,7 +173,7 @@ export default class RnsSDK {
 
         this.checkInitialized();
 
-        return await requestAccountDomains(accountAddress, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestAccountDomains(accountAddress, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
@@ -183,7 +183,7 @@ export default class RnsSDK {
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return await requestAuctionDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestAuctionDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
@@ -191,7 +191,7 @@ export default class RnsSDK {
 
         this.checkInitialized();
 
-        return await requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() }, nextCursor);
+        return requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() }, nextCursor);
 
     }
 
@@ -199,7 +199,7 @@ export default class RnsSDK {
 
         this.checkInitialized();
 
-        return await requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
 
     }
 
