@@ -1,14 +1,10 @@
 import { State, Status } from "@radixdlt/babylon-gateway-api-sdk";
 import { nameMappings, PriceTier } from "../mappings/entities";
 import { DependenciesI } from "./dependencies.types";
+import RnsSDK from "..";
 
 export interface InstancePropsI {
-
-    state: State;
-    status: Status;
-    entities: AddressMapT;
-    dependencies: DependenciesI;
-
+    sdkInstance: RnsSDK;
 }
 
 export type NameMapKeysT = keyof typeof nameMappings;

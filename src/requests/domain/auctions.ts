@@ -8,17 +8,17 @@ import { formatAuction } from "../../utils/auction.utils";
 import { InstancePropsI } from "../../common/entities.types";
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
 
-export async function requestAuctionDetails(domain: string, { state, entities, dependencies }: InstancePropsI): Promise<AuctionDetailsResponse> {
+export async function requestAuctionDetails(domain: string, { sdkInstance }: InstancePropsI): Promise<AuctionDetailsResponse> {
 
-    if (!dependencies.rates.usdXrd) return null;
+    if (!sdkInstance.dependencies.rates.usdXrd) return null;
 
     try {
 
         const domainId = await domainToNonFungId(domain, false);
 
-        const latestAuctionId = +((await state.innerClient.keyValueStoreData({
+        const latestAuctionId = +((await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.latestAuctionId,
+                key_value_store_address: sdkInstance.entities.latestAuctionId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueI64)?.value;
@@ -36,7 +36,7 @@ export async function requestAuctionDetails(domain: string, { state, entities, d
             )}]`;
         });
 
-        const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
+        const auctionNfts = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.rnsAuctionNftResource, auctionIds);
 
         const auctionMap = auctionNfts.map((auction) => {
             if (auction.data?.programmatic_json.kind === 'Tuple') {
@@ -63,7 +63,7 @@ export async function requestAuctionDetails(domain: string, { state, entities, d
         const auction = auctionMap[auctionMap.length - 1] as RawAuctionResultI;
         if (!auction) return null;
 
-        return formatAuction(auction, dependencies.rates.usdXrd);
+        return formatAuction(auction, sdkInstance.dependencies.rates.usdXrd);
 
     } catch (e) {
 
@@ -74,21 +74,21 @@ export async function requestAuctionDetails(domain: string, { state, entities, d
 
 }
 
-export async function requestAuctions({ state, entities, status, dependencies }: InstancePropsI & { status: Status }, nextCursor: string): Promise<AllAuctionsResponse> {
-    
-    if (!dependencies.rates.usdXrd) return null;
-    
-    const ledgerState = nextCursor ? await status.getCurrent() : undefined;
+export async function requestAuctions({ sdkInstance }: InstancePropsI, nextCursor: string): Promise<AllAuctionsResponse> {
 
-    const auctionIds = await state.innerClient.nonFungibleIds({
+    if (!sdkInstance.dependencies.rates.usdXrd) return null;
+
+    const ledgerState = nextCursor ? await sdkInstance.status.getCurrent() : undefined;
+
+    const auctionIds = await sdkInstance.state.innerClient.nonFungibleIds({
         stateNonFungibleIdsRequest: {
-            resource_address: entities.rnsAuctionNftResource,
+            resource_address: sdkInstance.entities.rnsAuctionNftResource,
             cursor: nextCursor,
             ...(ledgerState && { at_ledger_state: { state_version: ledgerState.ledger_state.state_version } })
         },
     });
 
-    const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds.non_fungible_ids.items);
+    const auctionNfts = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.rnsAuctionNftResource, auctionIds.non_fungible_ids.items);
 
     const data: FormattedAuctionResultI[] = auctionNfts.map((auction) => {
         if (auction.data?.programmatic_json.kind === 'Tuple') {
@@ -111,7 +111,7 @@ export async function requestAuctions({ state, entities, status, dependencies }:
                 return acc;
             }, { id: auction.non_fungible_id } as RawAuctionResultI);
 
-            return formatAuction(rawAuction, dependencies.rates.usdXrd);
+            return formatAuction(rawAuction, sdkInstance.dependencies.rates.usdXrd);
 
         }
     });
@@ -122,13 +122,12 @@ export async function requestAuctions({ state, entities, status, dependencies }:
 export async function requestBidsForAuction(
     auctionId: string,
     nextCursor: string | undefined,
-    { entities, stream, status }: InstancePropsI & { stream: Stream, status: Status }
-): Promise<AuctionBidResponse> {
-    const ledgerState = nextCursor ? await status.getCurrent() : undefined;
+    { sdkInstance }: InstancePropsI): Promise<AuctionBidResponse> {
+    const ledgerState = nextCursor ? await sdkInstance.status.getCurrent() : undefined;
 
-    return stream.innerClient.streamTransactions({
+    return sdkInstance.stream.innerClient.streamTransactions({
         streamTransactionsRequest: {
-            affected_global_entities_filter: [entities.rnsAuctionStorage, entities.rnsAuctionNftResource],
+            affected_global_entities_filter: [sdkInstance.entities.rnsAuctionStorage, sdkInstance.entities.rnsAuctionNftResource],
             opt_ins: {
                 receipt_events: true
             },

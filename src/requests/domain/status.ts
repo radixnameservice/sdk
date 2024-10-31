@@ -7,14 +7,14 @@ import { domainToNonFungId } from "../../utils/domain.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
 
-export async function requestDomainStatus(domainName: string, { state, status, entities, dependencies }: InstancePropsI) {
+export async function requestDomainStatus(domainName: string, { sdkInstance }: InstancePropsI) {
 
-    if (!dependencies.rates.usdXrd) {
+    if (!sdkInstance.dependencies.rates.usdXrd) {
         return null;
     }
 
-    const properties = await requestDomainProperties(domainName, { state, status, entities, dependencies });
-    const price = getBasePrice(domainName, dependencies.rates.usdXrd);
+    const properties = await requestDomainProperties(domainName, { sdkInstance });
+    const price = getBasePrice(domainName, sdkInstance.dependencies.rates.usdXrd);
 
     return {
         ...mapStatusInt(domainName, properties?.status),
@@ -28,24 +28,24 @@ const ClaimType = {
     Sunrise: DomainStatus.Sunrise,
 }
 
-async function requestDomainProperties(domainName: string, { state, status, entities, dependencies }: InstancePropsI) {
+async function requestDomainProperties(domainName: string, { sdkInstance }: InstancePropsI) {
 
     try {
 
         const domainId = await domainToNonFungId(domainName);
 
-        const domainExists = await state.getNonFungibleData(entities.domainNameResource, domainId);
+        const domainExists = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.domainNameResource, domainId);
 
-        const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
+        const settlementKvStoreResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.settlementVaultId,
+                key_value_store_address: sdkInstance.entities.settlementVaultId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
-        const domainClaimsResponse = await state.innerClient.keyValueStoreData({
+        const domainClaimsResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.domainEventClaimsKvId,
+                key_value_store_address: sdkInstance.entities.domainEventClaimsKvId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -55,9 +55,9 @@ async function requestDomainProperties(domainName: string, { state, status, enti
             return { status: ClaimType[value.variant_name as keyof typeof ClaimType] };
         }
 
-        const tldsResponse = await state.innerClient.keyValueStoreData({
+        const tldsResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.domainTldKvId,
+                key_value_store_address: sdkInstance.entities.domainTldKvId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -87,7 +87,7 @@ async function requestDomainProperties(domainName: string, { state, status, enti
         })[0];
 
         if (auctionId) {
-            const auction = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionId);
+            const auction = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.rnsAuctionNftResource, auctionId);
 
             if (auction.data?.programmatic_json.kind === 'Tuple') {
                 const auctionData = auction.data.programmatic_json.fields.reduce((acc, field) => {
@@ -138,7 +138,7 @@ async function requestDomainProperties(domainName: string, { state, status, enti
             }
         }
 
-        const domain = await requestDomainDetails(domainName, { state, status, entities, dependencies });
+        const domain = await requestDomainDetails(domainName, { sdkInstance });
 
         if (domain) {
             if (new Date().getTime() >= domain.last_valid_timestamp) {

@@ -1,12 +1,11 @@
 import { RadixDappToolkit } from "@radixdlt/radix-dapp-toolkit";
-import RnsSDK from "..";
 
 import { UserSpecificsI } from "./user.types";
 import { EventCallbacksI } from "./transaction.types";
+import { InstancePropsI } from "./entities.types";
 
-export interface DispatcherPropsI {
+export interface DispatcherPropsI extends InstancePropsI {
 
-    sdkInstance: RnsSDK;
     rdt: RadixDappToolkit;
     callbacks?: EventCallbacksI;
 

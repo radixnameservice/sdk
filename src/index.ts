@@ -57,15 +57,14 @@ export default class RnsSDK {
 
         this.network = network;
         this.initGateway({ gateway });
-        this.preload();
+        this.fetchDependencies();
 
     }
 
-    async preload(): Promise<void> {
+    async fetchDependencies(): Promise<void> {
 
-        await this.dAppEntities(); // Preload entities
-        await this.dAppDependencies(); // Preload dependencies
-
+        await Promise.all([this.dAppEntities(), this.dAppDependencies()]);
+        
     }
 
     initGateway({ gateway }: { gateway?: string; }): void {
@@ -91,6 +90,7 @@ export default class RnsSDK {
     async getDomainAttributes(domain: string): Promise<DomainAttributesResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -105,13 +105,14 @@ export default class RnsSDK {
 
         }
 
-        return requestDomainStatus(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestDomainStatus(normalisedDomain, { sdkInstance: this });
 
     }
 
     async getDomainDetails(domain: string): Promise<DomainDetailsResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -125,7 +126,7 @@ export default class RnsSDK {
 
         }
 
-        const details = await requestDomainDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        const details = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
         if (!details) {
             return null;
@@ -152,54 +153,60 @@ export default class RnsSDK {
     async getRecords(domain: string): Promise<RecordItem[]> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return requestRecords(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestRecords(normalisedDomain, { sdkInstance: this });
 
     }
 
     async resolveRecord({ domain, context, directive, proven }: { domain: string; context?: string; directive?: string; proven?: boolean }): Promise<ResolvedRecordResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return resolveRecord(normalisedDomain, { context, directive, proven }, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return resolveRecord(normalisedDomain, { context, directive, proven }, { sdkInstance: this });
 
     }
 
     async getAccountDomains(accountAddress: string): Promise<DomainData[]> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
-        return requestAccountDomains(accountAddress, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestAccountDomains(accountAddress, { sdkInstance: this });
 
     }
 
     async getAuction(domain: string): Promise<AuctionDetailsResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
 
-        return requestAuctionDetails(normalisedDomain, { state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestAuctionDetails(normalisedDomain, { sdkInstance: this });
 
     }
 
     async getAllAuctions(nextCursor?: string): Promise<AllAuctionsResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
-        return requestAuctions({ state: this.state, status: this.status, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() }, nextCursor);
+        return requestAuctions({ sdkInstance: this }, nextCursor);
 
     }
 
     async getBidsForAuction(auctionId: string, nextCursor?: string): Promise<AuctionBidResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
-        return requestBidsForAuction(auctionId, nextCursor, { state: this.state, status: this.status, stream: this.stream, entities: await this.dAppEntities(), dependencies: await this.dAppDependencies() });
+        return requestBidsForAuction(auctionId, nextCursor, { sdkInstance: this });
 
     }
 
@@ -226,6 +233,7 @@ export default class RnsSDK {
     async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<RegistrationResponse> {
 
         this.checkInitialized();
+        await this.fetchDependencies();
 
         return dispatchDomainRegistration({
             sdkInstance: this,
@@ -265,9 +273,7 @@ export default class RnsSDK {
                 this.dependencies = {
                     rates: {
                         usdXrd: await requestXRDExchangeRate({
-                            state: this.state,
-                            status: this.status,
-                            entities: this.entities,
+                            sdkInstance: this
                         }),
                     },
                 };
