@@ -63,8 +63,9 @@ export default class RnsSDK {
 
     async fetchDependencies(): Promise<void> {
 
-        await Promise.all([this.dAppEntities(), this.dAppDependencies()]);
-        
+        await this.dAppEntities();
+        await this.dAppDependencies();
+
     }
 
     initGateway({ gateway }: { gateway?: string; }): void {
