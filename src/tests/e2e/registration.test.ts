@@ -6,6 +6,8 @@ import registerDomainManifest from '../../manifests/register-domain';
 import { getWellKnownAddresses } from '../../utils/gateway.utils';
 import { getBasePrice } from '../../utils/pricing.utils';
 import { convertToDecimal, multiplyDecimal } from '../../utils/decimal.utils';
+import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
+import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 
 const mocks = {
     availableDomain: `test-registration-${(Math.random() + 1).toString(36).substring(3)}.xrd`,
@@ -14,26 +16,56 @@ const mocks = {
         badgeId: '#1'
     },
     durationYears: 2,
-    callbacks: {}
+    callbacks: {},
+    intentHash: 'txid_tdx_2_1p9j7njn5wuagry6j8mrmkvhhwvttskq2cy4e5nk2wpexhqjav2dszpptsr'
 };
 
+jest.mock('@radixdlt/radix-dapp-toolkit', () => {
+    return {
+        RadixDappToolkit: jest.fn(() => ({
+            walletApi: {
+                sendTransaction: jest.fn(() => {
+                    return {
+                        value: {
+                            transactionIntentHash: mocks.intentHash,
+                        },
+                        isErr: jest.fn(() => false),
+                    };
+                }),
+            },
+        })),
+    };
+});
 
-describe('registerDomainManifest', () => {
+describe('RNS - Register Domain', () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
 
     it(`should return a correctly formatted manifest string`, async () => {
 
         const rns = new RnsSDK({ network: 'stokenet' });
-        await rns.fetchDependencies(); // wait on dependencies required
 
-        const price = convertToDecimal(getBasePrice(mocks.availableDomain, rns.dependencies.rates.usdXrd).xrd);
-
-        const result = await registerDomainManifest({
-            sdkInstance: rns,
-            domain: mocks.availableDomain,
-            userDetails: mocks.userDetails,
-            price: multiplyDecimal(price, mocks.durationYears),
-            durationYears: mocks.durationYears
+        const dAppToolkit = RadixDappToolkit({
+            dAppDefinitionAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
+            networkId: RadixNetwork.Stokenet
         });
+
+        const register = await rns.registerDomain({
+            domain: mocks.availableDomain,
+            durationYears: mocks.durationYears,
+            rdt: dAppToolkit,
+            userDetails: mocks.userDetails
+        });
+
+        const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
+        expect(sendTransactionMock).toHaveBeenCalled();
+
+        const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
+        const transactionManifest = sendTransactionArgs.transactionManifest;
+
+        const price = multiplyDecimal(convertToDecimal(getBasePrice(mocks.availableDomain, rns.dependencies.rates.usdXrd).xrd), mocks.durationYears);
 
         const xrdTokenResource = (await getWellKnownAddresses(rns.status)).xrd;
 
@@ -44,10 +76,10 @@ describe('registerDomainManifest', () => {
                 Address("${mocks.userDetails.accountAddress}")
                 "withdraw"
                 Address("${xrdTokenResource}")
-                Decimal("${multiplyDecimal(price, mocks.durationYears)}");
+                Decimal("${price}");
             TAKE_FROM_WORKTOP
                 Address("${xrdTokenResource}")
-                Decimal("${multiplyDecimal(price, mocks.durationYears)}")
+                Decimal("${price}")
                 Bucket("radix_bucket");
             CALL_METHOD
                 Address("${mocks.userDetails.accountAddress}")
@@ -72,7 +104,8 @@ describe('registerDomainManifest', () => {
                 Expression("ENTIRE_WORKTOP");
         `;
 
-        expect(formatString(result)).toBe(formatString(expectedString));
+        expect(formatString(transactionManifest)).toBe(formatString(expectedString));
+        expect(register.status).toEqual("registration-successful");
 
     });
 
