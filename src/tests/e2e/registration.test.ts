@@ -1,13 +1,12 @@
 
 import RnsSDK from '../..';
 
-import registerDomainManifest from '../../manifests/register-domain';
+import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
+import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 
 import { getWellKnownAddresses } from '../../utils/gateway.utils';
 import { getBasePrice } from '../../utils/pricing.utils';
 import { convertToDecimal, multiplyDecimal } from '../../utils/decimal.utils';
-import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
-import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 
 const mocks = {
     availableDomain: `test-registration-${(Math.random() + 1).toString(36).substring(3)}.xrd`,
