@@ -2,7 +2,8 @@ import { RegistrationResponse } from "../..";
 
 import registerDomainManifest from "../../manifests/register-domain";
 import { sendTransaction } from "../../utils/transaction.utils";
-import { multiplyDecimal } from "../../utils/decimal.utils";
+import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
+import { getBasePrice } from "../../utils/pricing.utils";
 
 import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
 
@@ -42,7 +43,7 @@ export async function dispatchDomainRegistration({
             domain,
             userDetails,
             durationYears,
-            price: multiplyDecimal(sdkInstance.dependencies.rates.usdXrd, durationYears)
+            price: multiplyDecimal(convertToDecimal(getBasePrice(domain, sdkInstance.dependencies.rates.usdXrd).xrd), durationYears)
         });
 
         const dispatch = await sendTransaction({
