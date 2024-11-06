@@ -1,11 +1,10 @@
-import { RegistrationResponse } from "../..";
-
 import registerDomainManifest from "../../manifests/register-domain";
+
 import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";
 
-import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
+import { RegistrationDispatcherPropsI, RegistrationResponse } from "../../common/dispatcher.types";
 
 export async function dispatchDomainRegistration({
     sdkInstance,
@@ -53,6 +52,15 @@ export async function dispatchDomainRegistration({
             transaction: sdkInstance.transaction,
             callbacks
         });
+
+        if (!dispatch) {
+
+            return {
+                status: 'registration-failed',
+                verbose: `An error occurred when attempting to register ${domain}.`
+            };
+
+        }
 
         return {
             status: 'registration-successful',
