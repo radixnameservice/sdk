@@ -16,6 +16,17 @@ export interface RegistrationResponse {
     verbose: string;
 }
 
+export interface UserBadgeResponse {
+    status: 'issuance-successful' | 'issuance-failed';
+    verbose: string;
+}
+
+export interface UserBadgeDispatcherPropsI extends DispatcherPropsI {
+
+    userDetails: UserSpecificsI;
+
+}
+
 export interface RegistrationDispatcherPropsI extends DispatcherPropsI {
 
     domain: string;

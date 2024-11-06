@@ -7,6 +7,7 @@ import { DomainDetailsResponse, requestAccountDomains, requestDomainDetails } fr
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
+import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 
 import entityConfig from './entities.config';
 
@@ -14,7 +15,7 @@ import { parseEntityDetails } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
-import { RegistrationResponse } from './common/dispatcher.types';
+import { RegistrationResponse, UserBadgeResponse } from './common/dispatcher.types';
 import { UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
 import { AddressMapT } from './common/entities.types';
@@ -240,6 +241,20 @@ export default class RnsSDK {
             sdkInstance: this,
             domain,
             durationYears,
+            rdt,
+            userDetails,
+            callbacks
+        });
+
+    }
+
+    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<UserBadgeResponse> {
+
+        this.checkInitialized();
+        await this.fetchDependencies();
+
+        return dispatchUserBadgeIssuance({
+            sdkInstance: this,
             rdt,
             userDetails,
             callbacks
