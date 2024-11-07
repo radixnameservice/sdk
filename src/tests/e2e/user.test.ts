@@ -1,4 +1,3 @@
-
 import RnsSDK from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';

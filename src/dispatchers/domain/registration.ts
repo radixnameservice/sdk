@@ -1,4 +1,4 @@
-import registerDomainManifest from "../../manifests/register-domain";
+import registerDomainManifest from "../../manifests/domain-registration-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";

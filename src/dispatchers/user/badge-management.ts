@@ -1,4 +1,4 @@
-import issueBadgeManifest from "../../manifests/issue-badge";
+import issueBadgeManifest from "../../manifests/user-badge-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { UserBadgeDispatcherPropsI, UserBadgeResponse } from "../../common/dispatcher.types";
