@@ -34,7 +34,8 @@ export {
     CheckAuthenticityResponse,
     ResolvedRecordResponse,
     AuctionDetailsResponse,
-    RegistrationResponse
+    RegistrationResponse,
+    UserBadgeResponse
 };
 
 interface RnsSDKI {
