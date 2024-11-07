@@ -1,4 +1,4 @@
-import RnsKit from '../..';
+import RnsSDK from '../..';
 import Decimal from 'decimal.js';
 import { matchObjectTypes } from '../utils';
 import { convertToDecimal } from '../../utils/decimal.utils';
@@ -10,9 +10,9 @@ const attributesSchema = {
 };
 
 
-describe('RnsKit', () => {
+describe('RNS - Fetch Domain Attributes', () => {
 
-    const rns = new RnsKit({ network: 'stokenet' });
+    const rns = new RnsSDK({ network: 'stokenet' });
 
     it(`should return a 'registered' or 'settlement' status and decimal / numerical denoted price.`, async () => {
 

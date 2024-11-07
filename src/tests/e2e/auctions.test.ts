@@ -1,4 +1,4 @@
-import RnsKit from '../..';
+import RnsSDK from '../..';
 import { matchObjectTypes } from '../utils';
 
 const auctionSchema = {
@@ -8,9 +8,9 @@ const auctionSchema = {
     bids: 'object'
 };
 
-describe('RnsKit', () => {
+describe('RNS - Fetch Auction Details', () => {
 
-    const rns = new RnsKit({ network: 'stokenet' });
+    const rns = new RnsSDK({ network: 'stokenet' });
 
     it(`should return a schema match.`, async () => {
 

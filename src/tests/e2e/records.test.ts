@@ -1,4 +1,4 @@
-import RnsKit from '../..';
+import RnsSDK from '../..';
 import { matchObjectTypes } from '../utils';
 
 const recordsSchema = {
@@ -17,9 +17,9 @@ const resolvedRecordSchema = {
 };
 
 
-describe('RnsKit', () => {
+describe('RNS - Fetch Domain Records', () => {
 
-    const rns = new RnsKit({ network: 'stokenet' });
+    const rns = new RnsSDK({ network: 'stokenet' });
 
     it(`should return a corresponding record array of docket objects`, async () => {
 

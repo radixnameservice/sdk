@@ -1,4 +1,4 @@
-import RnsKit from '../..';
+import RnsSDK from '../..';
 import { matchObjectTypes } from '../utils';
 
 const detailsSchema = {
@@ -11,9 +11,9 @@ const detailsSchema = {
 }
 
 
-describe('RnsKit', () => {
+describe('RNS - Fetch Domain Details', () => {
 
-    const rns = new RnsKit({ network: 'stokenet' });
+    const rns = new RnsSDK({ network: 'stokenet' });
 
     it('should return correct domain details', async () => {
 

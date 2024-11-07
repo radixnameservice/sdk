@@ -1,4 +1,4 @@
-import RnsKit from '../..';
+import RnsSDK from '../..';
 import { matchObjectTypes } from '../utils';
 
 const domainsSchema = {
@@ -15,9 +15,9 @@ const authenticitySchema = {
     isAuthentic: 'boolean'
 };
 
-describe('RnsKit', () => {
+describe('RNS - Verify Domain Owner Accounts', () => {
 
-    const rns = new RnsKit({ network: 'stokenet' });
+    const rns = new RnsSDK({ network: 'stokenet' });
 
     it(`should return all domains within an account`, async () => {
 
