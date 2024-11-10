@@ -1,7 +1,7 @@
 import issueBadgeManifest from "../../manifests/user-badge-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { UserBadgeDispatcherPropsI, UserBadgeResponse } from "../../common/dispatcher.types";
+import { BadgeIssuanceResponse, UserBadgeDispatcherPropsI } from "../../common/dispatcher.types";
 
 
 export async function dispatchUserBadgeIssuance({
@@ -9,12 +9,11 @@ export async function dispatchUserBadgeIssuance({
     rdt,
     userDetails,
     callbacks
-}: UserBadgeDispatcherPropsI): Promise<UserBadgeResponse> {
+}: UserBadgeDispatcherPropsI): Promise<BadgeIssuanceResponse> {
 
     try {
 
-
-        const manifest = await issueBadgeManifest({
+        const manifest = issueBadgeManifest({
             sdkInstance,
             userDetails
         });
