@@ -129,13 +129,6 @@ export async function requestAccountDomains(accountAddress: string, { sdkInstanc
 
 }
 
-interface ErrorWithStatusResponse {
-    status: string;
-    verbose: string;
-}
-
-export type DomainDetailsResponse = DomainData | ErrorWithStatusResponse;
-
 export async function requestDomainDetails(domain: string, { sdkInstance }: InstancePropsI): Promise<DomainData> {
     const domainId = await domainToNonFungId(domain);
 

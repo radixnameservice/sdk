@@ -1,3 +1,4 @@
+import { ErrorWithStatusResponse } from "./feedback.types";
 import { PricePairI } from "./pricing.types";
 
 export interface DomainAttributesResponse {
@@ -18,3 +19,5 @@ export interface DomainData {
 export interface CheckAuthenticityResponse {
     isAuthentic: boolean;
 }
+
+export type DomainDetailsResponse = DomainData | ErrorWithStatusResponse;
