@@ -3,7 +3,7 @@ import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { DomainDetailsResponse, requestAccountDomains, requestDomainDetails } from './requests/address/domains';
+import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
@@ -15,14 +15,15 @@ import { parseEntityDetails } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
-import { RegistrationResponse, UserBadgeResponse } from './common/dispatcher.types';
-import { UserSpecificsI } from './common/user.types';
+import { BadgeIssuanceResponse, RegistrationResponse } from './common/dispatcher.types';
+import { UserBadgeResponse, UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
 import { AddressMapT } from './common/entities.types';
 import { RecordItem, ResolvedRecordResponse } from './common/records.types';
 import { DependenciesI } from './common/dependencies.types';
-import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
+import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData, DomainDetailsResponse } from './common/domain.types';
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
+import { getUserBadgeId } from './requests/user/badges';
 
 export {
     DomainAttributesResponse,
@@ -35,7 +36,8 @@ export {
     ResolvedRecordResponse,
     AuctionDetailsResponse,
     RegistrationResponse,
-    UserBadgeResponse
+    UserBadgeResponse,
+    BadgeIssuanceResponse
 };
 
 interface RnsSDKI {
@@ -249,7 +251,19 @@ export default class RnsSDK {
 
     }
 
-    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<UserBadgeResponse> {
+    async getUserBadge(accountAddress: string): Promise<UserBadgeResponse> {
+
+        this.checkInitialized();
+        await this.fetchDependencies();
+
+        return getUserBadgeId({
+            sdkInstance: this,
+            accountAddress
+        });
+
+    }
+
+    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<BadgeIssuanceResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();

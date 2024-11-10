@@ -16,7 +16,7 @@ export interface RegistrationResponse {
     verbose: string;
 }
 
-export interface UserBadgeResponse {
+export interface BadgeIssuanceResponse {
     status: 'issuance-successful' | 'issuance-failed';
     verbose: string;
 }

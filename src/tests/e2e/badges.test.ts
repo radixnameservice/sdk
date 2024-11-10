@@ -74,3 +74,17 @@ describe('RNS - Issue User Badge', () => {
     });
 
 });
+
+describe('RNS - Fetch User Badge', () => {
+
+    it(`should return a the corresponding account user badge ID`, async () => {
+
+        const rns = new RnsSDK({ network: 'stokenet' });
+
+        const userBadgeId = await rns.getUserBadge("account_tdx_2_129v4x3e4u5rgyz6239k92suwx70rarx33hwfl3prm54hv2ca9lp2kl");
+        
+        expect(userBadgeId).toBe("#1#");
+
+    });
+
+});
