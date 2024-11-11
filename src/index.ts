@@ -65,14 +65,14 @@ export default class RnsSDK {
 
     }
 
-    async fetchDependencies(): Promise<void> {
+    private async fetchDependencies(): Promise<void> {
 
         await this.dAppEntities();
         await this.dAppDependencies();
 
     }
 
-    initGateway({ gateway }: { gateway?: string; }): void {
+    private initGateway({ gateway }: { gateway?: string; }): void {
 
         const { status, state, transaction, stream } = GatewayApiClient.initialize({
             basePath: gateway ?? getBasePath(this.network),
