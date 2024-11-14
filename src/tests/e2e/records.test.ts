@@ -16,6 +16,31 @@ const resolvedRecordSchema = {
     nonFungibleDataList: 'object'
 };
 
+const mocks = {
+    userDetails: {
+        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
+        badgeId: '#1'
+    },
+    callbacks: {},
+    intentHash: 'txid_tdx_2_1p9j7njn5wuagry6j8mrmkvhhwvttskq2cy4e5nk2wpexhqjav2dszpptsr'
+};
+
+jest.mock('@radixdlt/radix-dapp-toolkit', () => {
+    return {
+        RadixDappToolkit: jest.fn(() => ({
+            walletApi: {
+                sendTransaction: jest.fn(() => {
+                    return {
+                        value: {
+                            transactionIntentHash: mocks.intentHash,
+                        },
+                        isErr: jest.fn(() => false),
+                    };
+                }),
+            },
+        })),
+    };
+});
 
 describe('RNS - Fetch Domain Records', () => {
 
@@ -67,3 +92,8 @@ describe('RNS - Fetch Domain Records', () => {
     });
 
 });
+
+// describe('RNS - Create a Domain Record', () => {
+
+    
+// });

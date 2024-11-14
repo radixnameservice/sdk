@@ -6,8 +6,10 @@ import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
+import { getUserBadgeId } from './requests/user/badges';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
+import { dispatchRecordCreation } from './dispatchers/record/creation';
 
 import entityConfig from './entities.config';
 
@@ -15,7 +17,7 @@ import { parseEntityDetails } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
-import { BadgeIssuanceResponse, RegistrationResponse } from './common/dispatcher.types';
+import { BadgeIssuanceResponse, RecordCreationResponse, RegistrationResponse } from './common/dispatcher.types';
 import { UserBadgeResponse, UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
 import { AddressMapT } from './common/entities.types';
@@ -23,7 +25,8 @@ import { RecordItem, ResolvedRecordResponse } from './common/records.types';
 import { DependenciesI } from './common/dependencies.types';
 import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData, DomainDetailsResponse } from './common/domain.types';
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
-import { getUserBadgeId } from './requests/user/badges';
+import { DocketI } from './common/record.types';
+import { ErrorWithStatusResponse } from './common/feedback.types';
 
 export {
     DomainAttributesResponse,
@@ -103,7 +106,7 @@ export default class RnsSDK {
         if (!domainValidation.valid) {
 
             return {
-                status: 'invalid',
+                status: 'invalid-domain',
                 verbose: domainValidation.message,
                 price: null
             };
@@ -114,7 +117,7 @@ export default class RnsSDK {
 
     }
 
-    async getDomainDetails(domain: string): Promise<DomainDetailsResponse> {
+    async getDomainDetails(domain: string): Promise<DomainDetailsResponse | ErrorWithStatusResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -125,7 +128,7 @@ export default class RnsSDK {
         if (!domainValidation.valid) {
 
             return {
-                status: 'invalid',
+                status: 'invalid-domain',
                 verbose: domainValidation.message
             };
 
@@ -240,9 +243,11 @@ export default class RnsSDK {
         this.checkInitialized();
         await this.fetchDependencies();
 
+        const normalisedDomain = normaliseDomain(domain);
+
         return dispatchDomainRegistration({
             sdkInstance: this,
-            domain,
+            domain: normalisedDomain,
             durationYears,
             rdt,
             userDetails,
@@ -272,6 +277,37 @@ export default class RnsSDK {
             sdkInstance: this,
             rdt,
             userDetails,
+            callbacks
+        });
+
+    }
+
+    async createRecord({ rdt, domain, userDetails, docket, callbacks }: { rdt: RadixDappToolkit; domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<RecordCreationResponse | ErrorWithStatusResponse> {
+
+        this.checkInitialized();
+        await this.fetchDependencies();
+
+        const domainData = await this.getDomainDetails(domain) as DomainData;
+        
+        if(!domainData) {
+
+            return {
+                status: 'invalid-domain',
+                verbose: 'This domain does not exist'
+            };
+        
+        }
+
+        // dev note: refactor error handling
+        // dev note: ensure domain passes validation
+
+        return dispatchRecordCreation({
+            sdkInstance: this,
+            rdt,
+            userDetails,
+            domainId: domainData.id,
+            rootDomainId: domainData.id,
+            docket,
             callbacks
         });
 
