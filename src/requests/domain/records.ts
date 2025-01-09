@@ -12,7 +12,7 @@ export async function requestRecords(domainName: string, { state, entities }: In
 
         const recordsVaultId = ((await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.recordServiceVaultId,
+                key_value_store_address: entities.components.domainStorage.recordServiceStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueOwn)?.value;
@@ -23,13 +23,13 @@ export async function requestRecords(domainName: string, { state, entities }: In
 
         const recordIds = (await state.innerClient.entityNonFungibleIdsPage({
             stateEntityNonFungibleIdsPageRequest: {
-                address: entities.rnsStorage,
-                resource_address: entities.resolverRecordResource,
+                address: entities.components.domainStorage.rootAddr,
+                resource_address: entities.resources.collections.records,
                 vault_address: recordsVaultId,
             }
         })).items;
 
-        return (await state.getNonFungibleData(entities.resolverRecordResource, recordIds))
+        return (await state.getNonFungibleData(entities.resources.collections.records, recordIds))
             .map(nft => {
                 if (nft.data?.programmatic_json.kind === 'Tuple') {
                     return nft.data?.programmatic_json.fields.reduce((acc, field) => {
@@ -99,7 +99,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
         const parsedDirective = directive ? `-${directive}` : '';
         const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}`);
 
-        const nft = await state.getNonFungibleData(entities.resolverRecordResource, recordId);
+        const nft = await state.getNonFungibleData(entities.resources.collections.records, recordId);
 
         if (nft?.data?.programmatic_json.kind === 'Tuple') {
 

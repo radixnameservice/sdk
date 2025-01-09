@@ -30,18 +30,18 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
 
         const domainId = await domainToNonFungId(domainName);
 
-        const domainExists = await state.getNonFungibleData(entities.domainNameResource, domainId);
+        const domainExists = await state.getNonFungibleData(entities.resources.collections.domains, domainId);
 
         const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.settlementVaultId,
+                key_value_store_address: entities.components.domainStorage.settlementConfigStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
         const domainClaimsResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.domainEventClaimsKvId,
+                key_value_store_address: entities.components.domainStorage.domainEventClaimsStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -53,7 +53,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
 
         const tldsResponse = await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.domainTldKvId,
+                key_value_store_address: entities.components.domainStorage.domainTldConfigKVAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -83,7 +83,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
         })[0];
 
         if (auctionId) {
-            const auction = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionId);
+            const auction = await state.getNonFungibleData(entities.resources.collections.auctions, auctionId);
 
             if (auction.data?.programmatic_json.kind === 'Tuple') {
                 const auctionData = auction.data.programmatic_json.fields.reduce((acc, field) => {
