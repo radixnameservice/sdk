@@ -32,7 +32,7 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
 
         const latestAuctionId = +((await state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.latestAuctionId,
+                key_value_store_address: entities.components.auctionStorage.latestAuctionId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueI64)?.value;
@@ -50,7 +50,7 @@ export async function requestAuctionDetails(domain: string, { state, entities }:
             )}]`;
         });
 
-        const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds);
+        const auctionNfts = await state.getNonFungibleData(entities.resources.collections.auctions, auctionIds);
 
         const auctionMap = auctionNfts.map((auction) => {
             if (auction.data?.programmatic_json.kind === 'Tuple') {
@@ -94,13 +94,13 @@ export async function requestAuctions({ state, entities, status }: InstanceProps
 
     const auctionIds = await state.innerClient.nonFungibleIds({
         stateNonFungibleIdsRequest: {
-            resource_address: entities.rnsAuctionNftResource,
+            resource_address: entities.resources.collections.auctions,
             cursor: nextCursor,
             ...(ledgerState && { at_ledger_state: { state_version: ledgerState.ledger_state.state_version } })
         },
     });
 
-    const auctionNfts = await state.getNonFungibleData(entities.rnsAuctionNftResource, auctionIds.non_fungible_ids.items);
+    const auctionNfts = await state.getNonFungibleData(entities.resources.collections.auctions, auctionIds.non_fungible_ids.items);
 
     const data: FormattedAuctionResultI[] = auctionNfts.map((auction) => {
         if (auction.data?.programmatic_json.kind === 'Tuple') {
@@ -136,11 +136,12 @@ export async function requestBidsForAuction(
     nextCursor: string | undefined,
     { entities, stream, status }: InstancePropsI & { stream: Stream, status: Status }
 ): Promise<AuctionBidResponse> {
+
     const ledgerState = nextCursor ? await status.getCurrent() : undefined;
 
     return stream.innerClient.streamTransactions({
         streamTransactionsRequest: {
-            affected_global_entities_filter: [entities.rnsAuctionStorage, entities.rnsAuctionNftResource],
+            affected_global_entities_filter: [entities.components.auctionStorage.rootAddr, entities.resources.collections.auctions],
             opt_ins: {
                 receipt_events: true
             },
@@ -161,6 +162,6 @@ export async function requestBidsForAuction(
             })
             .filter(b => b.auction_id === auctionId);
 
-            return { data, next_cursor: r.next_cursor, total_count: r.total_count };
+            return { data, next_cursor: r.next_cursor, total_count: r.items.length };
     });
 }
