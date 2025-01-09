@@ -1,7 +1,7 @@
-import { GatewayApiClient, GatewayStatusResponse, State, Status, Stream, Transaction } from '@radixdlt/babylon-gateway-api-sdk';
+import { GatewayApiClient,GatewayStatusResponse, State, Status, Stream, Transaction } from '@radixdlt/babylon-gateway-api-sdk';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import config from './entities.config';
-import { parseEntityDetails } from './utils/entity.utils';
+import { expandComponents } from './utils/entity.utils';
 import { DomainAttributesResponse, requestDomainStatus } from './requests/domain/status';
 import { ResolvedRecordResponse, requestRecords, resolveRecord } from './requests/domain/records';
 import { DomainDetailsResponse, DomainData, requestAccountDomains, requestDomainDetails, CheckAuthenticityResponse } from './requests/address/domains';
@@ -9,7 +9,7 @@ import { AuctionDetailsResponse, requestAuctionDetails, requestAuctions, request
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 import { RecordItem } from './mappings/records';
 import { AllAuctionsResponse, AuctionBidResponse } from './common/auction.types';
-import { AddressMapT } from './mappings/entities';
+import { EntitiesT } from './common/entities.types';
 
 export {
     DomainAttributesResponse,
@@ -37,7 +37,7 @@ export default class RnsSDK {
     transaction: Transaction;
     status: Status;
     stream: Stream;
-    entities: AddressMapT;
+    entities: EntitiesT;
 
     constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
 
@@ -177,12 +177,15 @@ export default class RnsSDK {
 
     }
 
-    private async dAppEntities(): Promise<AddressMapT> {
+    private async dAppEntities(): Promise<EntitiesT> {
 
         try {
 
             if (!this.entities) {
-                this.entities = await parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(config[this.network].entities, { explicitMetadata: ['name'] }), this.state);
+
+                const expandedComponents = await expandComponents(config[this.network].components, this.state);
+                this.entities = { ...config[this.network], components: expandedComponents }
+
             }
 
             return this.entities;
