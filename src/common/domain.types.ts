@@ -4,7 +4,7 @@ import { PricePairI } from "./pricing.types";
 export interface DomainAttributesResponse {
     status: string;
     verbose: string;
-    price: PricePairI;
+    price?: PricePairI;
 }
 
 export interface DomainData {
@@ -19,5 +19,3 @@ export interface DomainData {
 export interface CheckAuthenticityResponse {
     isAuthentic: boolean;
 }
-
-export type DomainDetailsResponse = DomainData | ErrorWithStatusResponse;
