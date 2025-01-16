@@ -14,7 +14,7 @@ export async function requestAccountDomains(accountAddress: string, { sdkInstanc
 
         const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
 
-        const domainBalance = accountNfts.non_fungible_resources.items.find(nft => nft.resource_address === sdkInstance.entities.domainNameResource)?.vaults.items[0];
+        const domainBalance = accountNfts.non_fungible_resources.items.find(nft => nft.resource_address === sdkInstance.entities.resources.collections.domains)?.vaults.items[0];
 
         const initialIds = domainBalance?.items ?? [];
 
@@ -22,13 +22,13 @@ export async function requestAccountDomains(accountAddress: string, { sdkInstanc
 
         const ledgerState = cursor ? await sdkInstance.status.getCurrent() : null;
 
-        const ids = await recursiveBalanceDomainIds(sdkInstance.state, accountAddress, domainBalance?.vault_address, sdkInstance.entities.domainNameResource, cursor, ledgerState?.ledger_state, initialIds);
+        const ids = await recursiveBalanceDomainIds(sdkInstance.state, accountAddress, domainBalance?.vault_address, sdkInstance.entities.resources.collections.domains, cursor, ledgerState?.ledger_state, initialIds);
 
         const batchedSubdomainIds = batchArray(ids, BATCHED_KV_STORE_LIMIT);
 
         const subdominKvStoreResponses = await Promise.all(batchedSubdomainIds.map((ids) => sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.subdomainVaults,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.subdomainStoreAddr,
                 keys: ids.map(id => ({ key_json: { kind: 'NonFungibleLocalId', value: id } }))
             }
         }).then(r => r.entries)));
@@ -42,15 +42,15 @@ export async function requestAccountDomains(accountAddress: string, { sdkInstanc
         const subdomainIds = await Promise.all(
             subdomainVaultIds.map(subdomainVaultId => sdkInstance.state.innerClient.entityNonFungibleIdsPage({
                 stateEntityNonFungibleIdsPageRequest: {
-                    address: sdkInstance.entities.rnsStorage,
-                    resource_address: sdkInstance.entities.domainNameResource,
+                    address: sdkInstance.entities.components.domainStorage.rootAddr,
+                    resource_address: sdkInstance.entities.resources.collections.domains,
                     vault_address: subdomainVaultId
                 }
             }).then(res => res.items)));
 
         const allOwnedSubdomains = subdomainIds.flatMap(r => r);
 
-        const nftData = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.domainNameResource, [...ids, ...allOwnedSubdomains]);
+        const nftData = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.domains, [...ids, ...allOwnedSubdomains]);
 
         const subdomains = nftData.filter(r => {
             return r.data?.programmatic_json.kind === 'Tuple'
@@ -132,7 +132,7 @@ export async function requestAccountDomains(accountAddress: string, { sdkInstanc
 export async function requestDomainDetails(domain: string, { sdkInstance }: InstancePropsI): Promise<DomainData> {
     const domainId = await domainToNonFungId(domain);
 
-    const nftData = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.domainNameResource, domainId);
+    const nftData = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.domains, domainId);
 
     if (!nftData) return null;
 

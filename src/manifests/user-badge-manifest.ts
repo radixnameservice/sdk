@@ -13,7 +13,7 @@ export default function issueBadgeManifest({
 
     return `
         CALL_METHOD
-            Address("${sdkInstance.entities.radixNameServiceComponent}")
+            Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "register_user";
         CALL_METHOD
             Address("${userDetails.accountAddress}")

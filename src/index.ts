@@ -11,22 +11,22 @@ import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
 
-import entityConfig from './entities.config';
-
-import { parseEntityDetails } from './utils/entity.utils';
+import { expandComponents } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
 import { BadgeIssuanceResponse, RecordCreationResponse, RegistrationResponse } from './common/dispatcher.types';
 import { UserBadgeResponse, UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
-import { AddressMapT } from './common/entities.types';
-import { RecordItem, ResolvedRecordResponse } from './common/records.types';
+
+import { RecordItem, ResolvedRecordResponse } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData, DomainDetailsResponse } from './common/domain.types';
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
 import { DocketI } from './common/record.types';
 import { ErrorWithStatusResponse } from './common/feedback.types';
+import { EntitiesT } from './common/entities.types';
+import config from './entities.config';
 
 export {
     DomainAttributesResponse,
@@ -57,7 +57,7 @@ export default class RnsSDK {
     transaction: Transaction;
     status: Status;
     stream: Stream;
-    entities: AddressMapT;
+    entities: EntitiesT;
     dependencies: DependenciesI;
 
     constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
@@ -288,14 +288,14 @@ export default class RnsSDK {
         await this.fetchDependencies();
 
         const domainData = await this.getDomainDetails(domain) as DomainData;
-        
-        if(!domainData) {
+
+        if (!domainData) {
 
             return {
                 status: 'invalid-domain',
                 verbose: 'This domain does not exist'
             };
-        
+
         }
 
         // dev note: refactor error handling
@@ -313,13 +313,17 @@ export default class RnsSDK {
 
     }
 
-    private async dAppEntities(): Promise<AddressMapT> {
+    private async dAppEntities(): Promise<EntitiesT> {
 
         try {
 
             if (!this.entities) {
-                this.entities = await parseEntityDetails(await this.state.getEntityDetailsVaultAggregated(entityConfig[this.network].entities, { explicitMetadata: ['name'] }), this.state);
+
+                const expandedComponents = await expandComponents(config[this.network].components, this.state);
+                this.entities = { ...config[this.network], components: expandedComponents }
+
             }
+
 
             return this.entities;
 

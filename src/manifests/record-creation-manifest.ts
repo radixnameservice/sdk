@@ -22,13 +22,13 @@ export default function recordCreationManifest({
         CALL_METHOD
             Address("${userDetails.accountAddress}")
             "create_proof_of_non_fungibles"
-            Address("${sdkInstance.entities.domainNameResource}")
+            Address("${sdkInstance.entities.resources.collections.domains}")
         Array<NonFungibleLocalId>(
             NonFungibleLocalId("${rootDomainId}");
         POP_FROM_AUTH_ZONE
             Proof("request_proof");
         CALL_METHOD
-            Address("${sdkInstance.entities.radixNameServiceComponent}")
+            Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "create_record"
             NonFungibleLocalId("${domainId}")
             "${recordDocket.context}"

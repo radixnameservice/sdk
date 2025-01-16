@@ -4,7 +4,8 @@ import { requestDomainDetails } from "../address/domains";
 import { domainToNonFungId } from "../../utils/domain.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
-import { DocketPropsI, RecordItem, ResolvedRecordResponse } from "../../common/records.types";
+import { DocketPropsI, RecordItem, ResolvedRecordResponse } from "../../common/record.types";
+
 
 export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI) {
 
@@ -14,7 +15,7 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
 
         const recordsVaultId = ((await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.recordServiceVaultId,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.recordServiceStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueOwn)?.value;
@@ -25,13 +26,13 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
 
         const recordIds = (await sdkInstance.state.innerClient.entityNonFungibleIdsPage({
             stateEntityNonFungibleIdsPageRequest: {
-                address: sdkInstance.entities.rnsStorage,
-                resource_address: sdkInstance.entities.resolverRecordResource,
+                address: sdkInstance.entities.components.domainStorage.rootAddr,
+                resource_address: sdkInstance.entities.resources.collections.records,
                 vault_address: recordsVaultId,
             }
         })).items;
 
-        return (await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resolverRecordResource, recordIds))
+        return (await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.records, recordIds))
             .map(nft => {
                 if (nft.data?.programmatic_json.kind === 'Tuple') {
                     return nft.data?.programmatic_json.fields.reduce((acc, field) => {
@@ -88,7 +89,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
         const parsedDirective = directive ? `-${directive}` : '';
         const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}`);
 
-        const nft = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resolverRecordResource, recordId);
+        const nft = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.records, recordId);
 
         if (nft?.data?.programmatic_json.kind === 'Tuple') {
 

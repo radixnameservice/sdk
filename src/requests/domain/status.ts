@@ -34,18 +34,18 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
 
         const domainId = await domainToNonFungId(domainName);
 
-        const domainExists = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.domainNameResource, domainId);
+        const domainExists = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.domains, domainId);
 
         const settlementKvStoreResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.settlementVaultId,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.settlementConfigStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
         const domainClaimsResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.domainEventClaimsKvId,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.domainEventClaimsStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -57,7 +57,7 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
 
         const tldsResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.domainTldKvId,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.domainTldConfigKVAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -87,7 +87,7 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
         })[0];
 
         if (auctionId) {
-            const auction = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.rnsAuctionNftResource, auctionId);
+            const auction = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.auctions, auctionId);
 
             if (auction.data?.programmatic_json.kind === 'Tuple') {
                 const auctionData = auction.data.programmatic_json.fields.reduce((acc, field) => {

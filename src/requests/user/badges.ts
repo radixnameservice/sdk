@@ -15,7 +15,7 @@ export async function getUserBadgeId({ sdkInstance, accountAddress }: UserBadgeR
 
         const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
 
-        const ids = accountNfts.non_fungible_resources.items.find(nft => nft.resource_address === sdkInstance.entities.rnsUserBadgeResource)?.vaults.items[0].items ?? [];
+        const ids = accountNfts.non_fungible_resources.items.find(nft => nft.resource_address === sdkInstance.entities.resources.badges.rnsUser)?.vaults.items[0].items ?? [];
 
         if (!ids.length) {
 

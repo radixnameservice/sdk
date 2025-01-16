@@ -32,14 +32,14 @@ export default async function registerDomainManifest({
         CALL_METHOD
             Address("${userDetails.accountAddress}")
             "create_proof_of_non_fungibles"
-            Address("${sdkInstance.entities.rnsUserBadgeResource}")
+            Address("${sdkInstance.entities.resources.badges.rnsUser}")
             Array<NonFungibleLocalId>(
                 NonFungibleLocalId("${userDetails.badgeId}")
             );
         POP_FROM_AUTH_ZONE
             Proof("user_proof");
         CALL_METHOD
-            Address("${sdkInstance.entities.radixNameServiceComponent}")
+            Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "register_domain"
             "${domain}"
             Address("${userDetails.accountAddress}")

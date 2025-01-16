@@ -18,7 +18,7 @@ export async function requestAuctionDetails(domain: string, { sdkInstance }: Ins
 
         const latestAuctionId = +((await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.latestAuctionId,
+                key_value_store_address: sdkInstance.entities.components.auctionStorage.latestAuctionId,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: `[${domainId}]` } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueI64)?.value;
@@ -36,7 +36,7 @@ export async function requestAuctionDetails(domain: string, { sdkInstance }: Ins
             )}]`;
         });
 
-        const auctionNfts = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.rnsAuctionNftResource, auctionIds);
+        const auctionNfts = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.auctions, auctionIds);
 
         const auctionMap = auctionNfts.map((auction) => {
             if (auction.data?.programmatic_json.kind === 'Tuple') {
@@ -82,13 +82,13 @@ export async function requestAuctions({ sdkInstance }: InstancePropsI, nextCurso
 
     const auctionIds = await sdkInstance.state.innerClient.nonFungibleIds({
         stateNonFungibleIdsRequest: {
-            resource_address: sdkInstance.entities.rnsAuctionNftResource,
+            resource_address: sdkInstance.entities.resources.collections.auctions,
             cursor: nextCursor,
             ...(ledgerState && { at_ledger_state: { state_version: ledgerState.ledger_state.state_version } })
         },
     });
 
-    const auctionNfts = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.rnsAuctionNftResource, auctionIds.non_fungible_ids.items);
+    const auctionNfts = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.auctions, auctionIds.non_fungible_ids.items);
 
     const data: FormattedAuctionResultI[] = auctionNfts.map((auction) => {
         if (auction.data?.programmatic_json.kind === 'Tuple') {
@@ -127,7 +127,7 @@ export async function requestBidsForAuction(
 
     return sdkInstance.stream.innerClient.streamTransactions({
         streamTransactionsRequest: {
-            affected_global_entities_filter: [sdkInstance.entities.rnsAuctionStorage, sdkInstance.entities.rnsAuctionNftResource],
+            affected_global_entities_filter: [sdkInstance.entities.components.auctionStorage.rootAddr, sdkInstance.entities.resources.collections.auctions],
             opt_ins: {
                 receipt_events: true
             },
@@ -148,6 +148,6 @@ export async function requestBidsForAuction(
             })
             .filter(b => b.auction_id === auctionId);
 
-        return { data, next_cursor: r.next_cursor, total_count: r.total_count };
+        return { data, next_cursor: r.next_cursor, total_count: r.items.length };
     });
 }

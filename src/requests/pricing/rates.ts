@@ -12,7 +12,7 @@ export async function requestXRDExchangeRate({ sdkInstance }: InstancePropsI): P
 
         const tokenUsdPrice = ((await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: sdkInstance.entities.tokenUsdPriceKvStore,
+                key_value_store_address: sdkInstance.entities.components.feeService.xrdToUsdRateAddr,
                 keys: [{ key_json: { kind: 'Reference', value: (await sdkInstance.status.getNetworkConfiguration()).well_known_addresses.xrd } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueOwn)?.value;
