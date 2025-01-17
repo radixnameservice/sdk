@@ -1,13 +1,14 @@
+<<<<<<< HEAD
 import RnsSDK from "..";
 import { State, StateEntityDetailsResponseComponentDetails } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { parsePricingTiers } from "../utils/pricing.utils";
 import { NetworkT } from "../utils/gateway.utils";
 
-
-export interface InstancePropsI {
-    sdkInstance: RnsSDK;
-}
+=======
+import { State, StateEntityDetailsResponseComponentDetails } from "@radixdlt/babylon-gateway-api-sdk";
+import { parsePricingTiers } from "../utils/pricing.utils";
+import { NetworkT } from "../utils/gateway.utils";
 
 export type ComponentReferencesT = {
 
@@ -54,6 +55,58 @@ export type EntitiesConfigT = {
     [key in NetworkT]: EntityStructT;
 
 };
+>>>>>>> main
+
+export interface InstancePropsI {
+    sdkInstance: RnsSDK;
+}
+
+export type ComponentReferencesT = {
+
+    domainStorage: string;
+    auctionStorage: string;
+    feeService: string;
+    coreVersionManager: string;
+
+};
+
+export type EntityStructT = {
+
+    components: ComponentReferencesT;
+    resources: {
+        collections: {
+            launchCommemoration: string;
+            auctions: string;
+            domains: string;
+            records: string;
+        }
+        badges: {
+            serviceDeployment: string;
+            upgrade: string;
+            admin: string;
+            storage: string;
+            service: string;
+            rnsUser: string;
+            domainUser: string;
+            auctionBid: string;
+            actionClaims: string;
+            auctionSettlement: string;
+            sunriseLandrushInitiativeSeed: string;
+            activation: string;
+        }
+        transients: {
+            subdomainRecaller: string;
+        }
+    }
+
+};
+
+<<<<<<< HEAD
+export type EntitiesConfigT = {
+
+    [key in NetworkT]: EntityStructT;
+
+};
 
 export interface ComponentDetailsI {
 
@@ -64,6 +117,22 @@ export interface ComponentDetailsI {
 
 }
 
+=======
+    state: State;
+    entities: EntitiesT;
+
+}
+
+export interface ComponentDetailsI {
+
+    kind: string;
+    type_name: string;
+    field_name: string;
+    value: string;
+
+}
+
+>>>>>>> main
 export interface ComponentCommonI {
 
     rootAddr: string;
