@@ -44,4 +44,5 @@ describe('RNS - Verify Domain Owner Accounts', () => {
         expect('isAuthentic' in authenticity && authenticity.isAuthentic).toBe(false);
 
     });
+    
 });
