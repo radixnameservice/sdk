@@ -1,20 +1,16 @@
-export function matchObjectTypes(obj, schema) {
+export function matchObjectTypes<T>(
+    obj: unknown,
+    expectedKeys: (keyof T)[]
+): obj is T {
+    if (typeof obj !== 'object' || obj === null) {
+        return false;
+    }
 
-    for (const key in schema) {
-
-        if (schema.hasOwnProperty(key)) {
-
-            const expectedType = schema?.[key];
-            const receivedValue = obj?.[key];
-
-            if (typeof receivedValue !== expectedType) {
-                return false;
-            }
-
+    for (const key of expectedKeys) {
+        if (!(key in obj)) {
+            return false;
         }
-
     }
 
     return true;
-
 }
