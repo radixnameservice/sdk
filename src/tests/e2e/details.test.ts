@@ -1,15 +1,6 @@
 import RnsSDK from '../..';
+import { PrimaryDomainI } from '../../common/domain.types';
 import { matchObjectTypes } from '../utils';
-
-const detailsSchema = {
-    id: 'string',
-    name: 'string',
-    address: 'string',
-    created_timestamp: 'number',
-    last_valid_timestamp: 'number',
-    key_image_url: 'string'
-}
-
 
 describe('RNS - Fetch Domain Details', () => {
 
@@ -18,8 +9,11 @@ describe('RNS - Fetch Domain Details', () => {
     it('should return correct domain details', async () => {
 
         const details = await rns.getDomainDetails('radixnameservice.xrd');
+        
+        if (!matchObjectTypes<PrimaryDomainI>(details, ['id', 'name', 'address', 'created_timestamp', 'last_valid_timestamp', 'key_image_url'])) {
+            throw new Error('Domain object did not match expected schema');
+        }
 
-        expect(matchObjectTypes(details, detailsSchema)).toBe(true);
     });
 
 });

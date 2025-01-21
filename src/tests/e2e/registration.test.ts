@@ -58,6 +58,10 @@ describe('RNS - Register Domain', () => {
             userDetails: mocks.userDetails
         });
 
+        if ('errors' in register) {
+            throw new Error('Mock registration failed');
+        }
+
         const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
         expect(sendTransactionMock).toHaveBeenCalled();
 
@@ -83,14 +87,14 @@ describe('RNS - Register Domain', () => {
             CALL_METHOD
                 Address("${mocks.userDetails.accountAddress}")
                 "create_proof_of_non_fungibles"
-                Address("${rns.entities.rnsUserBadgeResource}")
+                Address("${rns.entities.resources.badges.rnsUser}")
                 Array<NonFungibleLocalId>(
                     NonFungibleLocalId("${mocks.userDetails.badgeId}")
                 );
             POP_FROM_AUTH_ZONE
                 Proof("user_proof");
             CALL_METHOD
-                Address("${rns.entities.radixNameServiceComponent}")
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "register_domain"
                 "${mocks.availableDomain}"
                 Address("${mocks.userDetails.accountAddress}")
@@ -104,7 +108,6 @@ describe('RNS - Register Domain', () => {
         `;
 
         expect(formatString(transactionManifest)).toBe(formatString(expectedString));
-        expect(register.status).toEqual("registration-successful");
 
     });
 

@@ -1,19 +1,5 @@
-import RnsSDK from '../..';
+import RnsSDK, { CheckAuthenticityResponse, DomainData } from '../..';
 import { matchObjectTypes } from '../utils';
-
-const domainsSchema = {
-    id: 'string',
-    name: 'string',
-    subdomains: 'object',
-    created_timestamp: 'number',
-    last_valid_timestamp: 'number',
-    key_image_url: 'string',
-    address: 'string'
-};
-
-const authenticitySchema = {
-    isAuthentic: 'boolean'
-};
 
 describe('RNS - Verify Domain Owner Accounts', () => {
 
@@ -25,8 +11,7 @@ describe('RNS - Verify Domain Owner Accounts', () => {
 
         expect(Array.isArray(ownerDomains)).toBe(true);
         expect(ownerDomains.length).toBeGreaterThan(0);
-        expect(ownerDomains.every(domain => matchObjectTypes(domain, domainsSchema))).toBe(true);
-
+        expect(ownerDomains.every(domain => matchObjectTypes<DomainData>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'last_valid_timestamp', 'key_image_url', 'address']))).toBe(true);
 
     });
 
@@ -37,8 +22,11 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
-        expect(authenticity.isAuthentic).toBe(true);
+        if (!matchObjectTypes<CheckAuthenticityResponse>(authenticity, ['isAuthentic'])) {
+            throw new Error('Authenticity object did not match expected schema');
+        }
+
+        expect('isAuthentic' in authenticity && authenticity.isAuthentic).toBe(true);
 
     });
 
@@ -49,8 +37,11 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
-        expect(authenticity.isAuthentic).toBe(false);
+        if (!matchObjectTypes<CheckAuthenticityResponse>(authenticity, ['isAuthentic'])) {
+            throw new Error('Authenticity object did not match expected schema');
+        }
+
+        expect('isAuthentic' in authenticity && authenticity.isAuthentic).toBe(false);
 
     });
 

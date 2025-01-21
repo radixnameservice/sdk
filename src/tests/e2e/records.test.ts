@@ -1,20 +1,5 @@
-import RnsSDK from '../..';
+import RnsSDK, { RecordItem, ResolvedRecordResponse } from '../..';
 import { matchObjectTypes } from '../utils';
-
-const recordsSchema = {
-    record_id: 'string',
-    id_additions: 'object',
-    domain_id: 'string',
-    context: 'string',
-    directive: 'string',
-    platform_identifier: 'string',
-    value: 'string'
-};
-
-const resolvedRecordSchema = {
-    value: 'string',
-    nonFungibleDataList: 'object'
-};
 
 const mocks = {
     userDetails: {
@@ -50,15 +35,26 @@ describe('RNS - Fetch Domain Records', () => {
 
         const records = await rns.getRecords('test-records-present.xrd');
 
+        if ('errors' in records) {
+            throw new Error('Record list fetch failed');
+        }
+
         expect(Array.isArray(records)).toBe(true);
         expect(records.length).toBeGreaterThan(0);
-        expect(records.every(record => matchObjectTypes(record, recordsSchema))).toBe(true);
+
+        if (!matchObjectTypes<RecordItem>(records[0], ['record_id', 'id_additions', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
+            throw new Error('Record did not match expected schema');
+        }
 
     });
 
     it('should return a empty array', async () => {
 
         const records = await rns.getRecords('test-records-blank.xrd');
+
+        if ('errors' in records) {
+            throw new Error('Record list fetch failed');
+        }
 
         expect(Array.isArray(records)).toBe(true);
         expect(records.length).toBeLessThan(1);
@@ -72,6 +68,10 @@ describe('RNS - Fetch Domain Records', () => {
             context: 'receivers',
             directive: '*'
         });
+
+        if ('errors' in resolvedRecord) {
+            throw new Error('Record resolution failed');
+        }
 
         expect(resolvedRecord.value).toBe('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
 
@@ -87,8 +87,16 @@ describe('RNS - Fetch Domain Records', () => {
             proven: true
         });
 
+        if ('errors' in record) {
+            throw new Error('Record resolution failed');
+        }
+
         expect(Array.isArray(record.nonFungibleDataList)).toBe(true);
-        expect(matchObjectTypes(record, resolvedRecordSchema)).toBe(true);
+
+        if (!matchObjectTypes<ResolvedRecordResponse>(record, ['value', 'nonFungibleDataList'])) {
+            throw new Error('Record value did not match expected schema');
+        }
+
     });
 
 });

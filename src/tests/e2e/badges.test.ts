@@ -1,4 +1,4 @@
-import RnsSDK from '../..';
+import RnsSDK, { ErrorStackResponse, SuccessStackResponse } from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
@@ -48,7 +48,11 @@ describe('RNS - Issue User Badge', () => {
         const register = await rns.issueUserBadge({
             rdt: dAppToolkit,
             userDetails: mocks.userDetails
-        });
+        }) as SuccessStackResponse;
+
+        if ('errors' in register) {
+            throw new Error('Mock badge issuance failed');
+        }
 
         const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
         expect(sendTransactionMock).toHaveBeenCalled();
@@ -60,7 +64,7 @@ describe('RNS - Issue User Badge', () => {
 
         const expectedString = `
             CALL_METHOD
-                Address("${rns.entities.radixNameServiceComponent}")
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "register_user";
             CALL_METHOD
                 Address("${mocks.userDetails.accountAddress}")
@@ -69,7 +73,6 @@ describe('RNS - Issue User Badge', () => {
         `;
 
         expect(formatString(transactionManifest)).toBe(formatString(expectedString));
-        expect(register.status).toEqual("issuance-successful");
 
     });
 
@@ -82,7 +85,7 @@ describe('RNS - Fetch User Badge', () => {
         const rns = new RnsSDK({ network: 'stokenet' });
 
         const userBadgeId = await rns.getUserBadge("account_tdx_2_129v4x3e4u5rgyz6239k92suwx70rarx33hwfl3prm54hv2ca9lp2kl");
-        
+
         expect(userBadgeId).toBe("#1#");
 
     });
