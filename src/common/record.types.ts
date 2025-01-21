@@ -11,18 +11,6 @@ export interface DocketI {
 
 }
 
-export interface RecordResultI {
-
-    record_id: string;
-    id_additions: number[];
-    domain_id: string;
-    context: string;
-    directive: string;
-    platform_identifier: string;
-    value: string;
-
-}
-
 export interface RecordItem {
     record_id: string;
     platform_identifier: string;
@@ -46,4 +34,4 @@ export interface ResolvedRecordResponse {
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
 }
 
-export type RecordResultsT = RecordResultI[] | [];
+export type RecordResultsT = RecordItem[] | [];
