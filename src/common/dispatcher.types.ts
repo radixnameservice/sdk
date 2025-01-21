@@ -12,21 +12,6 @@ export interface DispatcherPropsI extends InstancePropsI {
 
 }
 
-export interface RegistrationResponse {
-    status: 'registration-successful' | 'registration-failed';
-    verbose: string;
-}
-
-export interface BadgeIssuanceResponse {
-    status: 'issuance-successful' | 'issuance-failed';
-    verbose: string;
-}
-
-export interface RecordCreationResponse {
-    status: 'creation-successful' | 'creation-failed';
-    verbose: string;
-}
-
 export interface UserBadgeDispatcherPropsI extends DispatcherPropsI {
 
     userDetails: UserSpecificsI;
