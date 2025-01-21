@@ -4,7 +4,10 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";
 
-import { RegistrationDispatcherPropsI, RegistrationResponse } from "../../common/dispatcher.types";
+import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
+import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
+import { commonErrors, registrationErrors } from "../../common/errors";
+import { errorResponse, successResponse } from "../../utils/response.utils";
 
 export async function dispatchDomainRegistration({
     sdkInstance,
@@ -13,29 +16,18 @@ export async function dispatchDomainRegistration({
     durationYears,
     userDetails,
     callbacks
-}: RegistrationDispatcherPropsI): Promise<RegistrationResponse> {
+}: RegistrationDispatcherPropsI): Promise<SuccessStackResponse | ErrorStackResponse> {
 
     try {
 
         const details = await sdkInstance.getDomainAttributes(domain);
 
-        if (!details) {
-
-            return {
-                status: 'registration-failed',
-                verbose: `An error occurred during the pre-registration checks, please try again.`
-            };
-
+        if ('errors' in details) {
+            return details;
         }
 
-        if (details.status !== 'available') {
-
-            return {
-                status: 'registration-failed',
-                verbose: `${domain} could not be registered as is already taken / reserved.`
-            };
-
-        }
+        if (details.status !== 'available')
+            return errorResponse(commonErrors.domainTaken({ domain }));
 
         const manifest = await registerDomainManifest({
             sdkInstance,
@@ -53,26 +45,17 @@ export async function dispatchDomainRegistration({
             callbacks
         });
 
-        if (!dispatch) {
+        if (!dispatch)
+            return errorResponse(registrationErrors.generic({ domain }));
 
-            return {
-                status: 'registration-failed',
-                verbose: `An error occurred when attempting to register ${domain}.`
-            };
-
-        }
-
-        return {
-            status: 'registration-successful',
-            verbose: `${domain} was succesfully registered.`
-        };
+        return successResponse({
+            code: 'REGISTRATION_SUCCESSFUL',
+            details: `${domain} was succesfully registered.`
+        });
 
     } catch (error) {
 
-        return {
-            status: 'registration-failed',
-            verbose: `An error occurred when attempting to register ${domain}: ${error}.`
-        };
+        return errorResponse(registrationErrors.generic({ domain, verbose: error }));
 
     }
 

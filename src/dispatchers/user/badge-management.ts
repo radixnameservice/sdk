@@ -1,7 +1,10 @@
 import issueBadgeManifest from "../../manifests/user-badge-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { BadgeIssuanceResponse, UserBadgeDispatcherPropsI } from "../../common/dispatcher.types";
+import { UserBadgeDispatcherPropsI } from "../../common/dispatcher.types";
+import { errorResponse, successResponse } from "../../utils/response.utils";
+import { badgeErrors } from "../../common/errors";
+import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
 
 
 export async function dispatchUserBadgeIssuance({
@@ -9,7 +12,7 @@ export async function dispatchUserBadgeIssuance({
     rdt,
     userDetails,
     callbacks
-}: UserBadgeDispatcherPropsI): Promise<BadgeIssuanceResponse> {
+}: UserBadgeDispatcherPropsI): Promise<SuccessStackResponse | ErrorStackResponse> {
 
     try {
 
@@ -26,26 +29,18 @@ export async function dispatchUserBadgeIssuance({
             callbacks
         });
 
-        if (!dispatch) {
+        if (!dispatch)
+            return errorResponse(badgeErrors.userIssuance({ accountAddress: userDetails.accountAddress }));
 
-            return {
-                status: 'issuance-failed',
-                verbose: `An error occurred when attempting to issue an RNS user badge to account: ${userDetails.accountAddress}.`
-            };
 
-        }
-
-        return {
-            status: 'issuance-successful',
-            verbose: `An RNS badge was was succesfully issued to account: ${userDetails.accountAddress}.`
-        };
+        return successResponse({
+            code: 'USER_BADGE_ISSUED',
+            details: `An RNS badge was was succesfully issued to account: ${userDetails.accountAddress}.`
+        });
 
     } catch (error) {
 
-        return {
-            status: 'issuance-failed',
-            verbose: `An error occurred when attempting to issue an RNS user badge: ${error}.`
-        };
+        return errorResponse(badgeErrors.userIssuance({ accountAddress: userDetails.accountAddress, verbose: error }));
 
     }
 

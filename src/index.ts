@@ -15,7 +15,6 @@ import { expandComponents } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 
-import { BadgeIssuanceResponse, RecordCreationResponse, RegistrationResponse } from './common/dispatcher.types';
 import { UserBadgeResponse, UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
 
@@ -24,11 +23,11 @@ import { DependenciesI } from './common/dependencies.types';
 import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
 import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
 import { DocketI } from './common/record.types';
-import { ErrorWithStatusResponse } from './common/feedback.types';
-import { ErrorStackResponse } from './common/error.types';
+import { SuccessStackResponse, ErrorStackResponse } from './common/response.types';
 import { commonErrors } from './common/errors';
 import { EntitiesT } from './common/entities.types';
 import config from './entities.config';
+import { errorResponse } from './utils/response.utils';
 
 export {
     DomainAttributesResponse,
@@ -39,9 +38,9 @@ export {
     CheckAuthenticityResponse,
     ResolvedRecordResponse,
     AuctionDetailsResponse,
-    RegistrationResponse,
     UserBadgeResponse,
-    BadgeIssuanceResponse
+    SuccessStackResponse,
+    ErrorStackResponse
 };
 
 interface RnsSDKI {
@@ -104,15 +103,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid) {
-
-            return {
-                errors: [
-                    commonErrors.invalidDomain(domain, domainValidation.message)
-                ]
-            };
-
-        }
+        if (!domainValidation.valid)
+            return errorResponse(commonErrors.invalidDomain({ domain, verbose: domainValidation.message }));
 
         return requestDomainStatus(normalisedDomain, { sdkInstance: this });
 
@@ -126,42 +118,21 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid) {
-
-            return {
-                errors: [
-                    commonErrors.invalidDomain(domain, domainValidation.message)
-                ]
-            };
-
-        }
+        if (!domainValidation.valid)
+            return errorResponse(commonErrors.invalidDomain({ domain, verbose: domainValidation.message }));
 
         const details = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
-        if (!details) {
-
-            return {
-                errors: [
-                    commonErrors.emptyDomainDetails(domain)
-                ]
-            };
-
-        }
+        if (!details)
+            return errorResponse(commonErrors.emptyDomainDetails({ domain }));
 
         const isAuthentic = await this.checkAuthenticity({
             domain: normalisedDomain,
             accountAddress: details.address
         });
 
-        if (!isAuthentic) {
-
-            return {
-                errors: [
-                    commonErrors.authenticityMismatch(domain)
-                ]
-            };
-
-        }
+        if (!isAuthentic)
+            return errorResponse(commonErrors.authenticityMismatch({ domain }));
 
         return details;
 
@@ -175,15 +146,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid) {
-
-            return {
-                errors: [
-                    commonErrors.invalidDomain(domain, domainValidation.message)
-                ]
-            };
-
-        }
+        if (!domainValidation.valid)
+            return errorResponse(commonErrors.invalidDomain({ domain, verbose: domainValidation.message }));
 
         const details = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
@@ -192,15 +156,9 @@ export default class RnsSDK {
             accountAddress: details.address
         });
 
-        if (!isAuthentic) {
+        if (!isAuthentic)
+            return errorResponse(commonErrors.authenticityMismatch({ domain }));
 
-            return {
-                errors: [
-                    commonErrors.authenticityMismatch(domain)
-                ]
-            };
-
-        }
 
         return requestRecords(normalisedDomain, { sdkInstance: this });
 
@@ -214,15 +172,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid) {
-
-            return {
-                errors: [
-                    commonErrors.invalidDomain(domain, domainValidation.message)
-                ]
-            };
-
-        }
+        if (!domainValidation.valid)
+            return errorResponse(commonErrors.invalidDomain({ domain, verbose: domainValidation.message }));
 
         const details = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
@@ -231,15 +182,8 @@ export default class RnsSDK {
             accountAddress: details.address
         });
 
-        if (!isAuthentic) {
-
-            return {
-                errors: [
-                    commonErrors.authenticityMismatch(domain)
-                ]
-            };
-
-        }
+        if (!isAuthentic)
+            return errorResponse(commonErrors.authenticityMismatch({ domain }));
 
         return resolveRecord(normalisedDomain, { context, directive, proven }, { sdkInstance: this });
 
@@ -289,13 +233,8 @@ export default class RnsSDK {
 
         const domainInterests = await this.getAccountDomains(accountAddress);
 
-        if (!domainInterests || domainInterests.length < 1) {
-            return {
-                errors: [
-                    commonErrors.authenticityMismatch(domain)
-                ]
-            };
-        }
+        if (!domainInterests || domainInterests.length < 1)
+            return errorResponse(commonErrors.authenticityMismatch({ domain }));
 
         const isAuthentic = domainInterests.find((interestDomain) => interestDomain.name === domain)?.address === accountAddress;
 
@@ -305,7 +244,7 @@ export default class RnsSDK {
 
     }
 
-    async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<RegistrationResponse> {
+    async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<SuccessStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -323,7 +262,7 @@ export default class RnsSDK {
 
     }
 
-    async getUserBadge(accountAddress: string): Promise<UserBadgeResponse> {
+    async getUserBadge(accountAddress: string): Promise<UserBadgeResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -335,7 +274,7 @@ export default class RnsSDK {
 
     }
 
-    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<BadgeIssuanceResponse> {
+    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<SuccessStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -349,20 +288,15 @@ export default class RnsSDK {
 
     }
 
-    async createRecord({ rdt, domain, userDetails, docket, callbacks }: { rdt: RadixDappToolkit; domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<RecordCreationResponse | ErrorWithStatusResponse> {
+    async createRecord({ rdt, domain, userDetails, docket, callbacks }: { rdt: RadixDappToolkit; domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<SuccessStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
 
-        const domainData = await this.getDomainDetails(domain) as DomainData;
+        const domainData = await this.getDomainDetails(domain);
 
-        if (!domainData) {
-
-            return {
-                status: 'invalid-domain',
-                verbose: 'This domain does not exist'
-            };
-
+        if ('errors' in domainData) {
+            return domainData;
         }
 
         return dispatchRecordCreation({
@@ -393,7 +327,7 @@ export default class RnsSDK {
 
         } catch (error) {
 
-            throw new Error(`RNS SDK: Could not fetch RNS (dApp component) entities: ${error}`);
+            throw new Error(`RNS SDK: Could not fetch RNS entities: ${error}`);
 
         }
 
@@ -419,7 +353,7 @@ export default class RnsSDK {
 
         } catch (error) {
 
-            throw new Error(`RNS SDK: Could not fetch RNS (dApp component) dependencies: ${error}`);
+            throw new Error(`RNS SDK: Could not fetch RNS dependencies: ${error}`);
 
         }
 

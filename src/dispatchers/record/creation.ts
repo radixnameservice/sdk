@@ -1,7 +1,10 @@
 import recordCreationManifest from "../../manifests/record-creation-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { CreateRecordDispatcherPropsI, RecordCreationResponse } from "../../common/dispatcher.types";
+import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
+import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
+import { errorResponse, successResponse } from "../../utils/response.utils";
+import { recordErrors } from "../../common/errors";
 
 
 export async function dispatchRecordCreation({
@@ -12,7 +15,7 @@ export async function dispatchRecordCreation({
     rootDomainId,
     docket,
     callbacks
-}: CreateRecordDispatcherPropsI): Promise<RecordCreationResponse> { 
+}: CreateRecordDispatcherPropsI): Promise<SuccessStackResponse | ErrorStackResponse> {
 
     try {
 
@@ -32,26 +35,17 @@ export async function dispatchRecordCreation({
             callbacks
         });
 
-        if (!dispatch) {
+        if (!dispatch)
+            return errorResponse(recordErrors.creation({ docket }));
 
-            return {
-                status: 'creation-failed',
-                verbose: `An error occurred when attempting to create a domain record for: ${docket.context}:${docket.directive}.`
-            };
-
-        }
-
-        return {
-            status: 'creation-successful',
-            verbose: `An domain record was succesfully created.`
-        };
+        return successResponse({
+            code: 'RECORD_SUCCESFULLY_CREATED',
+            details: `The domain record was successfully created.`
+        });
 
     } catch (error) {
 
-        return {
-            status: 'creation-failed',
-            verbose: `An error occurred when attempting to create an domain record: ${error}.`
-        };
+        return errorResponse(recordErrors.creation({ docket, verbose: error }));
 
     }
 
