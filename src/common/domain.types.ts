@@ -16,7 +16,7 @@ export interface DomainData {
     address: string | null,
 }
 
-export interface PrimaryDomainI {
+export interface RootDomainI {
     
     id: string,
     name: string,
