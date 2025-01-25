@@ -227,6 +227,29 @@ function formatDomainList(
 
 }
 
+async function fetchDomainData(
+
+    accountAddress: string,
+    { sdkInstance }: InstancePropsI
+
+): Promise<DomainData[]> {
+
+    const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
+
+    const rootDomainResourceIds = await fetchRootDomainIds(accountAddress, accountNfts, { sdkInstance });
+    if (!rootDomainResourceIds.length) return [];
+
+    const subdomainDomainResourceIds = await fetchSubdomainIds(rootDomainResourceIds, { sdkInstance });
+
+    const domains = await sdkInstance.state.getNonFungibleData(
+        sdkInstance.entities.resources.collections.domains,
+        [...rootDomainResourceIds, ...subdomainDomainResourceIds]
+    );
+
+    return formatDomainList(domains);
+
+}
+
 export async function requestAccountDomains(
 
     accountAddress: string,
@@ -238,25 +261,7 @@ export async function requestAccountDomains(
 
     try {
 
-        const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
-
-        const rootDomainResourceIds = await fetchRootDomainIds(
-            accountAddress,
-            accountNfts,
-            { sdkInstance }
-        );
-
-        if (!rootDomainResourceIds.length) return [];
-
-        const subdomainDomainResourceIds = await fetchSubdomainIds(
-            rootDomainResourceIds,
-            { sdkInstance }
-        );
-
-        const domains = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.domains, [...rootDomainResourceIds, ...subdomainDomainResourceIds]);
-
-        return formatDomainList(domains);
-
+        return await fetchDomainData(accountAddress, { sdkInstance });
 
     } catch (e) {
 
