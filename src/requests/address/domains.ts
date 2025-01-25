@@ -1,4 +1,4 @@
-import { NonFungibleResourcesCollectionItemVaultAggregatedVaultItem, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, StateEntityDetailsVaultResponseItem, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
+import { NonFungibleResourcesCollectionItemVaultAggregatedVaultItem, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, StateEntityDetailsVaultResponseItem, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { deriveRootDomain, domainToNonFungId } from "../../utils/domain.utils";
 import { batchArray } from "../../utils/array.utils";
