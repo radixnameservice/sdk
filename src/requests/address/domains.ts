@@ -1,4 +1,4 @@
-import { ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, StateEntityDetailsVaultResponseItem, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
+import { NonFungibleResourcesCollectionItemVaultAggregatedVaultItem, ProgrammaticScryptoSborValueOwn, ProgrammaticScryptoSborValueReference, ProgrammaticScryptoSborValueTuple, State, StateEntityDetailsVaultResponseItem, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { deriveRootDomain, domainToNonFungId } from "../../utils/domain.utils";
 import { batchArray } from "../../utils/array.utils";
@@ -8,7 +8,7 @@ import { InstancePropsI } from "../../common/entities.types";
 
 import { BATCHED_KV_STORE_LIMIT } from "../../api.config";
 
-function filterUserDomainVault(accountNfts, domainResourceAddr) {
+function filterUserDomainVault(accountNfts: StateEntityDetailsVaultResponseItem, domainResourceAddr: string): NonFungibleResourcesCollectionItemVaultAggregatedVaultItem {
 
     return accountNfts.non_fungible_resources.items.find(
         (nft) => nft.resource_address === domainResourceAddr
@@ -66,7 +66,7 @@ async function fetchRootDomainIds(
 
 }
 
-async function fetchSubdomainIds(rootDomainResourceIds: string[], { sdkInstance }) {
+async function fetchSubdomainIds(rootDomainResourceIds: string[], { sdkInstance }): Promise<string[]> {
 
     const batchedRootDomainIds = batchArray(rootDomainResourceIds, BATCHED_KV_STORE_LIMIT);
 
