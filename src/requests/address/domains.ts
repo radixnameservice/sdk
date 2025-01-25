@@ -56,24 +56,30 @@ async function fetchRootDomainIds(
 ): Promise<string[]> {
 
     const accountDomainVault = filterUserDomainVault(accountNfts, sdkInstance.entities.resources.collections.domains);
-
     if (!accountDomainVault?.items) return [];
 
     let { items: domainIds, vault_address: userDomainVaultAddr } = accountDomainVault;
-    let cursor: string | null = accountDomainVault.next_cursor || null;
+
+    if (!accountDomainVault?.next_cursor) {
+        return domainIds;
+    }
+
+    let cursor: string | null = null;
 
     do {
+
         try {
 
             const ledgerStateVersion = (await sdkInstance.status.getCurrent()).ledger_state.state_version;
+
             const response = await sdkInstance.state.innerClient.entityNonFungibleIdsPage({
                 stateEntityNonFungibleIdsPageRequest: {
                     address: accountAddress,
                     resource_address: sdkInstance.entities.resources.collections.domains,
                     vault_address: userDomainVaultAddr,
                     cursor,
-                    at_ledger_state: { state_version: ledgerStateVersion },
-                },
+                    at_ledger_state: { state_version: ledgerStateVersion }
+                }
             });
 
             cursor = response?.next_cursor || null;
@@ -85,12 +91,12 @@ async function fetchRootDomainIds(
             break;
 
         }
+
     } while (cursor !== null);
 
     return domainIds;
 
 }
-
 
 async function fetchSubdomainIds(
 
@@ -102,41 +108,33 @@ async function fetchSubdomainIds(
     const batchedRootDomainIds = batchArray(rootDomainResourceIds, BATCHED_KV_STORE_LIMIT);
 
     try {
-        const subdomainKvStoreResponses = await Promise.all(
-            batchedRootDomainIds.map((subdomainIdBatch) =>
-                sdkInstance.state.innerClient
-                    .keyValueStoreData({
-                        stateKeyValueStoreDataRequest: {
-                            key_value_store_address: sdkInstance.entities.components.domainStorage.subdomainStoreAddr,
-                            keys: subdomainIdBatch.map((id) => ({
-                                key_json: { kind: "NonFungibleLocalId", value: id },
-                            })),
-                        },
-                    })
-                    .then((r) => r.entries)
-            )
-        );
+
+        const subdomainKvStoreResponses = await Promise.all(batchedRootDomainIds.map((subdomainIdBatch) => {
+
+            return sdkInstance.state.innerClient.keyValueStoreData({
+                stateKeyValueStoreDataRequest: {
+                    key_value_store_address: sdkInstance.entities.components.domainStorage.subdomainStoreAddr,
+                    keys: subdomainIdBatch.map(id => ({ key_json: { kind: 'NonFungibleLocalId', value: id } }))
+                }
+            }).then(r => r.entries)
+
+        }));
 
         const subdomainKvStoreResponse = subdomainKvStoreResponses.reduce((acc, r) => acc.concat(r), []);
-        const subdomainVaultIds: string[] = subdomainKvStoreResponse.map(
-            (kvResponse) => (kvResponse.value.programmatic_json as ProgrammaticScryptoSborValueOwn).value
-        );
+        const subdomainVaultIds: string[] = subdomainKvStoreResponse.map(kvResponse => (kvResponse.value.programmatic_json as ProgrammaticScryptoSborValueOwn).value);
 
         const subdomainIdBatches = await Promise.all(
-            subdomainVaultIds.map((subdomainVaultId) =>
-                sdkInstance.state.innerClient
-                    .entityNonFungibleIdsPage({
-                        stateEntityNonFungibleIdsPageRequest: {
-                            address: sdkInstance.entities.components.domainStorage.rootAddr,
-                            resource_address: sdkInstance.entities.resources.collections.domains,
-                            vault_address: subdomainVaultId,
-                        },
-                    })
-                    .then((res) => res.items)
-            )
-        );
 
-        return subdomainIdBatches.flatMap((r) => r);
+            subdomainVaultIds.map(subdomainVaultId => sdkInstance.state.innerClient.entityNonFungibleIdsPage({
+                stateEntityNonFungibleIdsPageRequest: {
+                    address: sdkInstance.entities.components.domainStorage.rootAddr,
+                    resource_address: sdkInstance.entities.resources.collections.domains,
+                    vault_address: subdomainVaultId
+                }
+
+            }).then(res => res.items)));
+
+        return subdomainIdBatches.flatMap(r => r);
 
     } catch (error) {
 
@@ -144,8 +142,8 @@ async function fetchSubdomainIds(
         return [];
 
     }
-}
 
+}
 
 function filterSubdomains(
 
@@ -251,10 +249,19 @@ async function fetchDomainData(
     try {
 
         const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
-        const rootDomainResourceIds = await fetchRootDomainIds(accountAddress, accountNfts, { sdkInstance });
+
+        const rootDomainResourceIds = await fetchRootDomainIds(
+            accountAddress,
+            accountNfts,
+            { sdkInstance }
+        );
+
         if (!rootDomainResourceIds.length) return [];
 
-        const subdomainDomainResourceIds = await fetchSubdomainIds(rootDomainResourceIds, { sdkInstance });
+        const subdomainDomainResourceIds = await fetchSubdomainIds(
+            rootDomainResourceIds,
+            { sdkInstance }
+        );
 
         const domains = await sdkInstance.state.getNonFungibleData(
             sdkInstance.entities.resources.collections.domains,
@@ -271,7 +278,6 @@ async function fetchDomainData(
     }
 
 }
-
 
 export async function requestAccountDomains(
 
@@ -305,45 +311,39 @@ export async function requestDomainDetails(
     try {
 
         const domainId = await domainToNonFungId(domain);
-        const nftData = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.domains, domainId);
+
+        const nftData = await sdkInstance.state.getNonFungibleData(
+            sdkInstance.entities.resources.collections.domains,
+            domainId
+        );
 
         if (!nftData) return null;
 
-        return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce(
-            (acc, field) => {
-                if (field.kind === "String" && field.field_name === "name") {
-                    return { ...acc, [field.field_name]: field.value };
-                }
+        return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
+            if (field.kind === 'String' && field.field_name === 'name') {
+                return { ...acc, [field.field_name]: field.value };
+            }
 
-                if (field.kind === "String" && field.field_name) {
-                    return { ...acc, [field.field_name]: field.value };
-                }
+            if (field.kind === 'String' && field.field_name) {
+                return { ...acc, [field.field_name]: field.value };
+            }
 
-                if (field.field_name === "created_timestamp" && field.kind === "I64") {
-                    return { ...acc, [field.field_name]: +field.value * 1000 };
-                }
+            if (field.field_name === 'created_timestamp' && field.kind === 'I64') {
+                return { ...acc, [field.field_name]: +field.value * 1000 };
+            }
 
-                if (
-                    field.field_name === "last_valid_timestamp" &&
-                    field.kind === "Enum" &&
-                    field.variant_name !== "None" &&
-                    field.fields[0].kind === "I64"
-                ) {
-                    return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
-                }
+            if (field.field_name === 'last_valid_timestamp' && field.kind === 'Enum' && field.variant_name !== 'None' && field.fields[0].kind === 'I64') {
+                return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
+            }
 
-                if (field.field_name === "address" && field.kind === "Enum") {
-                    const reference = field.fields.find(
-                        (f) => f.kind === "Reference" && f.value
-                    ) as ProgrammaticScryptoSborValueReference | undefined;
+            if (field.field_name === 'address' && field.kind === 'Enum') {
+                const reference = field.fields.find(f => f.kind === 'Reference' && f.value) as ProgrammaticScryptoSborValueReference | undefined;
 
-                    return { ...acc, [field.field_name]: reference?.value };
-                }
+                return { ...acc, [field.field_name]: reference?.value };
+            }
 
-                return acc;
-            },
-            { id: nftData.non_fungible_id } as DomainData
-        );
+            return acc;
+        }, { id: nftData.non_fungible_id } as DomainData);
 
     } catch (error) {
 
@@ -352,5 +352,4 @@ export async function requestDomainDetails(
 
     }
 }
-
 
