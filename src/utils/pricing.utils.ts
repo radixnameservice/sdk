@@ -81,8 +81,8 @@ export function getBasePrice(domain: string, usdXrdRate: Decimal) {
 
     if (sdl.length >= 5) {
         return {
-            usd: 4,
-            xrd: usdToXrd(usdXrdRate, 4)
+            usd: pricingConfig.baseDollarPricing[5],
+            xrd: usdToXrd(usdXrdRate, pricingConfig.baseDollarPricing[5])
         };
     }
 
