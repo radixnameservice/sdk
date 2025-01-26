@@ -10,7 +10,7 @@ const config: PricingConfigI = {
 
     baseDollarPricing: {
 
-        1: 1000000,
+        1: 2250,
         2: 240,
         3: 120,
         4: 40,
