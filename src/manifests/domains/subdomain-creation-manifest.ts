@@ -4,12 +4,12 @@ import { UserSpecificsI } from "../../common/user.types";
 export default async function subdomainCreationManifest({
     sdkInstance,
     userDetails,
-    domainResourceId,
+    rootDomainId,
     subdomain,
 }: {
     sdkInstance: RnsSDK;
     userDetails: UserSpecificsI;
-    domainResourceId: string;
+    rootDomainId: string;
     subdomain: string;
 }) {
 
@@ -19,14 +19,14 @@ export default async function subdomainCreationManifest({
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
-                NonFungibleLocalId("${domainResourceId}")
+                NonFungibleLocalId("${rootDomainId}")
             );
         POP_FROM_AUTH_ZONE
             Proof("requester_proof");
         CALL_METHOD
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "register_subdomain"
-            NonFungibleLocalId("${domainResourceId}")
+            NonFungibleLocalId("${rootDomainId}")
             "${subdomain}"
             Address("${userDetails.accountAddress}")
             Proof("requester_proof")
