@@ -1,8 +1,8 @@
-import RnsSDK from "..";
-import { FungibleProofItemI, NonFungibleProofItemI, ProofsI } from "../common/entities.types";
+import RnsSDK from "../..";
+import { FungibleProofItemI, NonFungibleProofItemI, ProofsI } from "../../common/entities.types";
 
-import { DocketI } from "../common/record.types";
-import { UserSpecificsI } from "../common/user.types";
+import { DocketI } from "../../common/record.types";
+import { UserSpecificsI } from "../../common/user.types";
 
 
 function buildNonFungibleProofs(

@@ -1,6 +1,6 @@
-import RnsSDK from "..";
+import RnsSDK from "../..";
 
-import { UserSpecificsI } from "../common/user.types";
+import { UserSpecificsI } from "../../common/user.types";
 
 
 export default function issueBadgeManifest({

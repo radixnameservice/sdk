@@ -2,7 +2,7 @@
 import { sendTransaction } from "../../utils/transaction.utils";
 
 import { recordErrors } from "../../common/errors";
-import { recordCreationManifest } from "../../manifests/record-creation-manifest";
+import { recordCreationManifest } from "../../manifests/records/record-creation-manifest";
 
 import { errorResponse, successResponse } from "../../utils/response.utils";
 import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
