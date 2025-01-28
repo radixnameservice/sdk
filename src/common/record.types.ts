@@ -34,4 +34,9 @@ export interface ResolvedRecordResponse {
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
 }
 
+export interface RemovalPreferencesI {
+    deleteSubdomains: boolean;
+    deleteRecords: boolean;
+}
+
 export type RecordResultsT = RecordItem[] | [];
