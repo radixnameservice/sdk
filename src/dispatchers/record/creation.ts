@@ -1,20 +1,22 @@
-import recordCreationManifest from "../../manifests/record-creation-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
-import { errorResponse, successResponse } from "../../utils/response.utils";
-import { recordErrors } from "../../common/errors";
 
+import { recordErrors } from "../../common/errors";
+import { recordCreationManifest } from "../../manifests/record-creation-manifest";
+
+import { errorResponse, successResponse } from "../../utils/response.utils";
+import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
+import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
 
 export async function dispatchRecordCreation({
     sdkInstance,
     rdt,
     userDetails,
-    domainId,
     rootDomainId,
+    subDomainId,
     docket,
-    callbacks
+    callbacks,
+    proofs // Optional parameter for additional proofs
 }: CreateRecordDispatcherPropsI): Promise<SuccessStackResponse | ErrorStackResponse> {
 
     try {
@@ -22,9 +24,10 @@ export async function dispatchRecordCreation({
         const manifest = recordCreationManifest({
             sdkInstance,
             userDetails,
-            domainId,
             rootDomainId,
+            subDomainId,
             recordDocket: docket,
+            proofs
         });
 
         const dispatch = await sendTransaction({
@@ -35,11 +38,12 @@ export async function dispatchRecordCreation({
             callbacks
         });
 
-        if (!dispatch)
+        if (!dispatch) {
             return errorResponse(recordErrors.creation({ docket }));
+        }
 
         return successResponse({
-            code: 'RECORD_SUCCESFULLY_CREATED',
+            code: 'RECORD_SUCCESSFULLY_CREATED',
             details: `The domain record was successfully created.`
         });
 
