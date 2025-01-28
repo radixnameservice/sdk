@@ -126,3 +126,19 @@ export type ExpandedComponentsT = {
 };
 
 export type EntitiesT = Omit<EntityStructT, "components"> & { components: ExpandedComponentsT };
+
+export interface FungibleProofItemI {
+    resourceAddress: string;
+    amount: string;
+}
+
+export interface NonFungibleProofItemI {
+    resourceAddress: string;
+    ids: string[];
+}
+
+export interface ProofsI {
+    fungibles?: FungibleProofItemI[];
+    nonFungibles?: NonFungibleProofItemI[];
+    idAdditions?: string[];
+}
