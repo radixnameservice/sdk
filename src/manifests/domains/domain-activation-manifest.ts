@@ -1,7 +1,7 @@
 import RnsSDK from "../..";
 import { UserSpecificsI } from "../../common/user.types";
 
-export default async function registerDomainManifest({
+export default async function activateDomainManifest({
     sdkInstance,
     userDetails,
     rootDomainId,
