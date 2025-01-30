@@ -11,23 +11,24 @@ import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
 
+import config from './entities.config';
+import { commonErrors } from './common/errors';
+
 import { expandComponents } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
+import { errorResponse } from './utils/response.utils';
 
-import { UserBadgeResponse, UserSpecificsI } from './common/user.types';
+import { UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
 
-import { RecordItem, ResolvedRecordResponse } from './common/record.types';
+import { RecordItem } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
-import { CheckAuthenticityResponse, DomainAttributesResponse, DomainData } from './common/domain.types';
-import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from './common/auction.types';
+import { DomainData } from './common/domain.types';
 import { DocketI } from './common/record.types';
-import { SuccessStackResponse, ErrorStackResponse } from './common/response.types';
-import { commonErrors } from './common/errors';
+import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, CheckAuthenticityResponse, CommitmentStackResponse, DomainAttributesResponse, ErrorStackResponse, ResolvedRecordResponse, UserBadgeResponse } from './common/response.types';
 import { EntitiesT } from './common/entities.types';
-import config from './entities.config';
-import { errorResponse } from './utils/response.utils';
+
 
 export {
     DomainAttributesResponse,
@@ -39,7 +40,7 @@ export {
     ResolvedRecordResponse,
     AuctionDetailsResponse,
     UserBadgeResponse,
-    SuccessStackResponse,
+    CommitmentStackResponse,
     ErrorStackResponse
 };
 
@@ -244,7 +245,7 @@ export default class RnsSDK {
 
     }
 
-    async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<SuccessStackResponse | ErrorStackResponse> {
+    async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -274,7 +275,7 @@ export default class RnsSDK {
 
     }
 
-    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<SuccessStackResponse | ErrorStackResponse> {
+    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -288,7 +289,7 @@ export default class RnsSDK {
 
     }
 
-    async createRecord({ rdt, domain, userDetails, docket, callbacks }: { rdt: RadixDappToolkit; domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<SuccessStackResponse | ErrorStackResponse> {
+    async createRecord({ rdt, domain, userDetails, docket, callbacks }: { rdt: RadixDappToolkit; domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -303,7 +304,6 @@ export default class RnsSDK {
             sdkInstance: this,
             rdt,
             userDetails,
-            domainId: domainData.id,
             rootDomainId: domainData.id,
             docket,
             callbacks
