@@ -17,18 +17,6 @@ export interface RawAuctionResultI {
 
 }
 
-export interface AuctionDetailsResponse {
-    id: string;
-    ends: number;
-    domain: string;
-    bids: {
-        currentBid: BidI;
-        initialBid: BidI;
-        leaderBadgeId: string;
-        originatorBadgeId: string;
-    };
-};
-
 export interface BidI {
 
     usd: string;
@@ -46,13 +34,3 @@ export interface FormattedAuctionResultI {
         originatorBadgeId: string;
     }
 }
-
-export interface PaginatedResponse<T> {
-    data: T[];
-    next_cursor?: string;
-    total_count: number;
-}
-
-export type AllAuctionsResponse = PaginatedResponse<FormattedAuctionResultI>;
-
-export type AuctionBidResponse = PaginatedResponse<BidEvent>;

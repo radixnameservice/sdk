@@ -5,7 +5,7 @@ import { recordErrors } from "../../common/errors";
 import { recordCreationManifest } from "../../manifests/records/record-creation-manifest";
 
 import { errorResponse, successResponse } from "../../utils/response.utils";
-import { ErrorStackResponse, SuccessStackResponse } from "../../common/response.types";
+import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
 import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
 
 export async function dispatchRecordCreation({
@@ -17,7 +17,7 @@ export async function dispatchRecordCreation({
     docket,
     callbacks,
     proofs // Optional parameter for additional proofs
-}: CreateRecordDispatcherPropsI): Promise<SuccessStackResponse | ErrorStackResponse> {
+}: CreateRecordDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
     try {
 

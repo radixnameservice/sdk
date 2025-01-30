@@ -1,6 +1,6 @@
-import { ErrorI, ErrorStackResponse, SuccessI, SuccessStackResponse } from "../common/response.types";
+import { ErrorI, ErrorStackResponse, SuccessI, CommitmentStackResponse } from "../common/response.types";
 
-export function successResponse(success: SuccessI | SuccessI): SuccessStackResponse {
+export function successResponse(success: SuccessI | SuccessI): CommitmentStackResponse {
 
     if (Array.isArray(success)) {
         return {

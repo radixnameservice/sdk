@@ -1,6 +1,6 @@
 import { badgeErrors, commonErrors } from "../../common/errors";
-import { ErrorStackResponse } from "../../common/response.types";
-import { UserBadgeReqPropsI, UserBadgeResponse } from "../../common/user.types";
+import { ErrorStackResponse, UserBadgeResponse } from "../../common/response.types";
+import { UserBadgeReqPropsI } from "../../common/user.types";
 import { errorResponse } from "../../utils/response.utils";
 
 export async function getUserBadgeId({ sdkInstance, accountAddress }: UserBadgeReqPropsI): Promise<UserBadgeResponse | ErrorStackResponse> {

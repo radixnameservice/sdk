@@ -1,4 +1,4 @@
-import RnsSDK, { ErrorStackResponse, SuccessStackResponse } from '../..';
+import RnsSDK, { CommitmentStackResponse } from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
@@ -48,7 +48,7 @@ describe('RNS - Issue User Badge', () => {
         const register = await rns.issueUserBadge({
             rdt: dAppToolkit,
             userDetails: mocks.userDetails
-        }) as SuccessStackResponse;
+        }) as CommitmentStackResponse;
 
         if ('errors' in register) {
             throw new Error('Mock badge issuance failed');

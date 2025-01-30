@@ -1,11 +1,3 @@
-import { PricePairI } from "./pricing.types";
-
-export interface DomainAttributesResponse {
-    status: string;
-    verbose: string;
-    price?: PricePairI;
-}
-
 export interface DomainData extends RootDomainI {
 
     subdomains: SubDomainI[] | string[],
@@ -30,8 +22,4 @@ export interface SubDomainI {
     created_timestamp: number,
     key_image_url: string,
 
-}
-
-export interface CheckAuthenticityResponse {
-    isAuthentic: boolean;
 }

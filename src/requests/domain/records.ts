@@ -4,7 +4,8 @@ import { requestDomainDetails } from "../address/domains";
 import { domainToNonFungId } from "../../utils/domain.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
-import { DocketPropsI, RecordItem, ResolvedRecordResponse } from "../../common/record.types";
+import { DocketPropsI, RecordItem } from "../../common/record.types";
+import { ResolvedRecordResponse } from "../../common/response.types";
 
 
 export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI) {

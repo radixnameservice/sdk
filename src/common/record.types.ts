@@ -1,5 +1,3 @@
-import { StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
-
 export type ContextT = "receivers" | "delegation" | "navigation" | "social" | "discovery" | "widgets";
 
 export interface DocketI {
@@ -28,12 +26,6 @@ export interface DocketPropsI {
     proven?: boolean;
 
 }
-
-export interface ResolvedRecordResponse {
-    value: string,
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
-}
-
 export interface RemovalPreferencesI {
     deleteSubdomains: boolean;
     deleteRecords: boolean;

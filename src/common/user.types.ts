@@ -10,5 +10,3 @@ export interface UserBadgeReqPropsI extends InstancePropsI {
     accountAddress: string;
 
 }
-
-export type UserBadgeResponse =  string | null;

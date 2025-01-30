@@ -1,4 +1,4 @@
-import { ProgrammaticScryptoSborValueI64, ProgrammaticScryptoSborValueTuple, Status, Stream } from "@radixdlt/babylon-gateway-api-sdk";
+import { ProgrammaticScryptoSborValueI64, ProgrammaticScryptoSborValueTuple } from "@radixdlt/babylon-gateway-api-sdk";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 
 import { stringToUint } from "../../utils/string.utils";
@@ -6,7 +6,8 @@ import { domainToNonFungId } from "../../utils/domain.utils";
 import { formatAuction } from "../../utils/auction.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
-import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
+import { BidEvent, FormattedAuctionResultI, RawAuctionResultI } from "../../common/auction.types";
+import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse } from "../../common/response.types";
 
 export async function requestAuctionDetails(domain: string, { sdkInstance }: InstancePropsI): Promise<AuctionDetailsResponse> {
 
