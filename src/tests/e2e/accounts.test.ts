@@ -9,6 +9,10 @@ describe('RNS - Verify Domain Owner Accounts', () => {
 
         const ownerDomains = await rns.getAccountDomains('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
 
+        if ('errors' in ownerDomains) {
+            throw new Error('Domain list fetch failed');
+        }
+
         expect(Array.isArray(ownerDomains)).toBe(true);
         expect(ownerDomains.length).toBeGreaterThan(0);
         expect(ownerDomains.every(domain => matchObjectTypes<DomainData>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'last_valid_timestamp', 'key_image_url', 'address']))).toBe(true);
