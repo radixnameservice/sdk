@@ -87,6 +87,20 @@ export const registrationErrors = {
 
 };
 
+export const activationErrors = {
+
+    generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+            code: "ACTIVATION_ERROR",
+            error: `An error occurred when attempting to activate ${domain}.`,
+            verbose
+        };
+
+    }
+
+};
+
 export const badgeErrors = {
 
     userIssuance: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
