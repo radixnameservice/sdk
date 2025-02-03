@@ -59,6 +59,16 @@ export const commonErrors = {
             verbose
         };
 
+    },
+
+    accountRetrieval: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
+
+        return {
+            code: "ACCOUNT_RETRIEVAL_ERROR",
+            error: `An error occurred when attempting to fetch items from the following account: ${accountAddress}.`,
+            verbose
+        };
+
     }
 
 };
@@ -68,7 +78,7 @@ export const registrationErrors = {
     generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
         return {
-            code: "GENERIC_ERROR",
+            code: "REGISTRATION_ERROR",
             error: `An error occurred when attempting to register ${domain}.`,
             verbose
         };
