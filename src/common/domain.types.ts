@@ -1,6 +1,6 @@
 export interface DomainData extends RootDomainI {
 
-    subdomains: SubDomainI[] | string[],
+    subdomains: SubDomainI[],
 
 }
 
