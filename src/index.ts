@@ -26,7 +26,7 @@ import { RecordItem } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainData } from './common/domain.types';
 import { DocketI } from './common/record.types';
-import { AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, CheckAuthenticityResponse, CommitmentStackResponse, DomainAttributesResponse, ErrorStackResponse, ResolvedRecordResponse, UserBadgeResponse } from './common/response.types';
+import { AccountDomainsResponse, AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, CheckAuthenticityResponse, CommitmentStackResponse, DomainAttributesResponse, ErrorStackResponse, ResolvedRecordResponse, UserBadgeResponse } from './common/response.types';
 import { EntitiesT } from './common/entities.types';
 
 
@@ -190,14 +190,21 @@ export default class RnsSDK {
 
     }
 
-    async getAccountDomains(accountAddress: string): Promise<DomainData[]> {
+    async getAccountDomains(accountAddress: string): Promise<AccountDomainsResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
 
-        return requestAccountDomains(accountAddress, { sdkInstance: this });
+        const accountDomains = requestAccountDomains(accountAddress, { sdkInstance: this });
+
+        if (!accountDomains)
+            return errorResponse(commonErrors.accountRetrieval({ accountAddress, verbose: `An error occured when requesting user account domains from: ${accountAddress}.` }));
+
+        return accountDomains;
 
     }
+
+    // legacy
 
     async getAuction(domain: string): Promise<AuctionDetailsResponse> {
 
@@ -210,6 +217,8 @@ export default class RnsSDK {
 
     }
 
+    // legacy
+
     async getAllAuctions(nextCursor?: string): Promise<AllAuctionsResponse> {
 
         this.checkInitialized();
@@ -218,6 +227,8 @@ export default class RnsSDK {
         return requestAuctions({ sdkInstance: this }, nextCursor);
 
     }
+
+    // legacy
 
     async getBidsForAuction(auctionId: string, nextCursor?: string): Promise<AuctionBidResponse> {
 
@@ -234,8 +245,8 @@ export default class RnsSDK {
 
         const domainInterests = await this.getAccountDomains(accountAddress);
 
-        if (!domainInterests || domainInterests.length < 1)
-            return errorResponse(commonErrors.authenticityMismatch({ domain }));
+        if ('errors' in domainInterests)
+            return domainInterests;
 
         const isAuthentic = domainInterests.find((interestDomain) => interestDomain.name === domain)?.address === accountAddress;
 
