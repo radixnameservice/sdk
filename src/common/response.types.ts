@@ -1,6 +1,7 @@
 import { StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 import { PricePairI } from "./pricing.types";
 import { BidEvent, BidI, FormattedAuctionResultI } from "./auction.types";
+import { DomainData } from "./domain.types";
 
 export interface ErrorStackResponse {
 
@@ -72,4 +73,6 @@ export type AllAuctionsResponse = PaginatedResponse<FormattedAuctionResultI>;
 
 export type AuctionBidResponse = PaginatedResponse<BidEvent>;
 
-export type UserBadgeResponse =  string | null;
+export type UserBadgeResponse = string | null;
+
+export type AccountDomainsResponse = DomainData[];
