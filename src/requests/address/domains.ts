@@ -103,7 +103,7 @@ async function fetchSubdomainIds(
     rootDomainResourceIds: string[],
     { sdkInstance }
 
-): Promise<string[]> {
+): Promise<string[] | null> {
 
     const batchedRootDomainIds = batchArray(rootDomainResourceIds, BATCHED_KV_STORE_LIMIT);
 
@@ -139,7 +139,7 @@ async function fetchSubdomainIds(
     } catch (error) {
 
         logger.error("fetchSubdomainIds", error);
-        return [];
+        return null;
 
     }
 
@@ -244,7 +244,7 @@ async function fetchDomainData(
     accountAddress: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainData[]> {
+): Promise<DomainData[] | null> {
 
     try {
 
@@ -273,7 +273,7 @@ async function fetchDomainData(
     } catch (error) {
 
         logger.error("fetchDomainData", error);
-        return [];
+        return null;
 
     }
 
@@ -284,7 +284,7 @@ export async function requestAccountDomains(
     accountAddress: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainData[]> {
+): Promise<DomainData[] | null> {
 
     if (!accountAddress) return [];
 
@@ -295,7 +295,7 @@ export async function requestAccountDomains(
     } catch (error) {
 
         logger.error("requestAccountDomains", error);
-        return [];
+        return null;
 
     }
 
