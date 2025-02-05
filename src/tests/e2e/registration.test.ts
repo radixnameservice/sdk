@@ -7,6 +7,7 @@ import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 import { getWellKnownAddresses } from '../../utils/gateway.utils';
 import { getBasePrice } from '../../utils/pricing.utils';
 import { convertToDecimal, multiplyDecimal } from '../../utils/decimal.utils';
+import { normaliseManifest } from '../utils';
 
 const mocks = {
     availableDomain: `test-registration-${(Math.random() + 1).toString(36).substring(3)}.xrd`,
@@ -71,8 +72,6 @@ describe('RNS - Register Domain', () => {
 
         const xrdTokenResource = (await getWellKnownAddresses(rns.status)).xrd;
 
-        const formatString = (str: string) => str.replace(/\s+/g, ' ').trim();
-
         const expectedString = `
             CALL_METHOD
                 Address("${mocks.userDetails.accountAddress}")
@@ -106,7 +105,7 @@ describe('RNS - Register Domain', () => {
                 Expression("ENTIRE_WORKTOP");
         `;
 
-        expect(formatString(transactionManifest)).toBe(formatString(expectedString));
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
 
     });
 

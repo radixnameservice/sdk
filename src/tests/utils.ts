@@ -14,3 +14,7 @@ export function matchObjectTypes<T>(
 
     return true;
 }
+
+export function normaliseManifest(str: string): string {
+    return str.replace(/\s+/g, ' ').trim();
+}

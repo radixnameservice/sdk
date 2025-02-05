@@ -2,6 +2,7 @@ import RnsSDK, { CommitmentStackResponse } from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
+import { normaliseManifest } from '../utils';
 
 const mocks = {
     userDetails: {
@@ -59,8 +60,6 @@ describe('RNS - Issue User Badge', () => {
         const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
         const transactionManifest = sendTransactionArgs.transactionManifest;
 
-        const formatString = (str: string) => str.replace(/\s+/g, ' ').trim();
-
         const expectedString = `
             CALL_METHOD
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
@@ -71,7 +70,7 @@ describe('RNS - Issue User Badge', () => {
             Expression("ENTIRE_WORKTOP");
         `;
 
-        expect(formatString(transactionManifest)).toBe(formatString(expectedString));
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
 
     });
 
