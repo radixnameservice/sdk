@@ -48,6 +48,7 @@ export {
 interface RnsSDKI {
 
     gateway?: string;
+    rdt?: RadixDappToolkit;
     network?: NetworkT;
 
 }
@@ -55,6 +56,7 @@ interface RnsSDKI {
 export default class RnsSDK {
 
     network: NetworkT;
+    rdt: RadixDappToolkit;
     state: State;
     transaction: Transaction;
     status: Status;
@@ -62,9 +64,10 @@ export default class RnsSDK {
     entities: EntitiesT;
     dependencies: DependenciesI;
 
-    constructor({ gateway, network = 'mainnet' }: RnsSDKI) {
+    constructor({ gateway, rdt, network = 'mainnet' }: RnsSDKI) {
 
         this.network = network;
+        this.rdt = rdt;
         this.initGateway({ gateway });
         this.fetchDependencies();
 
@@ -222,7 +225,7 @@ export default class RnsSDK {
 
     }
 
-    async registerDomain({ domain, durationYears = 1, rdt, userDetails, callbacks }: { domain: string; durationYears?: number; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -231,14 +234,14 @@ export default class RnsSDK {
             sdkInstance: this,
             domain: normaliseDomain(domain),
             durationYears,
-            rdt,
+            rdt: this.rdt,
             userDetails,
             callbacks
         });
 
     }
 
-    async activateDomain({ domain, rdt, userDetails, callbacks }: { domain: string; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async activateDomain({ domain, userDetails, callbacks }: { domain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -247,7 +250,7 @@ export default class RnsSDK {
             sdkInstance: this,
             domain: normaliseDomain(domain),
             userDetails,
-            rdt,
+            rdt: this.rdt,
             callbacks
         });
 
@@ -265,21 +268,21 @@ export default class RnsSDK {
 
     }
 
-    async issueUserBadge({ rdt, userDetails, callbacks }: { rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async issueUserBadge({ userDetails, callbacks }: { userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
 
         return dispatchUserBadgeIssuance({
             sdkInstance: this,
-            rdt,
+            rdt: this.rdt,
             userDetails,
             callbacks
         });
 
     }
 
-    async createRecord({ rdt, domain, userDetails, docket, callbacks }: { rdt: RadixDappToolkit; domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async createRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         this.checkInitialized();
         await this.fetchDependencies();
@@ -291,7 +294,7 @@ export default class RnsSDK {
 
         return dispatchRecordCreation({
             sdkInstance: this,
-            rdt,
+            rdt: this.rdt,
             userDetails,
             rootDomainId: domainData.id,
             docket,
@@ -315,9 +318,7 @@ export default class RnsSDK {
             return this.entities;
 
         } catch (error) {
-
             throw new Error(`RNS SDK: Could not fetch RNS entities: ${error}`);
-
         }
 
     }
@@ -341,9 +342,7 @@ export default class RnsSDK {
             return this.dependencies;
 
         } catch (error) {
-
             throw new Error(`RNS SDK: Could not fetch RNS dependencies: ${error}`);
-
         }
 
     }

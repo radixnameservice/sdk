@@ -44,17 +44,16 @@ describe('RNS - Register Domain', () => {
 
     it(`should return a correctly formatted manifest string`, async () => {
 
-        const rns = new RnsSDK({ network: 'stokenet' });
-
         const dAppToolkit = RadixDappToolkit({
             dAppDefinitionAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
             networkId: RadixNetwork.Stokenet
         });
 
+        const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
+
         const register = await rns.registerDomain({
             domain: mocks.availableDomain,
             durationYears: mocks.durationYears,
-            rdt: dAppToolkit,
             userDetails: mocks.userDetails
         });
 
