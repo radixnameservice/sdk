@@ -4,6 +4,8 @@
         "target": "es2019",
         "esModuleInterop": true,
         "declaration": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         "outDir": "./dist"
     },
     "include": [
