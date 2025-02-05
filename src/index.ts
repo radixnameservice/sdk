@@ -205,41 +205,6 @@ export default class RnsSDK {
 
     }
 
-    // legacy
-
-    async getAuction(domain: string): Promise<AuctionDetailsResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
-
-        const normalisedDomain = normaliseDomain(domain);
-
-        return requestAuctionDetails(normalisedDomain, { sdkInstance: this });
-
-    }
-
-    // legacy
-
-    async getAllAuctions(nextCursor?: string): Promise<AllAuctionsResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
-
-        return requestAuctions({ sdkInstance: this }, nextCursor);
-
-    }
-
-    // legacy
-
-    async getBidsForAuction(auctionId: string, nextCursor?: string): Promise<AuctionBidResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
-
-        return requestBidsForAuction(auctionId, nextCursor, { sdkInstance: this });
-
-    }
-
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponse | ErrorStackResponse> {
 
         this.checkInitialized();
