@@ -19,10 +19,10 @@ import { expandComponents } from './utils/entity.utils';
 import { NetworkT, getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 import { errorResponse } from './utils/response.utils';
+import { requireDependencies } from './decorators/sdk.decorators';
 
 import { UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
-
 import { RecordItem } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainData } from './common/domain.types';
@@ -95,15 +95,14 @@ export default class RnsSDK {
     }
 
     private checkInitialized(): void {
+
         if (!this.state || !this.status || !this.transaction || !this.stream) {
             throw new Error('RNS SDK: The RNS SDK is not fully initialized.');
         }
     }
 
+    @requireDependencies('read-only')
     async getDomainAttributes(domain: string): Promise<DomainAttributesResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -115,10 +114,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('read-only')
     async getDomainDetails(domain: string): Promise<DomainData | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -143,10 +140,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('read-only')
     async getRecords(domain: string): Promise<RecordItem[] | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -169,10 +164,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('read-only')
     async resolveRecord({ domain, context, directive, proven }: { domain: string; context?: string; directive?: string; proven?: boolean }): Promise<ResolvedRecordResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -194,10 +187,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('read-only')
     async getAccountDomains(accountAddress: string): Promise<AccountDomainsResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         const accountDomains = requestAccountDomains(accountAddress, { sdkInstance: this });
 
@@ -208,9 +199,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('read-only')
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
 
         const domainInterests = await this.getAccountDomains(accountAddress);
 
@@ -225,10 +215,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('full')
     async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         return dispatchDomainRegistration({
             sdkInstance: this,
@@ -241,10 +229,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('full')
     async activateDomain({ domain, userDetails, callbacks }: { domain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         return dispatchDomainActivation({
             sdkInstance: this,
@@ -256,10 +242,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('read-only')
     async getUserBadge(accountAddress: string): Promise<UserBadgeResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         return getUserBadgeId({
             sdkInstance: this,
@@ -268,10 +252,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('full')
     async issueUserBadge({ userDetails, callbacks }: { userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         return dispatchUserBadgeIssuance({
             sdkInstance: this,
@@ -282,10 +264,8 @@ export default class RnsSDK {
 
     }
 
+    @requireDependencies('full')
     async createRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
-
-        this.checkInitialized();
-        await this.fetchDependencies();
 
         const domainData = await this.getDomainDetails(domain);
 
