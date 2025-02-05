@@ -17,6 +17,7 @@ export async function dispatchSubdomainCreation({
 }: ActivationDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
     try {
+        
 
         const details = await sdkInstance.getDomainDetails(domain);
 
