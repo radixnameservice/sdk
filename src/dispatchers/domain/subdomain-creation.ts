@@ -18,7 +18,6 @@ export async function dispatchSubdomainCreation({
 
     try {
         
-
         const details = await sdkInstance.getDomainDetails(domain);
 
         if ('errors' in details) {
