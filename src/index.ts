@@ -10,6 +10,7 @@ import { getUserBadgeId } from './requests/user/badges';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
+import { dispatchDomainActivation } from './dispatchers/domain/activation';
 
 import config from './entities.config';
 import { commonErrors } from './common/errors';
@@ -261,14 +262,27 @@ export default class RnsSDK {
         this.checkInitialized();
         await this.fetchDependencies();
 
-        const normalisedDomain = normaliseDomain(domain);
-
         return dispatchDomainRegistration({
             sdkInstance: this,
-            domain: normalisedDomain,
+            domain: normaliseDomain(domain),
             durationYears,
             rdt,
             userDetails,
+            callbacks
+        });
+
+    }
+
+    async activateDomain({ domain, rdt, userDetails, callbacks }: { domain: string; rdt: RadixDappToolkit; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+
+        this.checkInitialized();
+        await this.fetchDependencies();
+
+        return dispatchDomainActivation({
+            sdkInstance: this,
+            domain: normaliseDomain(domain),
+            userDetails,
+            rdt,
             callbacks
         });
 
@@ -307,9 +321,8 @@ export default class RnsSDK {
 
         const domainData = await this.getDomainDetails(domain);
 
-        if ('errors' in domainData) {
+        if ('errors' in domainData)
             return domainData;
-        }
 
         return dispatchRecordCreation({
             sdkInstance: this,
