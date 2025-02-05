@@ -27,7 +27,7 @@ export async function dispatchDomainActivation({
         const manifest = await activateDomainManifest({
             sdkInstance,
             rootDomainId: details.id,
-            subdomainIds: details.subdomains.map(subDomain => subDomain.id),
+            subdomainIds: details.subdomains ? details.subdomains.map(subDomain => subDomain.id) : [],
             userDetails
         });
 
