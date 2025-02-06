@@ -34,6 +34,13 @@ export interface ActivationDispatcherPropsI extends DispatcherPropsI {
 
 }
 
+export interface SubdomainDispatcherPropsI extends DispatcherPropsI {
+
+    subdomain: string;
+    userDetails: UserSpecificsI;
+
+}
+
 export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
    
     userDetails: UserSpecificsI;
