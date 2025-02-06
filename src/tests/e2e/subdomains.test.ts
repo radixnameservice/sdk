@@ -4,9 +4,6 @@ import RnsSDK from '../..';
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 
-import { getWellKnownAddresses } from '../../utils/gateway.utils';
-import { getBasePrice } from '../../utils/pricing.utils';
-import { convertToDecimal, multiplyDecimal } from '../../utils/decimal.utils';
 import { normaliseManifest } from '../utils';
 import { deriveRootDomain, normaliseDomain } from '../../utils/domain.utils';
 
