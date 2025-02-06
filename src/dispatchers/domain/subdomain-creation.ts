@@ -58,7 +58,7 @@ export async function dispatchSubdomainCreation({
 
     } catch (error) {
 
-        return errorResponse(subdomainErrors.recordCreation({ subdomain, verbose: error }));
+        return errorResponse(subdomainErrors.creation({ subdomain, verbose: error }));
 
     }
 
