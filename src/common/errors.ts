@@ -39,13 +39,24 @@ export const commonErrors = {
 
     },
 
-
     invalidSubdomain: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
 
         return {
 
             code: 'INVALID_SUBDOMAIN',
             error: `${subdomain} is an invalid domain name.`,
+            verbose
+
+        };
+
+    },
+
+    subdomainNotExist: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+
+            code: 'NONEXISTENT_SUBDOMAIN',
+            error: `${subdomain} does not exist.`,
             verbose
 
         };
@@ -126,11 +137,21 @@ export const subdomainErrors = {
 
     },
 
-    recordCreation: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+    creation: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
 
         return {
             code: "SUBDOMAIN_CREATION_FAILED",
             error: `An error occurred when attempting to create ${subdomain}.`,
+            verbose
+        };
+
+    },
+
+    deletion: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+            code: "SUBDOMAIN_DELETION_FAILED",
+            error: `An error occurred when attempting to delete ${subdomain}.`,
             verbose
         };
 
