@@ -8,6 +8,7 @@ import { ActivationDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
 
 
+
 export async function dispatchSubdomainCreation({
     sdkInstance,
     domain,
