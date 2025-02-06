@@ -2,14 +2,12 @@ import subdomainCreationManifest from "../../manifests/domains/subdomain-creatio
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorResponse, successResponse } from "../../utils/response.utils";
-import { deriveRootDomain, normaliseDomain } from "../../utils/domain.utils";
+import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
 
-import { activationErrors } from "../../common/errors";
+import { commonErrors, subdomainErrors } from "../../common/errors";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
-
-
 
 
 export async function dispatchSubdomainCreation({
@@ -23,8 +21,12 @@ export async function dispatchSubdomainCreation({
     try {
 
         const normalisedSubDomain = normaliseDomain(subdomain);
-        const rootDomain = deriveRootDomain(normalisedSubDomain);
+        const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
+        if (!subdomainValidation.valid)
+            return errorResponse(commonErrors.invalidSubdomain({ subdomain, verbose: subdomainValidation.message }));
+
+        const rootDomain = deriveRootDomain(normalisedSubDomain);
         const details = await sdkInstance.getDomainDetails(rootDomain);
 
         if ('errors' in details) {
@@ -38,6 +40,17 @@ export async function dispatchSubdomainCreation({
             userDetails
         });
 
+        const dispatch = await sendTransaction({
+            rdt,
+            message: `Create ${normalisedSubDomain}`,
+            manifest,
+            transaction: sdkInstance.transaction,
+            callbacks
+        });
+
+        if (!dispatch)
+            return errorResponse(subdomainErrors.generic({ subdomain }));
+
         return successResponse({
             code: 'SUBDOMAIN_CREATION_SUCCESSFUL',
             details: `${normalisedSubDomain} was succesfully created.`
@@ -45,7 +58,7 @@ export async function dispatchSubdomainCreation({
 
     } catch (error) {
 
-       // return errorResponse(activationErrors.generic({ domain, verbose: error }));
+        return errorResponse(subdomainErrors.recordCreation({ subdomain, verbose: error }));
 
     }
 
