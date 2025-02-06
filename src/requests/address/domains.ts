@@ -319,6 +319,16 @@ export async function requestDomainDetails(
 
         if (!nftData) return null;
 
+        const subdomainDomainResourceIds = await fetchSubdomainIds(
+            [domainId],
+            { sdkInstance }
+        );
+
+        const subdomains = filterSubdomains(await sdkInstance.state.getNonFungibleData(
+            sdkInstance.entities.resources.collections.domains,
+            [...subdomainDomainResourceIds]
+        ));
+
         return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
             if (field.kind === 'String' && field.field_name === 'name') {
                 return { ...acc, [field.field_name]: field.value };
@@ -343,7 +353,7 @@ export async function requestDomainDetails(
             }
 
             return acc;
-        }, { id: nftData.non_fungible_id } as DomainData);
+        }, { id: nftData.non_fungible_id, subdomains } as DomainData);
 
     } catch (error) {
 
