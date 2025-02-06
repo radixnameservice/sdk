@@ -39,6 +39,19 @@ export const commonErrors = {
 
     },
 
+
+    invalidSubdomain: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+
+            code: 'INVALID_SUBDOMAIN',
+            error: `${subdomain} is an invalid domain name.`,
+            verbose
+
+        };
+
+    },
+
     emptyDomainDetails: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
         return {
@@ -94,6 +107,30 @@ export const activationErrors = {
         return {
             code: "ACTIVATION_ERROR",
             error: `An error occurred when attempting to activate ${domain}.`,
+            verbose
+        };
+
+    }
+
+};
+
+export const subdomainErrors = {
+
+    generic: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+            code: "SUBDOMAIN_ERROR",
+            error: `An error occurred when attempting to create ${subdomain}.`,
+            verbose
+        };
+
+    },
+
+    recordCreation: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+            code: "SUBDOMAIN_CREATION_FAILED",
+            error: `An error occurred when attempting to create ${subdomain}.`,
             verbose
         };
 
