@@ -55,12 +55,12 @@ describe('RNS - Create Subdomain', () => {
             throw new Error('Subdomain details could not be obtained');
         }
 
-        const register = await rns.createSubdomain({
+        const createSubdomain = await rns.createSubdomain({
             subdomain: mocks.subdomain,
             userDetails: mocks.userDetails
         });
 
-        if ('errors' in register) {
+        if ('errors' in createSubdomain) {
             throw new Error('Mock subdomain creation failed');
         }
 
@@ -92,6 +92,76 @@ describe('RNS - Create Subdomain', () => {
                 Address("${mocks.userDetails.accountAddress}")
                 "deposit_batch"
                 Expression("ENTIRE_WORKTOP");
+        `;
+
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
+
+    });
+
+});
+
+describe('RNS - Delete Subdomain', () => {
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it(`should return a correctly formatted manifest string`, async () => {
+
+        const dAppToolkit = RadixDappToolkit({
+            dAppDefinitionAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
+            networkId: RadixNetwork.Stokenet
+        });
+
+        const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
+
+        const normalisedSubDomain = normaliseDomain(mocks.subdomain)
+
+        const rootDomainDetails = await rns.getDomainDetails(deriveRootDomain(normalisedSubDomain));
+
+        if ('errors' in rootDomainDetails) {
+            throw new Error('Root domain details could not be obtained');
+        }
+
+        const subdomainDetails = rootDomainDetails.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
+
+        if (!subdomainDetails) {
+            throw new Error('Subdomain details could not be obtained');
+        }
+
+        const deleteSubdomain = await rns.deleteSubdomain({
+            subdomain: mocks.subdomain,
+            userDetails: mocks.userDetails
+        });
+
+        if ('errors' in deleteSubdomain) {
+            throw new Error('Mock subdomain deletion failed');
+        }
+
+        const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
+        expect(sendTransactionMock).toHaveBeenCalled();
+
+        const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
+        const transactionManifest = sendTransactionArgs.transactionManifest;
+
+        const expectedString = `
+
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                    NonFungibleLocalId("${rootDomainDetails.id}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("requester_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "delete_subdomain"
+                NonFungibleLocalId("${subdomainDetails.id}")
+                Proof("requester_proof")
+                Enum<0u8>();
+            DROP_ALL_PROOFS;
         `;
 
         expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
