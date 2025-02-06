@@ -12,6 +12,7 @@ import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
 import { dispatchDomainActivation } from './dispatchers/domain/activation';
 import { dispatchSubdomainCreation } from './dispatchers/domain/subdomain-creation';
+import { dispatchSubdomainDeletion } from './dispatchers/domain/subdomain-deletion';
 
 import config from './entities.config';
 import { commonErrors } from './common/errors';
@@ -247,6 +248,19 @@ export default class RnsSDK {
     async createSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         return dispatchSubdomainCreation({
+            sdkInstance: this,
+            subdomain: normaliseDomain(subdomain),
+            rdt: this.rdt,
+            userDetails,
+            callbacks
+        });
+
+    }
+
+    @requireDependencies('full')
+    async deleteSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+
+        return dispatchSubdomainDeletion({
             sdkInstance: this,
             subdomain: normaliseDomain(subdomain),
             rdt: this.rdt,
