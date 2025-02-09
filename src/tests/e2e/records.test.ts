@@ -65,8 +65,10 @@ describe('RNS - Fetch Domain Records', () => {
 
         const resolvedRecord = await rns.resolveRecord({
             domain: 'test-records-present.xrd',
-            context: 'receivers',
-            directive: '*'
+            docket: {
+                context: 'receivers',
+                directive: '*'
+            }
         });
 
         if ('errors' in resolvedRecord) {
@@ -82,8 +84,10 @@ describe('RNS - Fetch Domain Records', () => {
 
         const record = await rns.resolveRecord({
             domain: 'test-records-present.xrd',
-            context: 'social',
-            directive: 'selfi:pfps',
+            docket: {
+                context: 'social',
+                directive: 'selfi:pfps'
+            },
             proven: true
         });
 
