@@ -3,8 +3,9 @@ import { RadixDappToolkit } from "@radixdlt/radix-dapp-toolkit";
 import { UserSpecificsI } from "./user.types";
 import { EventCallbacksI } from "./transaction.types";
 import { InstancePropsI, ProofsI } from "./entities.types";
-import { DocketI } from "./record.types";
+import { DocketI, DocketPropsI } from "./record.types";
 import { DomainData } from "./domain.types";
+
 
 export interface DispatcherPropsI extends InstancePropsI {
 
@@ -42,7 +43,7 @@ export interface SubdomainDispatcherPropsI extends DispatcherPropsI {
 }
 
 export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
-   
+
     userDetails: UserSpecificsI;
     rootDomainId: string;
     subDomainId?: string;
@@ -52,9 +53,9 @@ export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
 }
 
 export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
-   
+
     userDetails: UserSpecificsI;
-    rootDomainId: string;
-    recordId?: string;
+    domainDetails: DomainData;
+    docket: DocketPropsI;
 
 }
