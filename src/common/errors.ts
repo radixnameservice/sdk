@@ -193,6 +193,16 @@ export const recordErrors = {
             verbose
         };
 
+    },
+
+    deletion: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketI }): ErrorI => {
+
+        return {
+            code: "RECORD_DELETION_FAILED",
+            error: `An error occurred when attempting to delete a domain record for: ${docket.context}:${docket.directive}.`,
+            verbose
+        };
+
     }
 
 };
