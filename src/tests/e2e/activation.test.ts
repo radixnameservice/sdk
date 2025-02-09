@@ -24,7 +24,7 @@ const anticipated = {
     domain: {
         rootId: "[52e57ee0bdd7681786e15a0dabb7bdc4]",
         name: "radixnameservice.xrd",
-        subdomainIds: []
+        subdomainIds: ["[0601f34183fb940a690f3c87f29b6c25]"]
     }
 }
 
