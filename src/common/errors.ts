@@ -1,4 +1,4 @@
-import { DocketI } from "./record.types";
+import { DocketI, DocketPropsI } from "./record.types";
 import { ErrorGenerationI, ErrorI } from "./response.types";
 
 export const commonErrors = {
@@ -195,7 +195,7 @@ export const recordErrors = {
 
     },
 
-    deletion: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketI }): ErrorI => {
+    deletion: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketPropsI }): ErrorI => {
 
         return {
             code: "RECORD_DELETION_FAILED",
