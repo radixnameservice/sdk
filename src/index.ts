@@ -12,6 +12,7 @@ import { dispatchRecordCreation } from './dispatchers/record/creation';
 import { dispatchDomainActivation } from './dispatchers/domain/activation';
 import { dispatchSubdomainCreation } from './dispatchers/domain/subdomain-creation';
 import { dispatchSubdomainDeletion } from './dispatchers/domain/subdomain-deletion';
+import { dispatchRecordDeletion } from './dispatchers/record/deletion';
 
 import config from './entities.config';
 import { commonErrors } from './common/errors';
@@ -24,7 +25,7 @@ import { requireDependencies } from './decorators/sdk.decorators';
 
 import { UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
-import { RecordItem } from './common/record.types';
+import { DocketPropsI, RecordItem } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainData } from './common/domain.types';
 import { DocketI } from './common/record.types';
@@ -166,7 +167,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async resolveRecord({ domain, context, directive, proven }: { domain: string; context?: string; directive?: string; proven?: boolean }): Promise<ResolvedRecordResponse | ErrorStackResponse> {
+    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponse | ErrorStackResponse> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -184,7 +185,7 @@ export default class RnsSDK {
         if (!isAuthentic)
             return errorResponse(commonErrors.authenticityMismatch({ domain }));
 
-        return resolveRecord(normalisedDomain, { context, directive, proven }, { sdkInstance: this });
+        return resolveRecord(normalisedDomain, { context: docket.context, directive: docket.directive, proven }, { sdkInstance: this });
 
     }
 
@@ -294,7 +295,8 @@ export default class RnsSDK {
     @requireDependencies('full')
     async createRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
-        const domainData = await this.getDomainDetails(domain);
+        const normalisedDomain = normaliseDomain(domain);
+        const domainData = await this.getDomainDetails(normalisedDomain);
 
         if ('errors' in domainData)
             return domainData;
@@ -304,6 +306,26 @@ export default class RnsSDK {
             rdt: this.rdt,
             userDetails,
             rootDomainId: domainData.id,
+            docket,
+            callbacks
+        });
+
+    }
+
+    @requireDependencies('full')
+    async deleteRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+
+        const normalisedDomain = normaliseDomain(domain);
+        const domainData = await this.getDomainDetails(normalisedDomain);
+
+        if ('errors' in domainData)
+            return domainData;
+
+        return dispatchRecordDeletion({
+            sdkInstance: this,
+            rdt: this.rdt,
+            userDetails,
+            domainDetails: domainData,
             docket,
             callbacks
         });
