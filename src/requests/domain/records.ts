@@ -2,6 +2,7 @@ import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-s
 
 import { requestDomainDetails } from "../address/domains";
 import { domainToNonFungId } from "../../utils/domain.utils";
+import { docketToRecordId } from "../../utils/record.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
 import { DocketPropsI, RecordItem } from "../../common/record.types";
@@ -85,10 +86,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
 
     try {
 
-        const domainId = await domainToNonFungId(domain);
-        const parsedContext = context ? `-${context}` : '';
-        const parsedDirective = directive ? `-${directive}` : '';
-        const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}`);
+        const recordId = await docketToRecordId(domain, { context, directive });
 
         const nft = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.records, recordId);
 
@@ -139,7 +137,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
 
             }, []);
 
-            const fungibleResources = provenResourcesList.filter(r =>!r.ids).map(r => r.resourceAddress);
+            const fungibleResources = provenResourcesList.filter(r => !r.ids).map(r => r.resourceAddress);
 
             const accountNonFungibleVaultIds = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress).then(r => {
                 const nonFungibleVaultIds = new Set(r.non_fungible_resources.items.map(v => v.vaults.items[0].vault_address));
