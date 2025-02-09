@@ -1,7 +1,7 @@
 import RnsSDK from "../..";
 import { UserSpecificsI } from "../../common/user.types";
 
-export function recordCreationManifest({
+export function recordDeletionManifest({
     sdkInstance,
     userDetails,
     rootDomainId,
