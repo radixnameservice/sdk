@@ -50,3 +50,11 @@ export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
     proofs?: ProofsI;
 
 }
+
+export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
+   
+    userDetails: UserSpecificsI;
+    rootDomainId: string;
+    recordId?: string;
+
+}
