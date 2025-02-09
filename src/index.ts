@@ -4,7 +4,6 @@ import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
-import { requestAuctionDetails, requestAuctions, requestBidsForAuction } from './requests/domain/auctions';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { getUserBadgeId } from './requests/user/badges';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
