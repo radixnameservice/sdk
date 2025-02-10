@@ -30,7 +30,7 @@ import { DependenciesI } from './common/dependencies.types';
 import { DomainData } from './common/domain.types';
 import { DocketI } from './common/record.types';
 import { AccountDomainsResponse, AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, CheckAuthenticityResponse, CommitmentStackResponse, DomainAttributesResponse, ErrorStackResponse, ResolvedRecordResponse, UserBadgeResponse } from './common/response.types';
-import { EntitiesT } from './common/entities.types';
+import { EntitiesT, ProofsI } from './common/entities.types';
 
 
 export {
@@ -293,7 +293,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async createRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainData = await this.getDomainDetails(normalisedDomain);
@@ -307,6 +307,7 @@ export default class RnsSDK {
             userDetails,
             rootDomainId: domainData.id,
             docket,
+            proofs,
             callbacks
         });
 
