@@ -3,6 +3,7 @@ import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 import RnsSDK, { RecordItem, ResolvedRecordResponse } from '../..';
 import { matchObjectTypes, normaliseManifest } from '../utils';
 import { DocketI } from '../../common/record.types';
+import { buildFungibleProofs, buildNonFungibleProofs } from '../../utils/proof.utils';
 
 const mocks = {
     domain: {
@@ -11,6 +12,34 @@ const mocks = {
     userDetails: {
         accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p',
         badgeId: '#1'
+    },
+    proofs: {
+        nonFungibles: [
+            {
+                resourceAddress: "abc",
+                ids: ["abc"]
+            },
+            {
+                resourceAddress: "def",
+                ids: ["def"]
+            },
+        ],
+        fungibles: [
+            {
+                resourceAddress: "ghi",
+                amount: "1"
+            },
+            {
+                resourceAddress: "klm",
+                amount: "1"
+            },
+        ]
+    },
+    docket: {
+        context: "receivers",
+        directive: "*",
+        platformIdentifier: "SDK Tests",
+        value: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
     },
     callbacks: {},
     intentHash: 'txid_tdx_2_1p9j7njn5wuagry6j8mrmkvhhwvttskq2cy4e5nk2wpexhqjav2dszpptsr'
@@ -119,7 +148,7 @@ describe('RNS - Fetch Domain Records', () => {
 
 });
 
-describe('RNS - Create Domain Record', () => {
+describe('RNS - Manage Domain Records', () => {
 
     afterEach(() => {
         jest.clearAllMocks();
@@ -132,19 +161,12 @@ describe('RNS - Create Domain Record', () => {
 
     const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
 
-    it(`should return a correctly formatted manifest string`, async () => {
-
-        const docket = {
-            context: "receivers",
-            directive: "*",
-            platformIdentifier: "SDK Tests",
-            value: mocks.userDetails.accountAddress
-        } as DocketI;
+    it(`record creation should return a correctly formatted manifest string`, async () => {
 
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket
+            docket: mocks.docket as DocketI
         });
 
         if ('errors' in createRecord) {
@@ -171,10 +193,75 @@ describe('RNS - Create Domain Record', () => {
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "create_record"
                 NonFungibleLocalId("${anticipated.domain.rootId}")
+                "${mocks.docket.context}"
+                ${mocks.docket.directive}
+                ${mocks.docket.platformIdentifier}
+                Array<String>()
+                Proof("request_proof")
+                Enum<0u8>();
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "deposit_batch"
+                Expression("ENTIRE_WORKTOP");
+        `;
+
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
+
+    });
+
+    it(`record creation with resource proofs should return a correctly formatted manifest string`, async () => {
+
+        const docket = {
+            context: "receivers",
+            directive: "*",
+            platformIdentifier: "SDK Tests",
+            value: mocks.userDetails.accountAddress
+        } as DocketI;
+
+        const createRecord = await rns.createRecord({
+            domain: mocks.domain.name,
+            userDetails: mocks.userDetails,
+            docket,
+            proofs: mocks.proofs
+        });
+
+        if ('errors' in createRecord) {
+            throw new Error('Mock registration failed');
+        }
+
+        const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
+        expect(sendTransactionMock).toHaveBeenCalled();
+
+        const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
+        const transactionManifest = sendTransactionArgs.transactionManifest;
+
+        const nonFungibleProofs = buildNonFungibleProofs(mocks.proofs.nonFungibles, mocks.userDetails.accountAddress)
+        const fungibleProofs = buildFungibleProofs(mocks.proofs.fungibles, mocks.userDetails.accountAddress);
+
+        const expectedString = `
+            ${nonFungibleProofs.map(proof => proof.manifest).join('')}
+            ${fungibleProofs.map(proof => proof.manifest).join('')}
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                NonFungibleLocalId("${anticipated.domain.rootId}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("request_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "create_proven_record"
+                NonFungibleLocalId("${anticipated.domain.rootId}")
                 "${docket.context}"
                 ${docket.directive}
                 ${docket.platformIdentifier}
                 Array<String>()
+                Array<Proof>(
+                ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
+                ${fungibleProofs.map(proof => proof.proofIds).join(',')}
+                )
                 Proof("request_proof")
                 Enum<0u8>();
             CALL_METHOD
