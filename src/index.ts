@@ -34,6 +34,7 @@ import { EntitiesT, ProofsI } from './common/entities.types';
 
 
 export {
+    RnsSDKI,
     DomainAttributesResponse,
     RecordItem,
     DomainData,
