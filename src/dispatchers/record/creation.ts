@@ -12,8 +12,7 @@ export async function dispatchRecordCreation({
     sdkInstance,
     rdt,
     userDetails,
-    rootDomainId,
-    subDomainId,
+    domainDetails,
     docket,
     callbacks,
     proofs // Optional parameter for additional proofs
@@ -24,8 +23,7 @@ export async function dispatchRecordCreation({
         const manifest = recordCreationManifest({
             sdkInstance,
             userDetails,
-            rootDomainId,
-            subDomainId,
+            rootDomainId: domainDetails.id,
             recordDocket: docket,
             proofs
         });

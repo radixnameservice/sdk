@@ -307,7 +307,7 @@ export default class RnsSDK {
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            rootDomainId: domainData.id,
+            domainDetails: domainData,
             docket,
             proofs,
             callbacks

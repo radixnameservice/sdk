@@ -61,8 +61,7 @@ export function recordCreationManifest({
                 ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                 ${fungibleProofs.map(proof => proof.proofIds).join(',')}
             )`
-            : ""
-        }
+            : "" }
             Proof("request_proof")
             Enum<0u8>();
         CALL_METHOD

@@ -45,8 +45,7 @@ export interface SubdomainDispatcherPropsI extends DispatcherPropsI {
 export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
 
     userDetails: UserSpecificsI;
-    rootDomainId: string;
-    subDomainId?: string;
+    domainDetails: DomainData;
     docket: DocketI;
     proofs?: ProofsI;
 
