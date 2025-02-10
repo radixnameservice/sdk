@@ -9,10 +9,11 @@ import { getUserBadgeId } from './requests/user/badges';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
+import { dispatchRecordDeletion } from './dispatchers/record/deletion';
+import { dispatchRecordAmendment } from './dispatchers/record/amendment';
 import { dispatchDomainActivation } from './dispatchers/domain/activation';
 import { dispatchSubdomainCreation } from './dispatchers/domain/subdomain-creation';
 import { dispatchSubdomainDeletion } from './dispatchers/domain/subdomain-deletion';
-import { dispatchRecordDeletion } from './dispatchers/record/deletion';
 
 import config from './entities.config';
 import { commonErrors } from './common/errors';
@@ -307,6 +308,27 @@ export default class RnsSDK {
             rdt: this.rdt,
             userDetails,
             rootDomainId: domainData.id,
+            docket,
+            proofs,
+            callbacks
+        });
+
+    }
+
+    @requireDependencies('full')
+    async amendRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+
+        const normalisedDomain = normaliseDomain(domain);
+        const domainData = await this.getDomainDetails(normalisedDomain);
+
+        if ('errors' in domainData)
+            return domainData;
+
+        return dispatchRecordAmendment({
+            sdkInstance: this,
+            rdt: this.rdt,
+            userDetails,
+            domainDetails: domainData,
             docket,
             proofs,
             callbacks
