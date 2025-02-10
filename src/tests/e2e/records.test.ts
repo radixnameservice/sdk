@@ -211,17 +211,10 @@ describe('RNS - Manage Domain Records', () => {
 
     it(`record creation with resource proofs should return a correctly formatted manifest string`, async () => {
 
-        const docket = {
-            context: "receivers",
-            directive: "*",
-            platformIdentifier: "SDK Tests",
-            value: mocks.userDetails.accountAddress
-        } as DocketI;
-
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket,
+            docket: mocks.docket as DocketI,
             proofs: mocks.proofs
         });
 
@@ -254,9 +247,9 @@ describe('RNS - Manage Domain Records', () => {
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "create_proven_record"
                 NonFungibleLocalId("${anticipated.domain.rootId}")
-                "${docket.context}"
-                ${docket.directive}
-                ${docket.platformIdentifier}
+                "${mocks.docket.context}"
+                ${mocks.docket.directive}
+                ${mocks.docket.platformIdentifier}
                 Array<String>()
                 Array<Proof>(
                 ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
@@ -274,5 +267,5 @@ describe('RNS - Manage Domain Records', () => {
 
     });
 
-
+    
 });
