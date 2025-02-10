@@ -203,6 +203,16 @@ export const recordErrors = {
             verbose
         };
 
+    },
+
+    amendment: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketPropsI }): ErrorI => {
+
+        return {
+            code: "RECORD_AMENDMENT_FAILED",
+            error: `An error occurred when attempting to edit a domain record for: ${docket.context}:${docket.directive}.`,
+            verbose
+        };
+
     }
 
 };
