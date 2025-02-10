@@ -5,7 +5,7 @@ import { recordDeletionManifest } from "../../manifests/records/record-deletion-
 import { errorResponse, successResponse } from "../../utils/response.utils";
 import { sendTransaction } from "../../utils/transaction.utils";
 
-import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
+import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 import { DeleteRecordDispatcherPropsI } from "../../common/dispatcher.types";
 import { docketToRecordId } from "../../utils/record.utils";
 
@@ -17,7 +17,7 @@ export async function dispatchRecordDeletion({
     domainDetails,
     docket,
     callbacks
-}: DeleteRecordDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
+}: DeleteRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
 

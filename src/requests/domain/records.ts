@@ -5,8 +5,8 @@ import { domainToNonFungId } from "../../utils/domain.utils";
 import { docketToRecordId } from "../../utils/record.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
-import { DocketPropsI, RecordItem } from "../../common/record.types";
-import { ResolvedRecordResponse } from "../../common/response.types";
+import { DocketPropsI, RecordItemI } from "../../common/record.types";
+import { ResolvedRecordResponseI } from "../../common/response.types";
 
 
 export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI) {
@@ -68,9 +68,9 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
                         }
 
                         return acc;
-                    }, { record_id: nft.non_fungible_id } as RecordItem)
+                    }, { record_id: nft.non_fungible_id } as RecordItemI)
                 }
-                return {} as RecordItem;
+                return {} as RecordItemI;
             });
 
     } catch (e) {
@@ -82,7 +82,7 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
 
 }
 
-export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordResponse> {
+export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordResponseI> {
 
     try {
 

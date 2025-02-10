@@ -1,9 +1,8 @@
 import { StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
-import { PricePairI } from "./pricing.types";
-import { BidEvent, BidI, FormattedAuctionResultI } from "./auction.types";
-import { DomainData } from "./domain.types";
+import { RawPricePairI } from "./pricing.types";
+import { DomainDataI } from "./domain.types";
 
-export interface ErrorStackResponse {
+export interface ErrorStackResponseI {
 
     errors: ErrorI[];
 
@@ -30,49 +29,33 @@ export interface SuccessI {
 
 }
 
-export interface CommitmentStackResponse {
+export interface CommitmentStackResponseI {
 
     success: SuccessI[];
 
 }
 
-export interface ResolvedRecordResponse {
+export interface ResolvedRecordResponseI {
     value: string;
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
 }
 
-export interface AuctionDetailsResponse {
-    id: string;
-    ends: number;
-    domain: string;
-    bids: {
-        currentBid: BidI;
-        initialBid: BidI;
-        leaderBadgeId: string;
-        originatorBadgeId: string;
-    }
-}
-
-export interface CheckAuthenticityResponse {
+export interface CheckAuthenticityResponseI {
     isAuthentic: boolean;
 }
 
-export interface DomainAttributesResponse {
+export interface DomainAttributesResponseI {
     status: string;
     verbose: string;
-    price?: PricePairI;
+    price?: RawPricePairI;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponseI<T> {
     data: T[];
     next_cursor?: string;
     total_count: number;
 }
 
-export type AllAuctionsResponse = PaginatedResponse<FormattedAuctionResultI>;
+export type UserBadgeResponseT = string | null;
 
-export type AuctionBidResponse = PaginatedResponse<BidEvent>;
-
-export type UserBadgeResponse = string | null;
-
-export type AccountDomainsResponse = DomainData[];
+export type AccountDomainsResponseT = DomainDataI[];

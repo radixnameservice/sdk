@@ -19,34 +19,33 @@ import config from './entities.config';
 import { commonErrors } from './common/errors';
 
 import { expandComponents } from './utils/entity.utils';
-import { NetworkT, getBasePath } from './utils/gateway.utils';
+import { getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
 import { errorResponse } from './utils/response.utils';
 import { requireDependencies } from './decorators/sdk.decorators';
 
 import { UserSpecificsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
-import { DocketPropsI, RecordItem } from './common/record.types';
+import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
-import { DomainData } from './common/domain.types';
+import { DomainDataI } from './common/domain.types';
 import { DocketI } from './common/record.types';
-import { AccountDomainsResponse, AllAuctionsResponse, AuctionBidResponse, AuctionDetailsResponse, CheckAuthenticityResponse, CommitmentStackResponse, DomainAttributesResponse, ErrorStackResponse, ResolvedRecordResponse, UserBadgeResponse } from './common/response.types';
+import { AccountDomainsResponseT, CheckAuthenticityResponseI, CommitmentStackResponseI, DomainAttributesResponseI, ErrorStackResponseI, ResolvedRecordResponseI, UserBadgeResponseT } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
+import { NetworkT } from './common/gateway.types';
 
 
 export {
     RnsSDKI,
-    DomainAttributesResponse,
-    RecordItem,
-    DomainData,
-    AllAuctionsResponse,
-    AuctionBidResponse,
-    CheckAuthenticityResponse,
-    ResolvedRecordResponse,
-    AuctionDetailsResponse,
-    UserBadgeResponse,
-    CommitmentStackResponse,
-    ErrorStackResponse
+    DomainAttributesResponseI,
+    RecordItemI,
+    DomainDataI,
+    CheckAuthenticityResponseI,
+    ResolvedRecordResponseI,
+    UserBadgeResponseT,
+    ProofsI,
+    CommitmentStackResponseI,
+    ErrorStackResponseI
 };
 
 interface RnsSDKI {
@@ -106,7 +105,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getDomainAttributes(domain: string): Promise<DomainAttributesResponse | ErrorStackResponse> {
+    async getDomainAttributes(domain: string): Promise<DomainAttributesResponseI | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -119,7 +118,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getDomainDetails(domain: string): Promise<DomainData | ErrorStackResponse> {
+    async getDomainDetails(domain: string): Promise<DomainDataI | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -145,7 +144,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getRecords(domain: string): Promise<RecordItem[] | ErrorStackResponse> {
+    async getRecords(domain: string): Promise<RecordItemI[] | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -169,7 +168,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponse | ErrorStackResponse> {
+    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseI | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
@@ -192,7 +191,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getAccountDomains(accountAddress: string): Promise<AccountDomainsResponse | ErrorStackResponse> {
+    async getAccountDomains(accountAddress: string): Promise<AccountDomainsResponseT | ErrorStackResponseI> {
 
         const accountDomains = requestAccountDomains(accountAddress, { sdkInstance: this });
 
@@ -204,7 +203,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponse | ErrorStackResponse> {
+    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponseI | ErrorStackResponseI> {
 
         const domainInterests = await this.getAccountDomains(accountAddress);
 
@@ -220,7 +219,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         return dispatchDomainRegistration({
             sdkInstance: this,
@@ -234,7 +233,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async activateDomain({ domain, userDetails, callbacks }: { domain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async activateDomain({ domain, userDetails, callbacks }: { domain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         return dispatchDomainActivation({
             sdkInstance: this,
@@ -247,7 +246,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async createSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         return dispatchSubdomainCreation({
             sdkInstance: this,
@@ -260,7 +259,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async deleteSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async deleteSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         return dispatchSubdomainDeletion({
             sdkInstance: this,
@@ -273,7 +272,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getUserBadge(accountAddress: string): Promise<UserBadgeResponse | ErrorStackResponse> {
+    async getUserBadge(accountAddress: string): Promise<UserBadgeResponseT | ErrorStackResponseI> {
 
         return getUserBadgeId({
             sdkInstance: this,
@@ -283,7 +282,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async issueUserBadge({ userDetails, callbacks }: { userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async issueUserBadge({ userDetails, callbacks }: { userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         return dispatchUserBadgeIssuance({
             sdkInstance: this,
@@ -295,7 +294,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async createRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainData = await this.getDomainDetails(normalisedDomain);
@@ -316,7 +315,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async amendRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async amendRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainData = await this.getDomainDetails(normalisedDomain);
@@ -337,7 +336,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async deleteRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponse | ErrorStackResponse> {
+    async deleteRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const normalisedDomain = normaliseDomain(domain);
         const domainData = await this.getDomainDetails(normalisedDomain);

@@ -7,7 +7,7 @@ import { recordUpdateManifest } from "../../manifests/records/record-update-mani
 import { errorResponse, successResponse } from "../../utils/response.utils";
 import { docketToRecordId } from "../../utils/record.utils";
 
-import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
+import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 import { AmendRecordDispatcherPropsI } from "../../common/dispatcher.types";
 
 
@@ -19,7 +19,7 @@ export async function dispatchRecordAmendment({
     domainDetails,
     callbacks,
     proofs // Optional parameter for additional proofs
-}: AmendRecordDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
+}: AmendRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
 

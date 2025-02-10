@@ -4,7 +4,7 @@ import { UserSpecificsI } from "./user.types";
 import { EventCallbacksI } from "./transaction.types";
 import { InstancePropsI, ProofsI } from "./entities.types";
 import { DocketI, DocketPropsI } from "./record.types";
-import { DomainData } from "./domain.types";
+import { DomainDataI } from "./domain.types";
 
 
 export interface DispatcherPropsI extends InstancePropsI {
@@ -45,7 +45,7 @@ export interface SubdomainDispatcherPropsI extends DispatcherPropsI {
 export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
 
     userDetails: UserSpecificsI;
-    domainDetails: DomainData;
+    domainDetails: DomainDataI;
     docket: DocketI;
     proofs?: ProofsI;
 
@@ -54,7 +54,7 @@ export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
 export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
 
     userDetails: UserSpecificsI;
-    domainDetails: DomainData;
+    domainDetails: DomainDataI;
     docket: DocketPropsI;
 
 }
@@ -62,7 +62,7 @@ export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
 export interface AmendRecordDispatcherPropsI extends DispatcherPropsI {
 
     userDetails: UserSpecificsI;
-    domainDetails: DomainData;
+    domainDetails: DomainDataI;
     docket: DocketI;
     proofs?: ProofsI;
 

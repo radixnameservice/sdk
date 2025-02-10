@@ -5,7 +5,7 @@ import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";
 
 import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
+import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 import { commonErrors, registrationErrors } from "../../common/errors";
 import { errorResponse, successResponse } from "../../utils/response.utils";
 
@@ -16,7 +16,7 @@ export async function dispatchDomainRegistration({
     durationYears,
     userDetails,
     callbacks
-}: RegistrationDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
+}: RegistrationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
 

@@ -4,7 +4,7 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import { UserBadgeDispatcherPropsI } from "../../common/dispatcher.types";
 import { errorResponse, successResponse } from "../../utils/response.utils";
 import { badgeErrors } from "../../common/errors";
-import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
+import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 
 
 export async function dispatchUserBadgeIssuance({
@@ -12,7 +12,7 @@ export async function dispatchUserBadgeIssuance({
     rdt,
     userDetails,
     callbacks
-}: UserBadgeDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
+}: UserBadgeDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
 

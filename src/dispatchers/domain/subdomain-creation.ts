@@ -7,7 +7,7 @@ import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../util
 import { commonErrors, subdomainErrors } from "../../common/errors";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
+import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 
 
 export async function dispatchSubdomainCreation({
@@ -16,7 +16,7 @@ export async function dispatchSubdomainCreation({
     rdt,
     userDetails,
     callbacks
-}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
+}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
 

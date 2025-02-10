@@ -9,7 +9,7 @@ export interface DocketI {
 
 }
 
-export interface RecordItem {
+export interface RecordItemI {
     record_id: string;
     platform_identifier: string;
     domain_id: string;
@@ -31,4 +31,4 @@ export interface RemovalPreferencesI {
     deleteRecords: boolean;
 }
 
-export type RecordResultsT = RecordItem[] | [];
+export type RecordResultsT = RecordItemI[] | [];

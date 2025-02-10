@@ -21,7 +21,7 @@ import {
 } from "../../utils/log.utils";
 
 import {
-    DomainData,
+    DomainDataI,
     SubDomainI
 } from "../../common/domain.types";
 
@@ -187,7 +187,7 @@ function formatDomainList(
 
     domains: StateNonFungibleDetailsResponseItem[]
 
-): DomainData[] {
+): DomainDataI[] {
 
     const subdomains = filterSubdomains(domains);
 
@@ -233,7 +233,7 @@ function formatDomainList(
 
                 return acc;
 
-            }, { id: r.non_fungible_id } as DomainData);
+            }, { id: r.non_fungible_id } as DomainDataI);
         }
     });
 
@@ -244,7 +244,7 @@ async function fetchDomainData(
     accountAddress: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainData[] | null> {
+): Promise<DomainDataI[] | null> {
 
     try {
 
@@ -284,7 +284,7 @@ export async function requestAccountDomains(
     accountAddress: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainData[] | null> {
+): Promise<DomainDataI[] | null> {
 
     if (!accountAddress) return [];
 
@@ -306,7 +306,7 @@ export async function requestDomainDetails(
     domain: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainData | null> {
+): Promise<DomainDataI | null> {
 
     try {
 
@@ -353,7 +353,7 @@ export async function requestDomainDetails(
             }
 
             return acc;
-        }, { id: nftData.non_fungible_id, subdomains } as DomainData);
+        }, { id: nftData.non_fungible_id, subdomains } as DomainDataI);
 
     } catch (error) {
 

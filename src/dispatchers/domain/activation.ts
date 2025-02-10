@@ -5,7 +5,7 @@ import { errorResponse, successResponse } from "../../utils/response.utils";
 import { activationErrors } from "../../common/errors";
 
 import { ActivationDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponse, CommitmentStackResponse } from "../../common/response.types";
+import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 
 
 export async function dispatchDomainActivation({
@@ -14,7 +14,7 @@ export async function dispatchDomainActivation({
     rdt,
     userDetails,
     callbacks
-}: ActivationDispatcherPropsI): Promise<CommitmentStackResponse | ErrorStackResponse> {
+}: ActivationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
 

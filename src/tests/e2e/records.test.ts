@@ -1,8 +1,8 @@
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
-import RnsSDK, { RecordItem, ResolvedRecordResponse } from '../..';
+import RnsSDK, { ResolvedRecordResponseI } from '../..';
 import { matchObjectTypes, normaliseManifest } from '../utils';
-import { DocketI } from '../../common/record.types';
+import { DocketI, RecordItemI } from '../../common/record.types';
 import { buildFungibleProofs, buildNonFungibleProofs } from '../../utils/proof.utils';
 
 const mocks = {
@@ -87,7 +87,7 @@ describe('RNS - Fetch Domain Records', () => {
         expect(Array.isArray(records)).toBe(true);
         expect(records.length).toBeGreaterThan(0);
 
-        if (!matchObjectTypes<RecordItem>(records[0], ['record_id', 'id_additions', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
+        if (!matchObjectTypes<RecordItemI>(records[0], ['record_id', 'id_additions', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
             throw new Error('Record did not match expected schema');
         }
 
@@ -142,7 +142,7 @@ describe('RNS - Fetch Domain Records', () => {
 
         expect(Array.isArray(record.nonFungibleDataList)).toBe(true);
 
-        if (!matchObjectTypes<ResolvedRecordResponse>(record, ['value', 'nonFungibleDataList'])) {
+        if (!matchObjectTypes<ResolvedRecordResponseI>(record, ['value', 'nonFungibleDataList'])) {
             throw new Error('Record value did not match expected schema');
         }
 

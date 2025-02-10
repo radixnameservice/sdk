@@ -1,11 +1,14 @@
+import Decimal from "decimal.js";
 import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { ProgrammaticScryptoSborValueMap } from "@radixdlt/babylon-gateway-api-sdk";
-import { PriceTiers } from "../mappings/pricing";
+
 import { stripExtension } from "./domain.utils";
-import Decimal from "decimal.js";
 import { convertToDecimal, divideDecimal, isDecimalLessThan, multiplyDecimal } from "./decimal.utils";
+import { PriceTiers } from "../mappings/pricing";
 import pricingConfig from "../pricing.config";
-import { BidI } from "../common/auction.types";
+
+import { PricePairI } from "../common/pricing.types";
+
 
 export function convertToNormalisedPrice(usd: number, years: number, usdXrdRate: Decimal) {
 
@@ -33,7 +36,7 @@ export function formatXrd(xrd: number | string, decPoints: number = 2): number {
 
 }
 
-export function priceFromXrd(usdXrdRate: Decimal, xrd: Decimal | number | string | null | undefined): BidI {
+export function priceFromXrd(usdXrdRate: Decimal, xrd: Decimal | number | string | null | undefined): PricePairI {
 
     if (!xrd) {
         return null;

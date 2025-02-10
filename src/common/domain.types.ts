@@ -1,4 +1,4 @@
-export interface DomainData extends RootDomainI {
+export interface DomainDataI extends RootDomainI {
 
     subdomains: SubDomainI[],
 

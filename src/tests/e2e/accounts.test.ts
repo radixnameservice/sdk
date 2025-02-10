@@ -1,4 +1,4 @@
-import RnsSDK, { CheckAuthenticityResponse, DomainData } from '../..';
+import RnsSDK, { CheckAuthenticityResponseI, DomainDataI } from '../..';
 import { matchObjectTypes } from '../utils';
 
 describe('RNS - Verify Domain Owner Accounts', () => {
@@ -15,7 +15,7 @@ describe('RNS - Verify Domain Owner Accounts', () => {
 
         expect(Array.isArray(ownerDomains)).toBe(true);
         expect(ownerDomains.length).toBeGreaterThan(0);
-        expect(ownerDomains.every(domain => matchObjectTypes<DomainData>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'last_valid_timestamp', 'key_image_url', 'address']))).toBe(true);
+        expect(ownerDomains.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'last_valid_timestamp', 'key_image_url', 'address']))).toBe(true);
 
     });
 
@@ -26,7 +26,7 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        if (!matchObjectTypes<CheckAuthenticityResponse>(authenticity, ['isAuthentic'])) {
+        if (!matchObjectTypes<CheckAuthenticityResponseI>(authenticity, ['isAuthentic'])) {
             throw new Error('Authenticity object did not match expected schema');
         }
 
@@ -41,7 +41,7 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        if (!matchObjectTypes<CheckAuthenticityResponse>(authenticity, ['isAuthentic'])) {
+        if (!matchObjectTypes<CheckAuthenticityResponseI>(authenticity, ['isAuthentic'])) {
             throw new Error('Authenticity object did not match expected schema');
         }
 
