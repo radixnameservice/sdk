@@ -1,16 +1,17 @@
 import RnsSDK from "../..";
-import { ProofsI } from "../../common/entities.types";
 
+import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
+
+import { ProofsI } from "../../common/entities.types";
 import { DocketI } from "../../common/record.types";
 import { UserSpecificsI } from "../../common/user.types";
-import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
+
 
 
 export function recordUpdateManifest({
     sdkInstance,
     userDetails,
     rootDomainId,
-    subDomainId = null,
     recordDocket,
     recordId,
     proofs = {}
@@ -18,7 +19,6 @@ export function recordUpdateManifest({
     sdkInstance: RnsSDK;
     userDetails: UserSpecificsI;
     rootDomainId: string;
-    subDomainId?: string | null;
     recordDocket: DocketI;
     recordId: string;
     proofs?: ProofsI;
@@ -45,7 +45,7 @@ export function recordUpdateManifest({
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
-            NonFungibleLocalId("${subDomainId || rootDomainId}")
+            NonFungibleLocalId("${rootDomainId}")
             );
         POP_FROM_AUTH_ZONE
             Proof("requester_proof");

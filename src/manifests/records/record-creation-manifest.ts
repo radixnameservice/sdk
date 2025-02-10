@@ -1,22 +1,21 @@
 import RnsSDK from "../..";
-import { ProofsI } from "../../common/entities.types";
 
+import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
+
+import { ProofsI } from "../../common/entities.types";
 import { DocketI } from "../../common/record.types";
 import { UserSpecificsI } from "../../common/user.types";
-import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
 
 export function recordCreationManifest({
     sdkInstance,
     userDetails,
     rootDomainId,
-    subDomainId = null,
     recordDocket,
     proofs = {}
 }: {
     sdkInstance: RnsSDK;
     userDetails: UserSpecificsI;
     rootDomainId: string;
-    subDomainId?: string | null;
     recordDocket: DocketI;
     proofs?: ProofsI;
 }): string {
@@ -51,7 +50,7 @@ export function recordCreationManifest({
         CALL_METHOD
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "${methodName}"
-            NonFungibleLocalId("${subDomainId || rootDomainId}")
+            NonFungibleLocalId("${rootDomainId}")
             "${recordDocket.context}"
             ${recordDocket.directive}
             ${recordDocket.platformIdentifier}
