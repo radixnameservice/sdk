@@ -6,13 +6,13 @@ import { UserSpecificsI } from "../../common/user.types";
 import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
 
 
-
 export function recordUpdateManifest({
     sdkInstance,
     userDetails,
     rootDomainId,
     subDomainId = null,
     recordDocket,
+    recordId,
     proofs = {}
 }: {
     sdkInstance: RnsSDK;
@@ -20,6 +20,7 @@ export function recordUpdateManifest({
     rootDomainId: string;
     subDomainId?: string | null;
     recordDocket: DocketI;
+    recordId: string;
     proofs?: ProofsI;
 }): string {
 
@@ -31,12 +32,10 @@ export function recordUpdateManifest({
         : [];
     const idAdditions = proofs.idAdditions || [];
 
-
     const methodName =
         nonFungibleProofs.length > 0 || fungibleProofs.length > 0
             ? "update_proven_record"
             : "update_record";
-
 
     return `
         ${nonFungibleProofs.map(proof => proof.manifest).join('')}
@@ -46,26 +45,25 @@ export function recordUpdateManifest({
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
-                NonFungibleLocalId("${rootDomainId}")
+            NonFungibleLocalId("${subDomainId || rootDomainId}")
             );
         POP_FROM_AUTH_ZONE
-            Proof("request_proof");
+            Proof("requester_proof");
         CALL_METHOD
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "${methodName}"
-            NonFungibleLocalId("${subDomainId || rootDomainId}")
+            NonFungibleLocalId("${recordId}")
             "${recordDocket.context}"
             ${recordDocket.directive}
             ${recordDocket.platformIdentifier}
             Array<String>(${idAdditions.map(id => `"${id}"`).join(',')})
             ${methodName === "update_proven_record"
             ? `Array<Proof>(
-                ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
-                ${fungibleProofs.map(proof => proof.proofIds).join(',')}
+            ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
+            ${fungibleProofs.map(proof => proof.proofIds).join(',')}
             )`
-            : ""
-        }
-            Proof("request_proof")
+            : ""}
+            Proof("requester_proof")
             Enum<0u8>();
         CALL_METHOD
             Address("${userDetails.accountAddress}")
