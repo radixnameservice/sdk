@@ -271,6 +271,112 @@ describe('RNS - Manage Domain Records', () => {
     });
 
 
+    it(`record amendment should return a correctly formatted manifest string`, async () => {
+
+        const amendRecord = await rns.amendRecord({
+            domain: mocks.domain.name,
+            userDetails: mocks.userDetails,
+            docket: mocks.docket as DocketI
+        });
+
+        if ('errors' in amendRecord) {
+            throw new Error('Mock record amendment failed');
+        }
+
+        const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
+        expect(sendTransactionMock).toHaveBeenCalled();
+
+        const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
+        const transactionManifest = sendTransactionArgs.transactionManifest;
+
+        const expectedString = `
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                NonFungibleLocalId("${anticipated.domain.rootId}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("requester_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "update_record"
+                NonFungibleLocalId("${anticipated.record.id}")
+                "${mocks.docket.context}"
+                ${mocks.docket.directive}
+                ${mocks.docket.platformIdentifier}
+                Array<String>()
+                Proof("requester_proof")
+                Enum<0u8>();
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "deposit_batch"
+                Expression("ENTIRE_WORKTOP");
+        `;
+
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
+
+    });
+
+    it(`record amendment with resource proofs should return a correctly formatted manifest string`, async () => {
+
+        const deleteRecord = await rns.amendRecord({
+            domain: mocks.domain.name,
+            userDetails: mocks.userDetails,
+            docket: mocks.docket as DocketI,
+            proofs: mocks.proofs
+        });
+
+        if ('errors' in deleteRecord) {
+            throw new Error('Mock record amendment failed');
+        }
+
+        const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
+        expect(sendTransactionMock).toHaveBeenCalled();
+
+        const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
+        const transactionManifest = sendTransactionArgs.transactionManifest;
+
+        const nonFungibleProofs = buildNonFungibleProofs(mocks.proofs.nonFungibles, mocks.userDetails.accountAddress)
+        const fungibleProofs = buildFungibleProofs(mocks.proofs.fungibles, mocks.userDetails.accountAddress);
+
+        const expectedString = `
+            ${nonFungibleProofs.map(proof => proof.manifest).join('')}
+            ${fungibleProofs.map(proof => proof.manifest).join('')}
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                NonFungibleLocalId("${anticipated.domain.rootId}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("requester_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "update_proven_record"
+                NonFungibleLocalId("${anticipated.record.id}")
+                "${mocks.docket.context}"
+                ${mocks.docket.directive}
+                ${mocks.docket.platformIdentifier}
+                Array<String>()
+                Array<Proof>(
+                ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
+                ${fungibleProofs.map(proof => proof.proofIds).join(',')}
+                )
+                Proof("requester_proof")
+                Enum<0u8>();
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "deposit_batch"
+                Expression("ENTIRE_WORKTOP");
+        `;
+
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
+
+    });
+
     it(`record deletion should return a correctly formatted manifest string`, async () => {
 
         const deleteRecord = await rns.deleteRecord({
