@@ -59,3 +59,12 @@ export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
     docket: DocketPropsI;
 
 }
+
+export interface AmendRecordDispatcherPropsI extends DispatcherPropsI {
+
+    userDetails: UserSpecificsI;
+    domainDetails: DomainData;
+    docket: DocketI;
+    proofs?: ProofsI;
+
+}
