@@ -48,8 +48,10 @@ const mocks = {
 const anticipated = {
     domain: {
         rootId: "[52e57ee0bdd7681786e15a0dabb7bdc4]",
-        name: "radixnameservice.xrd",
-        subdomainIds: ["[0601f34183fb940a690f3c87f29b6c25]"]
+        name: "radixnameservice.xrd"
+    },
+    record: {
+        id: "[e544ec31725d2bbd41fd42ecfb74073a]"
     }
 }
 
@@ -170,7 +172,7 @@ describe('RNS - Manage Domain Records', () => {
         });
 
         if ('errors' in createRecord) {
-            throw new Error('Mock registration failed');
+            throw new Error('Mock record creation failed');
         }
 
         const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
@@ -209,6 +211,7 @@ describe('RNS - Manage Domain Records', () => {
 
     });
 
+
     it(`record creation with resource proofs should return a correctly formatted manifest string`, async () => {
 
         const createRecord = await rns.createRecord({
@@ -219,7 +222,7 @@ describe('RNS - Manage Domain Records', () => {
         });
 
         if ('errors' in createRecord) {
-            throw new Error('Mock registration failed');
+            throw new Error('Mock proven record creation failed');
         }
 
         const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
@@ -267,5 +270,49 @@ describe('RNS - Manage Domain Records', () => {
 
     });
 
-    
+
+    it(`record deletion should return a correctly formatted manifest string`, async () => {
+
+        const deleteRecord = await rns.deleteRecord({
+            domain: mocks.domain.name,
+            userDetails: mocks.userDetails,
+            docket: mocks.docket as DocketI
+        });
+
+        if ('errors' in deleteRecord) {
+            throw new Error('Mock record deletion failed');
+        }
+
+        const sendTransactionMock = dAppToolkit.walletApi.sendTransaction as jest.Mock;
+        expect(sendTransactionMock).toHaveBeenCalled();
+
+        const sendTransactionArgs = sendTransactionMock.mock.calls[0][0];
+        const transactionManifest = sendTransactionArgs.transactionManifest;
+
+        const expectedString = `
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                NonFungibleLocalId("${anticipated.domain.rootId}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("requester_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "delete_record"
+                NonFungibleLocalId("${anticipated.record.id}")
+                Proof("requester_proof")
+                Enum<0u8>();
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "deposit_batch"
+                Expression("ENTIRE_WORKTOP");
+        `;
+
+        expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
+
+    });
+
 });
