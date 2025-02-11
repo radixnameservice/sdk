@@ -193,7 +193,7 @@ export default class RnsSDK {
     @requireDependencies('read-only')
     async getAccountDomains(accountAddress: string): Promise<AccountDomainsResponseT | ErrorStackResponseI> {
 
-        const accountDomains = requestAccountDomains(accountAddress, { sdkInstance: this });
+        const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
         if (!accountDomains)
             return errorResponse(commonErrors.accountRetrieval({ accountAddress, verbose: `An error occured when requesting user account domains from: ${accountAddress}.` }));
