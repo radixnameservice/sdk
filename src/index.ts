@@ -36,7 +36,7 @@ import { NetworkT } from './common/gateway.types';
 
 
 export {
-    RnsSDKI,
+    RnsSDKConfigI,
     DomainAttributesResponseI,
     RecordItemI,
     DomainDataI,
@@ -48,7 +48,7 @@ export {
     ErrorStackResponseI
 };
 
-interface RnsSDKI {
+interface RnsSDKConfigI {
 
     gateway?: GatewayApiClient;
     rdt?: RadixDappToolkit;
@@ -67,7 +67,7 @@ export default class RnsSDK {
     entities: EntitiesT;
     dependencies: DependenciesI;
 
-    constructor({ gateway, rdt, network = 'mainnet' }: RnsSDKI) {
+    constructor({ gateway, rdt, network = 'mainnet' }: RnsSDKConfigI) {
 
         this.network = network;
         this.rdt = rdt;
