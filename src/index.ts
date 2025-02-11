@@ -50,7 +50,7 @@ export {
 
 interface RnsSDKI {
 
-    gateway?: string;
+    gateway?: GatewayApiClient;
     rdt?: RadixDappToolkit;
     network?: NetworkT;
 
@@ -83,7 +83,7 @@ export default class RnsSDK {
 
     }
 
-    private initGateway({ gateway }: { gateway?: string; }): void {
+    private initGateway({ gateway }: { gateway?: GatewayApiClient; }): void {
 
         const { status, state, transaction, stream } = GatewayApiClient.initialize({
             basePath: gateway ?? getBasePath(this.network),
