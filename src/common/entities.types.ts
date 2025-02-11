@@ -2,7 +2,8 @@ import RnsSDK from "..";
 import { State, StateEntityDetailsResponseComponentDetails } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { parsePricingTiers } from "../utils/pricing.utils";
-import { NetworkT } from "../utils/gateway.utils";
+
+import { NetworkT } from "./gateway.types";
 
 export type ComponentReferencesT = {
 
