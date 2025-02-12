@@ -83,12 +83,14 @@ export default class RnsSDK {
 
     }
 
-    private initGateway({ gateway }: { gateway?: GatewayApiClient; }): void {
+    private initGateway({ gateway, gatewayEndpoint }: { gateway?: GatewayApiClient; gatewayEndpoint?: string; }): void {
 
-        const { status, state, transaction, stream } = GatewayApiClient.initialize({
-            basePath: gateway ?? getBasePath(this.network),
+        const gatewayInstance = gateway ?? GatewayApiClient.initialize({
+            basePath: gatewayEndpoint ?? getBasePath(this.network),
             applicationName: 'The Radix Name Service'
         });
+
+        const { status, state, transaction, stream } = gatewayInstance;
 
         this.state = state;
         this.status = status;
