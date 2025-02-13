@@ -22,7 +22,7 @@ export interface ErrorGenerationI {
 
 }
 
-export interface SuccessI {
+export interface CommitmentSuccessI {
 
     code: string;
     details: string | null;
@@ -31,7 +31,7 @@ export interface SuccessI {
 
 export interface CommitmentStackResponseI {
 
-    success: SuccessI[];
+    success: CommitmentSuccessI[];
 
 }
 
