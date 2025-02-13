@@ -6,10 +6,9 @@ import { docketToRecordId } from "../../utils/record.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
 import { DocketPropsI, RecordItemI } from "../../common/record.types";
-import { ResolvedRecordResponseI } from "../../common/response.types";
+import { ResolvedRecordI } from "../../common/response.types";
 
-
-export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI) {
+export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI): Promise<RecordItemI[] | []> {
 
     try {
 
@@ -82,7 +81,7 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
 
 }
 
-export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordResponseI> {
+export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordI | null> {
 
     try {
 

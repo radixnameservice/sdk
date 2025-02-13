@@ -1,53 +1,33 @@
 import { StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 import { RawPricePairI } from "./pricing.types";
 import { DomainDataI } from "./domain.types";
+import { RecordItemI } from "./record.types";
 
 export interface ErrorStackResponseI {
-
     errors: ErrorI[];
-
 }
 
 export interface ErrorI {
-
     code: string;
     error: string;
     verbose: string | null;
-
 }
 
 export interface ErrorGenerationI {
-
     verbose?: string | null;
-
 }
 
 export interface CommitmentSuccessI {
-
     code: string;
     details: string | null;
-
 }
 
 export interface CommitmentStackResponseI {
-
     success: CommitmentSuccessI[];
-
 }
 
-export interface ResolvedRecordResponseI {
-    value: string;
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-}
-
-export interface CheckAuthenticityResponseI {
-    isAuthentic: boolean;
-}
-
-export interface DomainAttributesResponseI {
-    status: string;
-    verbose: string;
-    price?: RawPricePairI;
+export interface ResultI<T> {
+    data: T;
 }
 
 export interface PaginatedResponseI<T> {
@@ -56,6 +36,31 @@ export interface PaginatedResponseI<T> {
     total_count: number;
 }
 
-export type UserBadgeResponseT = string | null;
+export interface ResolvedRecordI {
+    value: string;
+    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
+}
 
-export type AccountDomainsResponseT = DomainDataI[];
+export type ResolvedRecordResponseI = ResultI<{
+    value: string;
+    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
+} | null>;
+
+export type DomainAttributesResponseT = ResultI<{
+    status: string;
+    verbose: string;
+    price?: RawPricePairI;
+} | null>;
+
+export type RecordListResponseT = ResultI<{ records: RecordItemI[] | [] }>;
+export type RecordResponseT = ResultI<{ record: RecordItemI | null }>;
+
+export type DomainListResponseT = ResultI<{ domains: DomainDataI[] | [] }>;
+
+export type UserBadgeResponseT = ResultI<{ badgeId: string | null }>;
+export type CheckAuthenticityResponseT = ResultI<{ isAuthentic: boolean } | null>;
+
+export type ResolvedRecordResponseT = ResultI<{
+    value: string;
+    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
+} | null>;
