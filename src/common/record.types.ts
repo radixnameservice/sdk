@@ -31,4 +31,3 @@ export interface RemovalPreferencesI {
     deleteRecords: boolean;
 }
 
-export type RecordResultsT = RecordItemI[] | [];
