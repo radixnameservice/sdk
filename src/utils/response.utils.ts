@@ -1,4 +1,4 @@
-import { ErrorI, ErrorStackResponseI, CommitmentSuccessI, CommitmentStackResponseI } from "../common/response.types";
+import { ErrorI, ErrorStackResponseI, CommitmentSuccessI, CommitmentStackResponseI, ResultI } from "../common/response.types";
 
 export function successResponse(success: CommitmentSuccessI | CommitmentSuccessI[]): CommitmentStackResponseI {
 
@@ -14,20 +14,9 @@ export function successResponse(success: CommitmentSuccessI | CommitmentSuccessI
 
 }
 
-export function infoResponse(success: CommitmentSuccessI | CommitmentSuccessI[]): CommitmentStackResponseI {
-
-    if (Array.isArray(success)) {
-        return {
-            success
-        };
-    }
-
-    return {
-        success: [success]
-    };
-
+export function dataResponse<T>(data: T): ResultI<T> {
+    return { data };
 }
-
 
 export function errorResponse(errors: ErrorI | ErrorI[]): ErrorStackResponseI {
 
