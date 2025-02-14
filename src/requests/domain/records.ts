@@ -8,7 +8,7 @@ import { InstancePropsI } from "../../common/entities.types";
 import { DocketPropsI, RecordItemI } from "../../common/record.types";
 import { ResolvedRecordI } from "../../common/response.types";
 
-export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI): Promise<RecordItemI[] | []> {
+export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI): Promise<RecordItemI[] | [] | Error> {
 
     try {
 
@@ -74,14 +74,13 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
 
     } catch (e) {
 
-        console.log(e);
-        return null;
+        return e;
 
     }
 
 }
 
-export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordI | null> {
+export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordI | null | Error> {
 
     try {
 
@@ -170,7 +169,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
     } catch (e) {
 
         console.log(e);
-        return null;
+        return e;
 
     }
 
