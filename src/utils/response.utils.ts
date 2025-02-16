@@ -14,8 +14,8 @@ export function successResponse(success: CommitmentSuccessI | CommitmentSuccessI
 
 }
 
-export function dataResponse<T>(data: T): ResultI<T> {
-    return { data };
+export function dataResponse<T>(responseData: T): ResultI<T> {
+    return { data: responseData };
 }
 
 export function errorResponse(errors: ErrorI | ErrorI[]): ErrorStackResponseI {
