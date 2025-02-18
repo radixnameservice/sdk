@@ -1,4 +1,4 @@
-import { errorResponse } from '../utils/response.utils';
+import { errorStack } from '../utils/response.utils';
 
 import { ErrorI } from '../common/response.types';
 import { ParamProcessMapT } from '../common/validation.types';
@@ -94,7 +94,7 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                                 }
 
                                 if (validationErrors.length > 0) {
-                                    return errorResponse(validationErrors);
+                                    return errorStack(validationErrors);
                                 }
                             }
                             return originalMethod.apply(this, methodArgs);

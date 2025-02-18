@@ -3,7 +3,7 @@ import { badgeErrors, commonErrors } from "../../common/errors";
 import { ErrorStackResponseI, UserBadgeResponseT } from "../../common/response.types";
 import { UserBadgeReqPropsI } from "../../common/user.types";
 
-import { dataResponse, errorResponse } from "../../utils/response.utils";
+import { dataResponse, errorStack } from "../../utils/response.utils";
 
 
 export async function getUserBadgeId({ sdkInstance, accountAddress }: UserBadgeReqPropsI): Promise<UserBadgeResponseT | ErrorStackResponseI> {
@@ -11,7 +11,7 @@ export async function getUserBadgeId({ sdkInstance, accountAddress }: UserBadgeR
     try {
 
         if (!accountAddress)
-            return errorResponse(commonErrors.missingParameters({ verbose: 'No account address was provided to the getUserBadge method.' }));
+            return errorStack(commonErrors.missingParameters({ verbose: 'No account address was provided to the getUserBadge method.' }));
 
         const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
 
@@ -25,7 +25,7 @@ export async function getUserBadgeId({ sdkInstance, accountAddress }: UserBadgeR
 
     } catch (error) {
 
-        return errorResponse(badgeErrors.userRequest({ accountAddress, verbose: error }));
+        return errorStack(badgeErrors.userRequest({ accountAddress, verbose: error }));
 
     }
 

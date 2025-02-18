@@ -2,7 +2,7 @@
 import { recordErrors } from "../../common/errors";
 import { recordDeletionManifest } from "../../manifests/records/record-deletion-manifest";
 
-import { errorResponse, successResponse } from "../../utils/response.utils";
+import { errorStack, successResponse } from "../../utils/response.utils";
 import { sendTransaction } from "../../utils/transaction.utils";
 
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
@@ -39,7 +39,7 @@ export async function dispatchRecordDeletion({
         });
 
         if (!dispatch) {
-            return errorResponse(recordErrors.deletion({ docket }));
+            return errorStack(recordErrors.deletion({ docket }));
         }
 
         return successResponse({
@@ -49,7 +49,7 @@ export async function dispatchRecordDeletion({
 
     } catch (error) {
 
-        return errorResponse(recordErrors.deletion({ docket, verbose: error }));
+        return errorStack(recordErrors.deletion({ docket, verbose: error }));
 
     }
 

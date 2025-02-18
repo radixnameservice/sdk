@@ -4,7 +4,7 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import { recordErrors } from "../../common/errors";
 import { recordCreationManifest } from "../../manifests/records/record-creation-manifest";
 
-import { errorResponse, successResponse } from "../../utils/response.utils";
+import { errorStack, successResponse } from "../../utils/response.utils";
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
 import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
 
@@ -37,7 +37,7 @@ export async function dispatchRecordCreation({
         });
 
         if (!dispatch) {
-            return errorResponse(recordErrors.creation({ docket }));
+            return errorStack(recordErrors.creation({ docket }));
         }
 
         return successResponse({
@@ -47,7 +47,7 @@ export async function dispatchRecordCreation({
 
     } catch (error) {
 
-        return errorResponse(recordErrors.creation({ docket, verbose: error }));
+        return errorStack(recordErrors.creation({ docket, verbose: error }));
 
     }
 

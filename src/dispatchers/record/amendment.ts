@@ -4,7 +4,7 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import { recordErrors } from "../../common/errors";
 import { recordUpdateManifest } from "../../manifests/records/record-update-manifest";
 
-import { errorResponse, successResponse } from "../../utils/response.utils";
+import { errorStack, successResponse } from "../../utils/response.utils";
 import { docketToRecordId } from "../../utils/record.utils";
 
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
@@ -43,7 +43,7 @@ export async function dispatchRecordAmendment({
         });
 
         if (!dispatch) {
-            return errorResponse(recordErrors.amendment({ docket }));
+            return errorStack(recordErrors.amendment({ docket }));
         }
 
         return successResponse({
@@ -53,7 +53,7 @@ export async function dispatchRecordAmendment({
 
     } catch (error) {
 
-        return errorResponse(recordErrors.amendment({ docket, verbose: error }));
+        return errorStack(recordErrors.amendment({ docket, verbose: error }));
 
     }
 

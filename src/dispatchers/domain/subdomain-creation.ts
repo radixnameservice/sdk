@@ -3,7 +3,7 @@ import subdomainCreationManifest from "../../manifests/domains/subdomain-creatio
 import { subdomainErrors } from "../../common/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { errorResponse, successResponse } from "../../utils/response.utils";
+import { errorStack, successResponse } from "../../utils/response.utils";
 import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
@@ -24,7 +24,7 @@ export async function dispatchSubdomainCreation({
         const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
         if (!subdomainValidation.valid)
-            return errorResponse(subdomainErrors.invalid({ subdomain, verbose: subdomainValidation.message }));
+            return errorStack(subdomainErrors.invalid({ subdomain, verbose: subdomainValidation.message }));
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
         const detailsRequest = await sdkInstance.getDomainDetails({ domain: rootDomain });
@@ -54,7 +54,7 @@ export async function dispatchSubdomainCreation({
         });
 
         if (!dispatch)
-            return errorResponse(subdomainErrors.generic({ subdomain }));
+            return errorStack(subdomainErrors.generic({ subdomain }));
 
         return successResponse({
             code: 'SUBDOMAIN_CREATION_SUCCESSFUL',
@@ -63,7 +63,7 @@ export async function dispatchSubdomainCreation({
 
     } catch (error) {
 
-        return errorResponse(subdomainErrors.creation({ subdomain, verbose: error }));
+        return errorStack(subdomainErrors.creation({ subdomain, verbose: error }));
 
     }
 

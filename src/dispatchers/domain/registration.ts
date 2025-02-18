@@ -4,7 +4,7 @@ import { domainErrors, registrationErrors } from "../../common/errors";
 import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";
-import { errorResponse, successResponse } from "../../utils/response.utils";
+import { errorStack, successResponse } from "../../utils/response.utils";
 
 import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
@@ -32,7 +32,7 @@ export async function dispatchDomainRegistration({
         const attributes = attributeRequest.data;
 
         if (attributes.status !== 'available')
-            return errorResponse(domainErrors.unavailable({ domain }));
+            return errorStack(domainErrors.unavailable({ domain }));
 
         const manifest = await registerDomainManifest({
             sdkInstance,
@@ -51,7 +51,7 @@ export async function dispatchDomainRegistration({
         });
 
         if (!dispatch)
-            return errorResponse(registrationErrors.generic({ domain }));
+            return errorStack(registrationErrors.generic({ domain }));
 
         return successResponse({
             code: 'REGISTRATION_SUCCESSFUL',
@@ -60,7 +60,7 @@ export async function dispatchDomainRegistration({
 
     } catch (error) {
 
-        return errorResponse(registrationErrors.generic({ domain, verbose: error }));
+        return errorStack(registrationErrors.generic({ domain, verbose: error }));
 
     }
 

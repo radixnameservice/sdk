@@ -21,7 +21,7 @@ import { commonErrors, domainErrors, recordErrors } from './common/errors';
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
 import { normaliseDomain, validateDomainEntity } from './utils/domain.utils';
-import { dataResponse, errorResponse, successResponse } from './utils/response.utils';
+import { dataResponse, errorStack, successResponse } from './utils/response.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
 import { UserSpecificsI } from './common/user.types';
@@ -117,12 +117,12 @@ export default class RnsSDK {
         const domainValidation = validateDomainEntity(normalisedDomain);
 
         if (!domainValidation.valid)
-            return errorResponse(domainErrors.invalid({ domain, verbose: domainValidation.message }));
+            return errorStack(domainErrors.invalid({ domain, verbose: domainValidation.message }));
 
         const fetchAttributes = await requestDomainStatus(normalisedDomain, { sdkInstance: this });
 
         if (fetchAttributes instanceof Error)
-            return errorResponse(domainErrors.generic({ domain, verbose: fetchAttributes.message }));
+            return errorStack(domainErrors.generic({ domain, verbose: fetchAttributes.message }));
 
         return dataResponse({ ...fetchAttributes });
 
@@ -135,15 +135,15 @@ export default class RnsSDK {
         const domainValidation = validateDomainEntity(normalisedDomain);
 
         if (!domainValidation.valid)
-            return errorResponse(domainErrors.invalid({ domain, verbose: domainValidation.message }));
+            return errorStack(domainErrors.invalid({ domain, verbose: domainValidation.message }));
 
         const fetchDetails = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
         if (fetchDetails instanceof Error)
-            return errorResponse(domainErrors.generic({ domain, verbose: fetchDetails.message }));
+            return errorStack(domainErrors.generic({ domain, verbose: fetchDetails.message }));
 
         if (!fetchDetails)
-            return errorResponse(domainErrors.emptyDetails({ domain }));
+            return errorStack(domainErrors.emptyDetails({ domain }));
 
         const isAuthentic = await this.checkAuthenticity({
             domain: normalisedDomain,
@@ -151,7 +151,7 @@ export default class RnsSDK {
         });
 
         if (!isAuthentic)
-            return errorResponse(commonErrors.authenticityMismatch({ domain }));
+            return errorStack(commonErrors.authenticityMismatch({ domain }));
 
         return dataResponse({ details: fetchDetails });
 
@@ -164,15 +164,15 @@ export default class RnsSDK {
         const domainValidation = validateDomainEntity(normalisedDomain);
 
         if (!domainValidation.valid)
-            return errorResponse(domainErrors.invalid({ domain, verbose: domainValidation.message }));
+            return errorStack(domainErrors.invalid({ domain, verbose: domainValidation.message }));
 
         const details = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
         if (details instanceof Error)
-            return errorResponse(domainErrors.generic({ domain, verbose: details.message }));
+            return errorStack(domainErrors.generic({ domain, verbose: details.message }));
 
         if (!details)
-            return errorResponse(domainErrors.emptyDetails({ domain }));
+            return errorStack(domainErrors.emptyDetails({ domain }));
 
         const isAuthentic = await this.checkAuthenticity({
             domain: normalisedDomain,
@@ -180,12 +180,12 @@ export default class RnsSDK {
         });
 
         if (!isAuthentic)
-            return errorResponse(commonErrors.authenticityMismatch({ domain }));
+            return errorStack(commonErrors.authenticityMismatch({ domain }));
 
         const fetchRecords = await requestRecords(normalisedDomain, { sdkInstance: this });
 
         if (fetchRecords instanceof Error)
-            return errorResponse(recordErrors.recordRetrieval({ domain, verbose: fetchRecords.message }));
+            return errorStack(recordErrors.recordRetrieval({ domain, verbose: fetchRecords.message }));
 
         return dataResponse({ records: fetchRecords });
 
@@ -198,11 +198,11 @@ export default class RnsSDK {
         const domainValidation = validateDomainEntity(normalisedDomain);
 
         if (!domainValidation.valid)
-            return errorResponse(domainErrors.invalid({ domain, verbose: domainValidation.message }));
+            return errorStack(domainErrors.invalid({ domain, verbose: domainValidation.message }));
 
         const fetchDetails = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
         if (fetchDetails instanceof Error)
-            return errorResponse(commonErrors.authenticityMismatch({ domain, verbose: fetchDetails.message }));
+            return errorStack(commonErrors.authenticityMismatch({ domain, verbose: fetchDetails.message }));
 
         const isAuthentic = await this.checkAuthenticity({
             domain: normalisedDomain,
@@ -210,11 +210,11 @@ export default class RnsSDK {
         });
 
         if (!isAuthentic)
-            return errorResponse(commonErrors.authenticityMismatch({ domain }));
+            return errorStack(commonErrors.authenticityMismatch({ domain }));
 
         const fetchRecord = await resolveRecord(normalisedDomain, { context: docket.context, directive: docket.directive, proven }, { sdkInstance: this });
         if (fetchRecord instanceof Error)
-            return errorResponse(recordErrors.recordRetrieval({ domain, verbose: fetchRecord.message }));
+            return errorStack(recordErrors.recordRetrieval({ domain, verbose: fetchRecord.message }));
 
         return dataResponse({ ...fetchRecord });
 
@@ -226,7 +226,7 @@ export default class RnsSDK {
         const fetchAccountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
         if (fetchAccountDomains instanceof Error)
-            return errorResponse(commonErrors.accountRetrieval({ accountAddress, verbose: fetchAccountDomains.message }));
+            return errorStack(commonErrors.accountRetrieval({ accountAddress, verbose: fetchAccountDomains.message }));
 
         return dataResponse({ domains: fetchAccountDomains });
 
@@ -238,7 +238,7 @@ export default class RnsSDK {
         const fetchInterests = await this.getAccountDomains({ accountAddress });
 
         if (fetchInterests instanceof Error)
-            return errorResponse(commonErrors.accountRetrieval({ accountAddress, verbose: fetchInterests.message }));
+            return errorStack(commonErrors.accountRetrieval({ accountAddress, verbose: fetchInterests.message }));
 
         if ('errors' in fetchInterests)
             return fetchInterests;
@@ -330,7 +330,7 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const fetchDetails = await this.getDomainDetails({ domain: normalisedDomain });
         if (fetchDetails instanceof Error)
-            return errorResponse(domainErrors.generic({ domain, verbose: fetchDetails.message }));
+            return errorStack(domainErrors.generic({ domain, verbose: fetchDetails.message }));
 
         if ('errors' in fetchDetails)
             return fetchDetails;
@@ -353,7 +353,7 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const fetchDetails = await this.getDomainDetails({ domain: normalisedDomain });
         if (fetchDetails instanceof Error)
-            return errorResponse(domainErrors.generic({ domain, verbose: fetchDetails.message }));
+            return errorStack(domainErrors.generic({ domain, verbose: fetchDetails.message }));
 
         if ('errors' in fetchDetails)
             return fetchDetails;
@@ -376,7 +376,7 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const fetchDetails = await this.getDomainDetails({ domain: normalisedDomain });
         if (fetchDetails instanceof Error)
-            return errorResponse(domainErrors.generic({ domain, verbose: fetchDetails.message }));
+            return errorStack(domainErrors.generic({ domain, verbose: fetchDetails.message }));
 
         if ('errors' in fetchDetails)
             return fetchDetails;

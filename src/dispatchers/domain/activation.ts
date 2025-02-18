@@ -1,7 +1,7 @@
 import activateDomainManifest from "../../manifests/domains/domain-activation-manifest";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { errorResponse, successResponse } from "../../utils/response.utils";
+import { errorStack, successResponse } from "../../utils/response.utils";
 import { activationErrors } from "../../common/errors";
 
 import { ActivationDispatcherPropsI } from "../../common/dispatcher.types";
@@ -44,7 +44,7 @@ export async function dispatchDomainActivation({
         });
 
         if (!dispatch)
-            return errorResponse(activationErrors.generic({ domain }));
+            return errorStack(activationErrors.generic({ domain }));
 
         return successResponse({
             code: 'ACTIVATION_SUCCESSFUL',
@@ -53,7 +53,7 @@ export async function dispatchDomainActivation({
 
     } catch (error) {
 
-        return errorResponse(activationErrors.generic({ domain, verbose: error }));
+        return errorStack(activationErrors.generic({ domain, verbose: error }));
 
     }
 
