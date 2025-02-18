@@ -27,64 +27,6 @@ export const commonErrors = {
 
     },
 
-    invalidDomain: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
-
-        return {
-
-            code: 'INVALID_DOMAIN',
-            error: `${domain} is an invalid domain name.`,
-            verbose
-
-        };
-
-    },
-
-    invalidSubdomain: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
-
-        return {
-
-            code: 'INVALID_SUBDOMAIN',
-            error: `${subdomain} is an invalid domain name.`,
-            verbose
-
-        };
-
-    },
-
-    subdomainNotExist: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
-
-        return {
-
-            code: 'NONEXISTENT_SUBDOMAIN',
-            error: `${subdomain} does not exist.`,
-            verbose
-
-        };
-
-    },
-
-    emptyDomainDetails: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
-
-        return {
-
-            code: 'EMPTY_DOMAIN_DETAILS',
-            error: `Could not retrieve details for ${domain}.`,
-            verbose
-
-        };
-
-    },
-
-    domainTaken: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
-
-        return {
-            code: "DOMAIN_TAKEN",
-            error: `${domain} could not be registered as is already taken / reserved.`,
-            verbose
-        };
-
-    },
-
     accountRetrieval: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
 
         return {
@@ -125,13 +67,61 @@ export const activationErrors = {
 
 };
 
+export const domainErrors = {
+
+    generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+            code: "DOMAIN_ERROR",
+            error: `An error occurred when attempting to interface with ${domain}.`,
+            verbose
+        };
+
+    },
+
+    unavailable: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+            code: "DOMAIN_TAKEN",
+            error: `${domain} could not be registered as is already taken / reserved.`,
+            verbose
+        };
+
+    },
+
+    invalid: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+
+            code: 'INVALID_DOMAIN',
+            error: `${domain} is an invalid domain name.`,
+            verbose
+
+        };
+
+    },
+
+    emptyDetails: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+
+            code: 'EMPTY_DOMAIN_DETAILS',
+            error: `Could not retrieve details for ${domain}.`,
+            verbose
+
+        };
+
+    },
+
+};
+
 export const subdomainErrors = {
 
     generic: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
 
         return {
             code: "SUBDOMAIN_ERROR",
-            error: `An error occurred when attempting to create ${subdomain}.`,
+            error: `An error occurred when attempting to interface with ${subdomain}.`,
             verbose
         };
 
@@ -153,6 +143,31 @@ export const subdomainErrors = {
             code: "SUBDOMAIN_DELETION_FAILED",
             error: `An error occurred when attempting to delete ${subdomain}.`,
             verbose
+        };
+
+    },
+
+
+    invalid: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+
+            code: 'INVALID_SUBDOMAIN',
+            error: `${subdomain} is an invalid domain name.`,
+            verbose
+
+        };
+
+    },
+
+    doesNotExist: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+
+            code: 'NONEXISTENT_SUBDOMAIN',
+            error: `${subdomain} does not exist.`,
+            verbose
+
         };
 
     }
@@ -210,6 +225,16 @@ export const recordErrors = {
         return {
             code: "RECORD_AMENDMENT_FAILED",
             error: `An error occurred when attempting to edit a domain record for: ${docket.context}:${docket.directive}.`,
+            verbose
+        };
+
+    },
+
+    recordRetrieval: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+            code: "RECORD_RETRIEVAL_ERROR",
+            error: `An error occurred when attempting to retrieve domain records for: ${domain}.`,
             verbose
         };
 
