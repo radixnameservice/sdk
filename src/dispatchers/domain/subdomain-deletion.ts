@@ -1,10 +1,10 @@
 import subdomainDeletionManifest from "../../manifests/domains/subdomain-deletion-manifest";
 
+import { subdomainErrors } from "../../common/errors";
+
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorResponse, successResponse } from "../../utils/response.utils";
 import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
-
-import { commonErrors, subdomainErrors } from "../../common/errors";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
@@ -24,19 +24,23 @@ export async function dispatchSubdomainDeletion({
         const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
         if (!subdomainValidation.valid)
-            return errorResponse(commonErrors.invalidSubdomain({ subdomain, verbose: subdomainValidation.message }));
+            return errorResponse(subdomainErrors.invalid({ subdomain, verbose: subdomainValidation.message }));
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
-        const rootDomainDetails = await sdkInstance.getDomainDetails(rootDomain);
+        const requestRootDetails = await sdkInstance.getDomainDetails({ domain: rootDomain });
 
-        if ('errors' in rootDomainDetails) {
-            return rootDomainDetails;
+        if (requestRootDetails instanceof Error)
+            throw requestRootDetails;
+
+        if ('errors' in requestRootDetails) {
+            return requestRootDetails;
         }
 
+        const rootDomainDetails = requestRootDetails.data.details;
         const subdomainDetails = rootDomainDetails.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails)
-            return errorResponse(commonErrors.subdomainNotExist({ subdomain }));
+            return errorResponse(subdomainErrors.doesNotExist({ subdomain }));
 
         const manifest = await subdomainDeletionManifest({
             sdkInstance,

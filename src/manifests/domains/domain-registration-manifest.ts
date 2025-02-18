@@ -1,7 +1,10 @@
 import Decimal from "decimal.js";
-import { getWellKnownAddresses } from "../../utils/gateway.utils";
-import { UserSpecificsI } from "../../common/user.types";
 import RnsSDK from "../..";
+
+import { getWellKnownAddresses } from "../../utils/gateway.utils";
+
+import { UserSpecificsI } from "../../common/user.types";
+
 
 export default async function registerDomainManifest({
     sdkInstance,

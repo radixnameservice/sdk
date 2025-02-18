@@ -1,10 +1,11 @@
 
-import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
 import Decimal from "decimal.js";
+import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { convertToDecimal } from "../../utils/decimal.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
+
 
 export async function requestXRDExchangeRate({ sdkInstance }: InstancePropsI): Promise<Decimal> {
 

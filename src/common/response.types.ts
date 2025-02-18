@@ -56,9 +56,10 @@ export type RecordListResponseT = ResultI<{ records: RecordItemI[] | [] }>;
 export type RecordResponseT = ResultI<{ record: RecordItemI | null }>;
 
 export type DomainListResponseT = ResultI<{ domains: DomainDataI[] | [] }>;
+export type DomainDetailsResponseT = ResultI<{ details: DomainDataI }>;
 
 export type UserBadgeResponseT = ResultI<{ badgeId: string | null }>;
-export type CheckAuthenticityResponseT = ResultI<{ isAuthentic: boolean } | null>;
+export type CheckAuthenticityResponseT = ResultI<{ isAuthentic: boolean }>;
 
 export type ResolvedRecordResponseT = ResultI<{
     value: string;

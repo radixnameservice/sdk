@@ -2,10 +2,12 @@ import { ProgrammaticScryptoSborValueBool, ProgrammaticScryptoSborValueEnum } fr
 
 import { DomainStatus, mapStatusInt } from "../../mappings/status";
 import { requestDomainDetails } from "../address/domains";
+
 import { getBasePrice } from "../../utils/pricing.utils";
 import { domainToNonFungId } from "../../utils/domain.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
+
 
 export async function requestDomainStatus(domainName: string, { sdkInstance }: InstancePropsI) {
 
@@ -139,6 +141,7 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
         }
 
         const domain = await requestDomainDetails(domainName, { sdkInstance });
+        if (domain instanceof Error) throw new Error(domain.message);
 
         if (domain) {
             if (new Date().getTime() >= domain.last_valid_timestamp) {
@@ -159,7 +162,7 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
     } catch (e) {
 
         console.log(e);
-        return null;
+        return e;
 
     }
 

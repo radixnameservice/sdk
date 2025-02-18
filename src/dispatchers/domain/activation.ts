@@ -18,11 +18,15 @@ export async function dispatchDomainActivation({
 
     try {
 
-        const details = await sdkInstance.getDomainDetails(domain);
+        const detailRequest = await sdkInstance.getDomainDetails({ domain });
 
-        if ('errors' in details) {
-            return details;
-        }
+        if (detailRequest instanceof Error)
+            throw detailRequest;
+
+        if ('errors' in detailRequest)
+            return detailRequest;
+
+        const details = detailRequest.data.details;
 
         const manifest = await activateDomainManifest({
             sdkInstance,

@@ -1,10 +1,10 @@
 import subdomainCreationManifest from "../../manifests/domains/subdomain-creation-manifest";
 
+import { subdomainErrors } from "../../common/errors";
+
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorResponse, successResponse } from "../../utils/response.utils";
 import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
-
-import { commonErrors, subdomainErrors } from "../../common/errors";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
@@ -24,14 +24,19 @@ export async function dispatchSubdomainCreation({
         const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
         if (!subdomainValidation.valid)
-            return errorResponse(commonErrors.invalidSubdomain({ subdomain, verbose: subdomainValidation.message }));
+            return errorResponse(subdomainErrors.invalid({ subdomain, verbose: subdomainValidation.message }));
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
-        const details = await sdkInstance.getDomainDetails(rootDomain);
+        const detailsRequest = await sdkInstance.getDomainDetails({ domain: rootDomain });
 
-        if ('errors' in details) {
-            return details;
+        if (detailsRequest instanceof Error)
+            throw detailsRequest;
+
+        if ('errors' in detailsRequest) {
+            return detailsRequest;
         }
+
+        const details = detailsRequest.data.details;
 
         const manifest = await subdomainCreationManifest({
             sdkInstance,

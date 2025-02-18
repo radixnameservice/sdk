@@ -7,7 +7,6 @@ import { DocketI } from "../../common/record.types";
 import { UserSpecificsI } from "../../common/user.types";
 
 
-
 export function recordUpdateManifest({
     sdkInstance,
     userDetails,

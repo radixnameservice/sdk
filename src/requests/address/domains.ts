@@ -284,7 +284,7 @@ export async function requestAccountDomains(
     accountAddress: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainDataI[] | null> {
+): Promise<DomainDataI[] | Error> {
 
     if (!accountAddress) return [];
 
@@ -292,10 +292,10 @@ export async function requestAccountDomains(
 
         return await fetchDomainData(accountAddress, { sdkInstance });
 
-    } catch (error) {
+    } catch (e) {
 
-        logger.error("requestAccountDomains", error);
-        return null;
+        logger.error("requestAccountDomains", e);
+        return e;
 
     }
 
@@ -306,7 +306,7 @@ export async function requestDomainDetails(
     domain: string,
     { sdkInstance }: InstancePropsI
 
-): Promise<DomainDataI | null> {
+): Promise<DomainDataI | Error> {
 
     try {
 
@@ -355,10 +355,10 @@ export async function requestDomainDetails(
             return acc;
         }, { id: nftData.non_fungible_id, subdomains } as DomainDataI);
 
-    } catch (error) {
+    } catch (e) {
 
-        logger.error("requestDomainDetails", error);
-        return null;
+        logger.error("requestDomainDetails", e);
+        return e;
 
     }
 }

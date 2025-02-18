@@ -8,6 +8,7 @@ import { InstancePropsI } from "../../common/entities.types";
 import { DocketPropsI, RecordItemI } from "../../common/record.types";
 import { ResolvedRecordI } from "../../common/response.types";
 
+
 export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI): Promise<RecordItemI[] | [] | Error> {
 
     try {
@@ -114,6 +115,10 @@ export async function resolveRecord(domain: string, { context, directive, proven
             }
 
             const domainDetails = await requestDomainDetails(domain, { sdkInstance });
+
+            if (domainDetails instanceof Error) {
+                throw domainDetails;
+            }
 
             const accountAddress = domainDetails.address;
 
