@@ -18,7 +18,7 @@ export function dataResponse<T>(responseData: T): ResultI<T> {
     return { data: responseData };
 }
 
-export function errorResponse(errors: ErrorI | ErrorI[]): ErrorStackResponseI {
+export function errorStack(errors: ErrorI | ErrorI[]): ErrorStackResponseI {
 
     if (Array.isArray(errors)) {
         return {
