@@ -1,6 +1,6 @@
 import issueBadgeManifest from "../../manifests/badges/user-badge-manifest";
 
-import { badgeErrors } from "../../common/errors";
+import { badgeErrors } from "../../mappings/errors";
 import { errorStack, successResponse } from "../../utils/response.utils";
 import { sendTransaction } from "../../utils/transaction.utils";
 

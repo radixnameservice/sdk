@@ -1,6 +1,6 @@
 import registerDomainManifest from "../../manifests/domains/domain-registration-manifest";
 
-import { domainErrors, registrationErrors } from "../../common/errors";
+import { domainErrors, registrationErrors } from "../../mappings/errors";
 import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";

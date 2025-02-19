@@ -2,7 +2,7 @@ import activateDomainManifest from "../../manifests/domains/domain-activation-ma
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";
-import { activationErrors } from "../../common/errors";
+import { activationErrors } from "../../mappings/errors";
 
 import { ActivationDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";

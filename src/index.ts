@@ -16,7 +16,7 @@ import { dispatchSubdomainCreation } from './dispatchers/domain/subdomain-creati
 import { dispatchSubdomainDeletion } from './dispatchers/domain/subdomain-deletion';
 
 import config from './entities.config';
-import { commonErrors, domainErrors, recordErrors } from './common/errors';
+import { commonErrors, domainErrors, recordErrors } from './mappings/errors';
 
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';

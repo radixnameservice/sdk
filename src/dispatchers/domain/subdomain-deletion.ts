@@ -1,6 +1,6 @@
 import subdomainDeletionManifest from "../../manifests/domains/subdomain-deletion-manifest";
 
-import { subdomainErrors } from "../../common/errors";
+import { subdomainErrors } from "../../mappings/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";

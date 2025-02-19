@@ -1,4 +1,4 @@
-import { badgeErrors, commonErrors } from "../../common/errors";
+import { badgeErrors, commonErrors } from "../../mappings/errors";
 
 import { ErrorStackResponseI, UserBadgeResponseT } from "../../common/response.types";
 import { UserBadgeReqPropsI } from "../../common/user.types";

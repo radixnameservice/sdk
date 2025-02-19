@@ -1,7 +1,7 @@
 
 import { sendTransaction } from "../../utils/transaction.utils";
 
-import { recordErrors } from "../../common/errors";
+import { recordErrors } from "../../mappings/errors";
 import { recordCreationManifest } from "../../manifests/records/record-creation-manifest";
 
 import { errorStack, successResponse } from "../../utils/response.utils";

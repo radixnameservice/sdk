@@ -1,4 +1,4 @@
-import { domainErrors } from "../common/errors";
+import { domainErrors } from "./errors";
 import { normaliseDomain, validateDomainEntity } from "../utils/domain.utils";
 import { ParamProcessMapT } from "../common/validation.types";
 

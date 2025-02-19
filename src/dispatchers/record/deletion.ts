@@ -1,5 +1,5 @@
 
-import { recordErrors } from "../../common/errors";
+import { recordErrors } from "../../mappings/errors";
 import { recordDeletionManifest } from "../../manifests/records/record-deletion-manifest";
 
 import { errorStack, successResponse } from "../../utils/response.utils";

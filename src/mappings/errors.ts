@@ -1,5 +1,5 @@
-import { DocketI, DocketPropsI } from "./record.types";
-import { ErrorGenerationI, ErrorI } from "./response.types";
+import { DocketI, DocketPropsI } from "../common/record.types";
+import { ErrorGenerationI, ErrorI } from "../common/response.types";
 
 const inputs = {
 
