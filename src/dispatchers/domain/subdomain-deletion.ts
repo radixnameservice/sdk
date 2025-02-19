@@ -1,6 +1,6 @@
 import subdomainDeletionManifest from "../../manifests/domains/subdomain-deletion-manifest";
 
-import { subdomainErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";
@@ -24,7 +24,7 @@ export async function dispatchSubdomainDeletion({
         const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
         if (!subdomainValidation.valid)
-            return errorStack(subdomainErrors.invalid({ subdomain, verbose: subdomainValidation.message }));
+            return errorStack(errors.subdomain.invalid({ subdomain, verbose: subdomainValidation.message }));
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
         const requestRootDetails = await sdkInstance.getDomainDetails({ domain: rootDomain });
@@ -40,7 +40,7 @@ export async function dispatchSubdomainDeletion({
         const subdomainDetails = rootDomainDetails.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails)
-            return errorStack(subdomainErrors.doesNotExist({ subdomain }));
+            return errorStack(errors.subdomain.doesNotExist({ subdomain }));
 
         const manifest = await subdomainDeletionManifest({
             sdkInstance,
@@ -58,7 +58,7 @@ export async function dispatchSubdomainDeletion({
         });
 
         if (!dispatch)
-            return errorStack(subdomainErrors.generic({ subdomain }));
+            return errorStack(errors.subdomain.generic({ subdomain }));
 
         return successResponse({
             code: 'SUBDOMAIN_DELETION_SUCCESSFUL',
@@ -67,7 +67,7 @@ export async function dispatchSubdomainDeletion({
 
     } catch (error) {
 
-        return errorStack(subdomainErrors.deletion({ subdomain, verbose: error }));
+        return errorStack(errors.subdomain.deletion({ subdomain, verbose: error }));
 
     }
 

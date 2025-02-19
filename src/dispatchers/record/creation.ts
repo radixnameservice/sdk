@@ -1,7 +1,7 @@
 
 import { sendTransaction } from "../../utils/transaction.utils";
 
-import { recordErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 import { recordCreationManifest } from "../../manifests/records/record-creation-manifest";
 
 import { errorStack, successResponse } from "../../utils/response.utils";
@@ -37,7 +37,7 @@ export async function dispatchRecordCreation({
         });
 
         if (!dispatch) {
-            return errorStack(recordErrors.creation({ docket }));
+            return errorStack(errors.record.creation({ docket }));
         }
 
         return successResponse({
@@ -47,7 +47,7 @@ export async function dispatchRecordCreation({
 
     } catch (error) {
 
-        return errorStack(recordErrors.creation({ docket, verbose: error }));
+        return errorStack(errors.record.creation({ docket, verbose: error }));
 
     }
 

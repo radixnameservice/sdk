@@ -1,6 +1,6 @@
 import subdomainCreationManifest from "../../manifests/domains/subdomain-creation-manifest";
 
-import { subdomainErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";
@@ -24,7 +24,7 @@ export async function dispatchSubdomainCreation({
         const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
         if (!subdomainValidation.valid)
-            return errorStack(subdomainErrors.invalid({ subdomain, verbose: subdomainValidation.message }));
+            return errorStack(errors.subdomain.invalid({ subdomain, verbose: subdomainValidation.message }));
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
         const detailsRequest = await sdkInstance.getDomainDetails({ domain: rootDomain });
@@ -54,7 +54,7 @@ export async function dispatchSubdomainCreation({
         });
 
         if (!dispatch)
-            return errorStack(subdomainErrors.generic({ subdomain }));
+            return errorStack(errors.subdomain.generic({ subdomain }));
 
         return successResponse({
             code: 'SUBDOMAIN_CREATION_SUCCESSFUL',
@@ -63,7 +63,7 @@ export async function dispatchSubdomainCreation({
 
     } catch (error) {
 
-        return errorStack(subdomainErrors.creation({ subdomain, verbose: error }));
+        return errorStack(errors.subdomain.creation({ subdomain, verbose: error }));
 
     }
 

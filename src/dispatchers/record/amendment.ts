@@ -1,7 +1,7 @@
 
 import { sendTransaction } from "../../utils/transaction.utils";
 
-import { recordErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 import { recordUpdateManifest } from "../../manifests/records/record-update-manifest";
 
 import { errorStack, successResponse } from "../../utils/response.utils";
@@ -43,7 +43,7 @@ export async function dispatchRecordAmendment({
         });
 
         if (!dispatch) {
-            return errorStack(recordErrors.amendment({ docket }));
+            return errorStack(errors.record.amendment({ docket }));
         }
 
         return successResponse({
@@ -53,7 +53,7 @@ export async function dispatchRecordAmendment({
 
     } catch (error) {
 
-        return errorStack(recordErrors.amendment({ docket, verbose: error }));
+        return errorStack(errors.record.amendment({ docket, verbose: error }));
 
     }
 

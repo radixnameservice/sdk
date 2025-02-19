@@ -1,6 +1,6 @@
 import issueBadgeManifest from "../../manifests/badges/user-badge-manifest";
 
-import { badgeErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 import { errorStack, successResponse } from "../../utils/response.utils";
 import { sendTransaction } from "../../utils/transaction.utils";
 
@@ -31,7 +31,7 @@ export async function dispatchUserBadgeIssuance({
         });
 
         if (!dispatch)
-            return errorStack(badgeErrors.userIssuance({ accountAddress: userDetails.accountAddress }));
+            return errorStack(errors.badge.issuance({ accountAddress: userDetails.accountAddress }));
 
 
         return successResponse({
@@ -41,7 +41,7 @@ export async function dispatchUserBadgeIssuance({
 
     } catch (error) {
 
-        return errorStack(badgeErrors.userIssuance({ accountAddress: userDetails.accountAddress, verbose: error }));
+        return errorStack(errors.badge.issuance({ accountAddress: userDetails.accountAddress, verbose: error }));
 
     }
 

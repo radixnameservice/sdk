@@ -1,5 +1,5 @@
 
-import { recordErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 import { recordDeletionManifest } from "../../manifests/records/record-deletion-manifest";
 
 import { errorStack, successResponse } from "../../utils/response.utils";
@@ -39,7 +39,7 @@ export async function dispatchRecordDeletion({
         });
 
         if (!dispatch) {
-            return errorStack(recordErrors.deletion({ docket }));
+            return errorStack(errors.record.deletion({ docket }));
         }
 
         return successResponse({
@@ -49,7 +49,7 @@ export async function dispatchRecordDeletion({
 
     } catch (error) {
 
-        return errorStack(recordErrors.deletion({ docket, verbose: error }));
+        return errorStack(errors.record.deletion({ docket, verbose: error }));
 
     }
 

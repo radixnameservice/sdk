@@ -1,6 +1,6 @@
 import registerDomainManifest from "../../manifests/domains/domain-registration-manifest";
 
-import { domainErrors, registrationErrors } from "../../mappings/errors";
+import errors from "../../mappings/errors";
 import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";
@@ -32,7 +32,7 @@ export async function dispatchDomainRegistration({
         const attributes = attributeRequest.data;
 
         if (attributes.status !== 'available')
-            return errorStack(domainErrors.unavailable({ domain }));
+            return errorStack(errors.domain.unavailable({ domain }));
 
         const manifest = await registerDomainManifest({
             sdkInstance,
@@ -51,7 +51,7 @@ export async function dispatchDomainRegistration({
         });
 
         if (!dispatch)
-            return errorStack(registrationErrors.generic({ domain }));
+            return errorStack(errors.registration.generic({ domain }));
 
         return successResponse({
             code: 'REGISTRATION_SUCCESSFUL',
@@ -60,7 +60,7 @@ export async function dispatchDomainRegistration({
 
     } catch (error) {
 
-        return errorStack(registrationErrors.generic({ domain, verbose: error }));
+        return errorStack(errors.registration.generic({ domain, verbose: error }));
 
     }
 
