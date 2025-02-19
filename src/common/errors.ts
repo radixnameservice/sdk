@@ -1,19 +1,7 @@
 import { DocketI, DocketPropsI } from "./record.types";
 import { ErrorGenerationI, ErrorI } from "./response.types";
 
-export const commonErrors = {
-
-    authenticityMismatch: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
-
-        return {
-
-            code: "AUTHENTICITY_MISMATCH",
-            error: `${domain} has failed the authenticity check.`,
-            verbose: verbose || `Inconsistencies have been detected for ${domain} (e.g. could be inactive with residual records from a previous owner). It is inadvisable to utilize this domain within trusted contexts under these circumstances.`
-
-        };
-
-    },
+const inputs = {
 
     missingParameters: ({ verbose = null }: ErrorGenerationI): ErrorI => {
 
@@ -25,9 +13,13 @@ export const commonErrors = {
 
         };
 
-    },
+    }
 
-    accountRetrieval: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
+};
+
+const account = {
+
+    retrieval: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
 
         return {
             code: "ACCOUNT_RETRIEVAL_ERROR",
@@ -35,11 +27,23 @@ export const commonErrors = {
             verbose
         };
 
+    },
+
+    authenticityMismatch: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+
+            code: "AUTHENTICITY_MISMATCH",
+            error: `${domain} has failed the authenticity check.`,
+            verbose: verbose || `Inconsistencies have been detected for ${domain} (e.g. could be inactive with residual records from a previous owner). It is inadvisable to utilize this domain within trusted contexts under these circumstances.`
+
+        };
+
     }
 
 };
 
-export const registrationErrors = {
+const registration = {
 
     generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
@@ -53,7 +57,7 @@ export const registrationErrors = {
 
 };
 
-export const activationErrors = {
+export const activation = {
 
     generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
@@ -67,7 +71,7 @@ export const activationErrors = {
 
 };
 
-export const domainErrors = {
+export const domain = {
 
     generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
@@ -101,7 +105,7 @@ export const domainErrors = {
 
     },
 
-    emptyDetails: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+    empty: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
         return {
 
@@ -115,7 +119,7 @@ export const domainErrors = {
 
 };
 
-export const subdomainErrors = {
+export const subdomain = {
 
     generic: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
 
@@ -174,9 +178,9 @@ export const subdomainErrors = {
 
 };
 
-export const badgeErrors = {
+export const badge = {
 
-    userIssuance: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
+    issuance: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
 
         return {
             code: "USER_BADGE_ISSUANCE_FAILED",
@@ -186,7 +190,7 @@ export const badgeErrors = {
 
     },
 
-    userRequest: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
+    generic: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
 
         return {
             code: "USER_BADGE_REQUEST_FAILED",
@@ -198,7 +202,7 @@ export const badgeErrors = {
 
 };
 
-export const recordErrors = {
+export const record = {
 
     creation: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketI }): ErrorI => {
 
@@ -241,3 +245,5 @@ export const recordErrors = {
     }
 
 };
+
+export default { inputs, account, registration, activation, domain, subdomain, badge, record }
