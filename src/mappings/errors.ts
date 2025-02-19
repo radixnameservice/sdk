@@ -234,7 +234,7 @@ export const record = {
 
     },
 
-    recordRetrieval: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+    retrieval: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
         return {
             code: "RECORD_RETRIEVAL_ERROR",
