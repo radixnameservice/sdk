@@ -1,7 +1,7 @@
 import { DocketI, DocketPropsI } from "../common/record.types";
 import { ErrorGenerationI, ErrorI } from "../common/response.types";
 
-const inputs = {
+const request = {
 
     missingParameters: ({ verbose = null }: ErrorGenerationI): ErrorI => {
 
@@ -246,4 +246,4 @@ export const record = {
 
 };
 
-export default { inputs, account, registration, activation, domain, subdomain, badge, record }
+export default { request, account, registration, activation, domain, subdomain, badge, record }
