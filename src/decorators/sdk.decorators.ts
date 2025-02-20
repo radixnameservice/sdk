@@ -34,57 +34,45 @@ export function requireDependencies(mode: 'read-only' | 'full') {
 }
 
 export function ProcessParameters(mapping: ParamProcessMapT) {
-
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
         return class extends constructor {
-            constructor(...args: any[]) {
-                super(...args);
-                const prototype = Object.getPrototypeOf(this);
 
-                for (const key of Object.getOwnPropertyNames(prototype)) {
-                    if (key === 'constructor') continue;
-                    const descriptor = Object.getOwnPropertyDescriptor(prototype, key);
+            constructor(...args: any[]) {
+
+                super(...args);
+                const methodNames = Object.getOwnPropertyNames(constructor.prototype);
+
+                for (const methodName of methodNames) {
+                    if (methodName === 'constructor') continue;
+                    const descriptor = Object.getOwnPropertyDescriptor(constructor.prototype, methodName);
                     if (!descriptor) continue;
 
                     if (typeof descriptor.value === 'function') {
                         const originalMethod = descriptor.value;
                         descriptor.value = async function (...methodArgs: any[]) {
-
+                            // We assume the method takes a single object as its first argument.
                             if (methodArgs.length && typeof methodArgs[0] === 'object') {
                                 const argObj = methodArgs[0];
                                 const validationErrors: ErrorI[] = [];
 
-                                for (const prop in mapping) {
-                                    const config = mapping[prop];
-                                    if (Object.prototype.hasOwnProperty.call(argObj, prop)) {
+                                for (const key in mapping) {
+                                    const config = mapping[key];
 
-                                        // Normalize if a function is provided
+                                    if (Object.prototype.hasOwnProperty.call(argObj, key)) {
+
+                                        // Normalize the value if a normalization function is provided.
                                         if (config.normalize) {
-                                            argObj[prop] = config.normalize(argObj[prop]);
+                                            const normalizedValue = config.normalize(argObj[key]);
+                                            argObj[key] = normalizedValue;
                                         }
 
-                                        // Validate if a function is provided
+                                        // Validate the value if a validation function is provided.
                                         if (config.validate) {
-
-                                            const isValid = config.validate(argObj[prop]);
-
-                                            if (isValid !== true) {
-
-                                                if (!argObj[prop] && config.missingError) {
-                                                    validationErrors.push(config.missingError(argObj[prop]));
-                                                } else {
-                                                    validationErrors.push(isValid);
-                                                }
+                                            const result = config.validate(argObj[key]);
+                                            if (result !== true) {
+                                                validationErrors.push(result);
                                             }
                                         }
-
-                                    } else {
-
-                                        // If the parameter is missing entirely from the object
-                                        if (config.missingError) {
-                                            validationErrors.push(config.missingError(undefined));
-                                        }
-
                                     }
                                 }
 
@@ -95,11 +83,12 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                             return originalMethod.apply(this, methodArgs);
                         };
 
-                        Object.defineProperty(prototype, key, descriptor);
+                        Object.defineProperty(constructor.prototype, methodName, descriptor);
                     }
                 }
+
             }
+
         };
     };
-
 }
