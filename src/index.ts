@@ -34,12 +34,12 @@ import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { parameterProcessMap } from './mappings/sdk-processors';
 
-
-
 export {
     RnsSDKConfigI,
     DomainAttributesResponseT,
     DomainDetailsResponseT,
+    DomainListResponseT,
+    RecordListResponseT,
     RecordItemI,
     DomainDataI,
     CheckAuthenticityResponseT,
@@ -177,7 +177,7 @@ export default class RnsSDK {
     async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseI | ErrorStackResponseI> {
 
         const details = await requestDomainDetails(domain, { sdkInstance: this });
-        
+
         if (details instanceof Error)
             return errorStack(errors.account.authenticityMismatch({ domain, verbose: details.message }));
 
@@ -221,6 +221,16 @@ export default class RnsSDK {
         const isAuthentic = accountDomains?.find((interestDomain: DomainDataI) => interestDomain.name === domain)?.address === accountAddress;
 
         return dataResponse({ isAuthentic });
+
+    }
+
+    @requireDependencies('read-only')
+    async getUserBadge({ accountAddress }: { accountAddress: string }): Promise<UserBadgeResponseT | ErrorStackResponseI> {
+
+        return getUserBadgeId({
+            sdkInstance: this,
+            accountAddress
+        });
 
     }
 
@@ -273,16 +283,6 @@ export default class RnsSDK {
             rdt: this.rdt,
             userDetails,
             callbacks
-        });
-
-    }
-
-    @requireDependencies('read-only')
-    async getUserBadge({ accountAddress }: { accountAddress: string }): Promise<UserBadgeResponseT | ErrorStackResponseI> {
-
-        return getUserBadgeId({
-            sdkInstance: this,
-            accountAddress
         });
 
     }
