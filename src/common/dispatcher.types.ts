@@ -30,7 +30,7 @@ export interface RegistrationDispatcherPropsI extends DispatcherPropsI {
 
 export interface ActivationDispatcherPropsI extends DispatcherPropsI {
 
-    domain: string;
+    domainDetails: DomainDataI;
     userDetails: UserSpecificsI;
 
 }
@@ -38,6 +38,7 @@ export interface ActivationDispatcherPropsI extends DispatcherPropsI {
 export interface SubdomainDispatcherPropsI extends DispatcherPropsI {
 
     subdomain: string;
+    rootDomainDetails: DomainDataI;
     userDetails: UserSpecificsI;
 
 }

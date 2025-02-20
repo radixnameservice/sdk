@@ -13,6 +13,7 @@ import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/resp
 export async function dispatchSubdomainDeletion({
     sdkInstance,
     subdomain,
+    rootDomainDetails,
     rdt,
     userDetails,
     callbacks
@@ -20,20 +21,7 @@ export async function dispatchSubdomainDeletion({
 
     try {
 
-        const normalisedSubDomain = normaliseDomain(subdomain);
-        const subdomainValidation = validateSubdomain(normalisedSubDomain);
-
-        if (subdomainValidation !== true)
-            return errorStack(subdomainValidation);
-
-        const rootDomain = deriveRootDomain(normalisedSubDomain);
-        const rootDomainDetails = await sdkInstance.getDomainDetails({ domain: rootDomain });
-
-        if ('errors' in rootDomainDetails) {
-            return rootDomainDetails;
-        }
-
-        const subdomainDetails = rootDomainDetails.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
+        const subdomainDetails = rootDomainDetails.subdomains.find((subdomainItem) => subdomainItem.name === subdomain);
 
         if (!subdomainDetails)
             return errorStack(errors.subdomain.doesNotExist({ subdomain }));
@@ -47,7 +35,7 @@ export async function dispatchSubdomainDeletion({
 
         const dispatch = await sendTransaction({
             rdt,
-            message: `Delete ${normalisedSubDomain}`,
+            message: `Delete ${subdomain}`,
             manifest,
             transaction: sdkInstance.transaction,
             callbacks
@@ -58,7 +46,7 @@ export async function dispatchSubdomainDeletion({
 
         return successResponse({
             code: 'SUBDOMAIN_DELETION_SUCCESSFUL',
-            details: `${normalisedSubDomain} was succesfully deleted.`
+            details: `${subdomain} was succesfully deleted.`
         });
 
     } catch (error) {

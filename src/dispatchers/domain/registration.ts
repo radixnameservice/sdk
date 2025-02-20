@@ -21,17 +21,6 @@ export async function dispatchDomainRegistration({
 
     try {
 
-        const attributes = await sdkInstance.getDomainAttributes({ domain });
-
-        if (attributes instanceof Error)
-            throw attributes;
-
-        if ('errors' in attributes)
-            return attributes;
-
-        if (attributes.status !== 'available')
-            return errorStack(errors.domain.unavailable({ domain }));
-
         const manifest = await registerDomainManifest({
             sdkInstance,
             domain,

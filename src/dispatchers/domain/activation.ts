@@ -10,7 +10,7 @@ import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/resp
 
 export async function dispatchDomainActivation({
     sdkInstance,
-    domain,
+    domainDetails,
     rdt,
     userDetails,
     callbacks
@@ -18,40 +18,32 @@ export async function dispatchDomainActivation({
 
     try {
 
-        const details = await sdkInstance.getDomainDetails({ domain });
-
-        if (details instanceof Error)
-            throw details;
-
-        if ('errors' in details)
-            return details;
-
         const manifest = await activateDomainManifest({
             sdkInstance,
-            rootDomainId: details.id,
-            subdomainIds: details.subdomains ? details.subdomains.map(subDomain => subDomain.id) : [],
+            rootDomainId: domainDetails.id,
+            subdomainIds: domainDetails.subdomains ? domainDetails.subdomains.map(subdomain => subdomain.id) : [],
             userDetails
         });
 
         const dispatch = await sendTransaction({
             rdt,
-            message: `Activate ${domain}`,
+            message: `Activate ${domainDetails.name}`,
             manifest,
             transaction: sdkInstance.transaction,
             callbacks
         });
 
         if (!dispatch)
-            return errorStack(errors.activation.generic({ domain }));
+            return errorStack(errors.activation.generic({ domain: domainDetails.name }));
 
         return successResponse({
             code: 'ACTIVATION_SUCCESSFUL',
-            details: `${domain} was succesfully activated.`
+            details: `${domainDetails.name} was succesfully activated.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.activation.generic({ domain, verbose: error }));
+        return errorStack(errors.activation.generic({ domain: domainDetails.name, verbose: error }));
 
     }
 

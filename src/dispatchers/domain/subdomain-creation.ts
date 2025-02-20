@@ -4,7 +4,6 @@ import errors from "../../mappings/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";
-import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
 import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
@@ -13,6 +12,7 @@ import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/resp
 export async function dispatchSubdomainCreation({
     sdkInstance,
     subdomain,
+    rootDomainDetails,
     rdt,
     userDetails,
     callbacks
@@ -20,29 +20,16 @@ export async function dispatchSubdomainCreation({
 
     try {
 
-        const normalisedSubDomain = normaliseDomain(subdomain);
-        const subdomainValidation = validateSubdomain(normalisedSubDomain);
-
-        if (subdomainValidation !== true)
-            return errorStack(subdomainValidation);
-
-        const rootDomain = deriveRootDomain(normalisedSubDomain);
-        const details = await sdkInstance.getDomainDetails({ domain: rootDomain });
-
-        if ('errors' in details) {
-            return details;
-        }
-
         const manifest = await subdomainCreationManifest({
             sdkInstance,
-            subdomain: normalisedSubDomain,
-            rootDomainId: details.id,
+            subdomain,
+            rootDomainId: rootDomainDetails.id,
             userDetails
         });
 
         const dispatch = await sendTransaction({
             rdt,
-            message: `Create ${normalisedSubDomain}`,
+            message: `Create ${subdomain}`,
             manifest,
             transaction: sdkInstance.transaction,
             callbacks
@@ -53,7 +40,7 @@ export async function dispatchSubdomainCreation({
 
         return successResponse({
             code: 'SUBDOMAIN_CREATION_SUCCESSFUL',
-            details: `${normalisedSubDomain} was succesfully created.`
+            details: `${subdomain} was succesfully created.`
         });
 
     } catch (error) {
