@@ -177,6 +177,7 @@ export default class RnsSDK {
     async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseI | ErrorStackResponseI> {
 
         const details = await requestDomainDetails(domain, { sdkInstance: this });
+        
         if (details instanceof Error)
             return errorStack(errors.account.authenticityMismatch({ domain, verbose: details.message }));
 
@@ -189,6 +190,7 @@ export default class RnsSDK {
             return errorStack(errors.account.authenticityMismatch({ domain }));
 
         const record = await resolveRecord(domain, { context: docket.context, directive: docket.directive, proven }, { sdkInstance: this });
+
         if (record instanceof Error)
             return errorStack(errors.record.retrieval({ domain, verbose: record.message }));
 
@@ -211,13 +213,10 @@ export default class RnsSDK {
     @requireDependencies('read-only')
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponseT | ErrorStackResponseI> {
 
-        const accountDomains = await this.getAccountDomains({ accountAddress });
+        const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
         if (accountDomains instanceof Error)
             return errorStack(errors.account.retrieval({ accountAddress, verbose: accountDomains.message }));
-
-        if ('errors' in accountDomains)
-            return accountDomains;
 
         const isAuthentic = accountDomains?.find((interestDomain: DomainDataI) => interestDomain.name === domain)?.address === accountAddress;
 
