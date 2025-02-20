@@ -54,7 +54,7 @@ export type RecordResponseT = RecordItemI | null;
 export type DomainListResponseT = DomainDataI[] | [];
 export type DomainDetailsResponseT = DomainDataI;
 
-export type UserBadgeResponseT = { badgeId: string | null };
+export type UserBadgeResponseT = { id: string | null };
 export type CheckAuthenticityResponseT = { isAuthentic: boolean };
 
 export type ResolvedRecordResponseT = {

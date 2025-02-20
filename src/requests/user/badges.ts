@@ -21,7 +21,7 @@ export async function getUserBadgeId({ sdkInstance, accountAddress }: UserBadgeR
             return null;
         }
 
-        return dataResponse({ badgeId: ids[0] });
+        return dataResponse({ id: ids[0] });
 
     } catch (error) {
 
