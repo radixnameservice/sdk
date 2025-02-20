@@ -7,20 +7,32 @@ import { getBasePrice } from "../../utils/pricing.utils";
 import { domainToNonFungId } from "../../utils/domain.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
+import { DomainAttributesResponseT } from "../../common/response.types";
 
 
-export async function requestDomainStatus(domainName: string, { sdkInstance }: InstancePropsI) {
+export async function requestDomainStatus(domainName: string, { sdkInstance }: InstancePropsI): Promise<DomainAttributesResponseT | Error> {
 
-    if (!sdkInstance.dependencies.rates.usdXrd) {
-        return null;
-    }
+    try {
 
-    const properties = await requestDomainProperties(domainName, { sdkInstance });
-    const price = getBasePrice(domainName, sdkInstance.dependencies.rates.usdXrd);
+        if (!sdkInstance.dependencies.rates.usdXrd)
+            throw new Error("RNS SDK: Price / rate based dependencies have not been resolved, but are required for this method.");
 
-    return {
-        ...mapStatusInt(domainName, properties?.status),
-        ...{ price }
+        const properties = await requestDomainProperties(domainName, { sdkInstance });
+
+        if (properties instanceof Error)
+            throw properties;
+
+        const price = getBasePrice(domainName, sdkInstance.dependencies.rates.usdXrd);
+
+        return {
+            ...mapStatusInt(domainName, properties?.status),
+            ...{ price }
+        }
+
+    } catch (e) {
+
+        return e;
+
     }
 
 }
@@ -35,8 +47,6 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
     try {
 
         const domainId = await domainToNonFungId(domainName);
-
-        const domainExists = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.domains, domainId);
 
         const settlementKvStoreResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
@@ -141,7 +151,8 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
         }
 
         const domain = await requestDomainDetails(domainName, { sdkInstance });
-        if (domain instanceof Error) throw new Error(domain.message);
+        if (domain instanceof Error)
+            throw new Error(domain.message);
 
         if (domain) {
             if (new Date().getTime() >= domain.last_valid_timestamp) {
