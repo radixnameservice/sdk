@@ -157,7 +157,7 @@ export const subdomain = {
         return {
 
             code: 'INVALID_SUBDOMAIN',
-            error: `${subdomain} is an invalid domain name.`,
+            error: `${subdomain} is an invalid subdomain name.`,
             verbose
 
         };
