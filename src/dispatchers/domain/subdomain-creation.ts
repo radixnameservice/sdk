@@ -23,8 +23,8 @@ export async function dispatchSubdomainCreation({
         const normalisedSubDomain = normaliseDomain(subdomain);
         const subdomainValidation = validateSubdomain(normalisedSubDomain);
 
-        if (!subdomainValidation.valid)
-            return errorStack(errors.subdomain.invalid({ subdomain, verbose: subdomainValidation.message }));
+        if (subdomainValidation !== true)
+            return errorStack(subdomainValidation);
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
         const detailsRequest = await sdkInstance.getDomainDetails({ domain: rootDomain });

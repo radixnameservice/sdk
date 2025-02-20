@@ -30,7 +30,7 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI } from './common/domain.types';
 import { DocketI } from './common/record.types';
-import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, UserBadgeResponseT, DomainListResponseT, DomainDetailsResponseT } from './common/response.types';
+import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, UserBadgeResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { parameterProcessMap } from './mappings/sdk-processors';
@@ -47,6 +47,7 @@ export {
     ResolvedRecordResponseI,
     UserBadgeResponseT,
     ProofsI,
+    ErrorI,
     CommitmentStackResponseI,
     ErrorStackResponseI
 };
@@ -116,8 +117,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid)
-            return errorStack(errors.domain.invalid({ domain, verbose: domainValidation.message }));
+        if (domainValidation !== true)
+            return errorStack(domainValidation);
 
         const fetchAttributes = await requestDomainStatus(normalisedDomain, { sdkInstance: this });
 
@@ -134,8 +135,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid)
-            return errorStack(errors.domain.invalid({ domain, verbose: domainValidation.message }));
+        if (domainValidation !== true)
+            return errorStack(domainValidation);
 
         const fetchDetails = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
@@ -163,8 +164,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid)
-            return errorStack(errors.domain.invalid({ domain, verbose: domainValidation.message }));
+        if (domainValidation !== true)
+            return errorStack(domainValidation);
 
         const details = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
 
@@ -197,8 +198,8 @@ export default class RnsSDK {
         const normalisedDomain = normaliseDomain(domain);
         const domainValidation = validateDomainEntity(normalisedDomain);
 
-        if (!domainValidation.valid)
-            return errorStack(errors.domain.invalid({ domain, verbose: domainValidation.message }));
+        if (domainValidation !== true)
+            return errorStack(domainValidation);
 
         const fetchDetails = await requestDomainDetails(normalisedDomain, { sdkInstance: this });
         if (fetchDetails instanceof Error)
