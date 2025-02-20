@@ -73,19 +73,6 @@ export function validateSubdomain(subdomain: string): true | ErrorI {
     return true;
 }
 
-export function validateDomainEntity(domain: string): true | ErrorI {
-
-    const isValidDomain = validateDomain(domain);
-    const isValidSubdomain = validateSubdomain(domain);
-
-    if (isValidDomain !== true)
-        return isValidDomain;
-
-    if (isValidSubdomain !== true)
-        return isValidSubdomain;
-
-}
-
 export function normaliseDomain(domain: string) {
 
     return domain.trim().toLowerCase();
