@@ -17,10 +17,12 @@ import { dispatchSubdomainDeletion } from './dispatchers/domain/subdomain-deleti
 
 import config from './entities.config';
 import errors from './mappings/errors';
+import { parameterProcessMap } from './mappings/sdk-processors';
 
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
-import { dataResponse, errorStack, successResponse } from './utils/response.utils';
+import { deriveRootDomain } from './utils/domain.utils';
+import { dataResponse, errorStack } from './utils/response.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
 import { UserSpecificsI } from './common/user.types';
@@ -32,7 +34,6 @@ import { DocketI } from './common/record.types';
 import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, UserBadgeResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
-import { parameterProcessMap } from './mappings/sdk-processors';
 
 export {
     RnsSDKConfigI,
@@ -173,7 +174,6 @@ export default class RnsSDK {
 
         if (details instanceof Error)
             return errorStack(errors.domain.generic({ domain, verbose: details.message }));
-
         if (!details)
             return errorStack(errors.domain.empty({ domain }));
 
@@ -196,7 +196,6 @@ export default class RnsSDK {
 
         if (details instanceof Error)
             return errorStack(errors.domain.generic({ domain, verbose: details.message }));
-
         if (!details)
             return errorStack(errors.domain.empty({ domain }));
 
@@ -281,6 +280,13 @@ export default class RnsSDK {
     @requireDependencies('full')
     async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
+        const attributes = await requestDomainStatus(domain, { sdkInstance: this });
+
+        if (attributes instanceof Error)
+            return errorStack(errors.registration.generic({ domain, verbose: attributes.message }));
+        if (attributes.status !== 'available')
+            return errorStack(errors.domain.unavailable({ domain }));
+
         return dispatchDomainRegistration({
             sdkInstance: this,
             domain,
@@ -295,9 +301,16 @@ export default class RnsSDK {
     @requireDependencies('full')
     async activateDomain({ domain, userDetails, callbacks }: { domain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
+        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
+
+        if (domainDetails instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: domainDetails.message }));
+        if (!domainDetails)
+            return errorStack(errors.domain.empty({ domain }));
+
         return dispatchDomainActivation({
             sdkInstance: this,
-            domain,
+            domainDetails,
             userDetails,
             rdt: this.rdt,
             callbacks
@@ -308,9 +321,17 @@ export default class RnsSDK {
     @requireDependencies('full')
     async createSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
+        const rootDomainDetails = await requestDomainDetails(deriveRootDomain(subdomain), { sdkInstance: this });
+
+        if (rootDomainDetails instanceof Error)
+            return errorStack(errors.domain.generic({ domain: rootDomainDetails.name, verbose: rootDomainDetails.message }));
+        if (!rootDomainDetails)
+            return errorStack(errors.domain.empty({ domain: rootDomainDetails.name }));
+
         return dispatchSubdomainCreation({
             sdkInstance: this,
             subdomain,
+            rootDomainDetails,
             rdt: this.rdt,
             userDetails,
             callbacks
@@ -321,9 +342,17 @@ export default class RnsSDK {
     @requireDependencies('full')
     async deleteSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
+        const rootDomainDetails = await requestDomainDetails(deriveRootDomain(subdomain), { sdkInstance: this });
+
+        if (rootDomainDetails instanceof Error)
+            return errorStack(errors.domain.generic({ domain: rootDomainDetails.name, verbose: rootDomainDetails.message }));
+        if (!rootDomainDetails)
+            return errorStack(errors.domain.empty({ domain: rootDomainDetails.name }));
+
         return dispatchSubdomainDeletion({
             sdkInstance: this,
             subdomain,
+            rootDomainDetails,
             rdt: this.rdt,
             userDetails,
             callbacks
@@ -346,18 +375,18 @@ export default class RnsSDK {
     @requireDependencies('full')
     async createRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
-        const details = await this.getDomainDetails({ domain });
-        if (details instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
+        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
-        if ('errors' in details)
-            return details;
+        if (domainDetails instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: domainDetails.message }));
+        if (!domainDetails)
+            return errorStack(errors.domain.empty({ domain }));
 
         return dispatchRecordCreation({
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            domainDetails: details,
+            domainDetails,
             docket,
             proofs,
             callbacks
@@ -368,18 +397,18 @@ export default class RnsSDK {
     @requireDependencies('full')
     async amendRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
-        const details = await this.getDomainDetails({ domain });
-        if (details instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
+        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
-        if ('errors' in details)
-            return details;
+        if (domainDetails instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: domainDetails.message }));
+        if (!domainDetails)
+            return errorStack(errors.domain.empty({ domain }));
 
         return dispatchRecordAmendment({
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            domainDetails: details,
+            domainDetails,
             docket,
             proofs,
             callbacks
@@ -390,18 +419,18 @@ export default class RnsSDK {
     @requireDependencies('full')
     async deleteRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
-        const details = await this.getDomainDetails({ domain });
-        if (details instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
+        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
-        if ('errors' in details)
-            return details;
+        if (domainDetails instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: domainDetails.message }));
+        if (!domainDetails)
+            return errorStack(errors.domain.empty({ domain }));
 
         return dispatchRecordDeletion({
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            domainDetails: details,
+            domainDetails,
             docket,
             callbacks
         });
