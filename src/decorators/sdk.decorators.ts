@@ -27,7 +27,7 @@ export function requireDependencies(mode: 'read-only' | 'full') {
 
             // Execute the original method.
             return originalMethod.apply(this, args);
-            
+
         };
         return descriptor;
     };
@@ -65,20 +65,15 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
 
                                         // Validate if a function is provided
                                         if (config.validate) {
-                                            const result = config.validate(argObj[prop]);
-                                            if (!result.valid) {
 
-                                                // If the parameter is missing (falsy) use missingError, otherwise use invalidError
+                                            const isValid = config.validate(argObj[prop]);
+
+                                            if (isValid !== true) {
+
                                                 if (!argObj[prop] && config.missingError) {
                                                     validationErrors.push(config.missingError(argObj[prop]));
-                                                } else if (config.invalidError) {
-                                                    validationErrors.push(config.invalidError(argObj[prop], result.message));
                                                 } else {
-                                                    validationErrors.push({
-                                                        code: 'GENERIC_VALIDATION_ERROR',
-                                                        error: `Invalid ${prop}`,
-                                                        verbose: result.message || null,
-                                                    });
+                                                    validationErrors.push(isValid);
                                                 }
                                             }
                                         }
@@ -99,7 +94,7 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                             }
                             return originalMethod.apply(this, methodArgs);
                         };
-                        
+
                         Object.defineProperty(prototype, key, descriptor);
                     }
                 }
