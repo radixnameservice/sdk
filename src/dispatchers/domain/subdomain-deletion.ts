@@ -27,16 +27,12 @@ export async function dispatchSubdomainDeletion({
             return errorStack(subdomainValidation);
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
-        const requestRootDetails = await sdkInstance.getDomainDetails({ domain: rootDomain });
+        const rootDomainDetails = await sdkInstance.getDomainDetails({ domain: rootDomain });
 
-        if (requestRootDetails instanceof Error)
-            throw requestRootDetails;
-
-        if ('errors' in requestRootDetails) {
-            return requestRootDetails;
+        if ('errors' in rootDomainDetails) {
+            return rootDomainDetails;
         }
 
-        const rootDomainDetails = requestRootDetails.data.details;
         const subdomainDetails = rootDomainDetails.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails)

@@ -113,35 +113,35 @@ export default class RnsSDK {
     @requireDependencies('read-only')
     async getDomainAttributes({ domain }: { domain: string }): Promise<DomainAttributesResponseT | ErrorStackResponseI> {
 
-        const fetchAttributes = await requestDomainStatus(domain, { sdkInstance: this });
+        const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
-        if (fetchAttributes instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: fetchAttributes.message }));
+        if (attributes instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: attributes.message }));
 
-        return dataResponse({ ...fetchAttributes });
+        return dataResponse(attributes);
 
     }
 
     @requireDependencies('read-only')
     async getDomainDetails({ domain }: { domain: string }): Promise<DomainDetailsResponseT | ErrorStackResponseI> {
 
-        const fetchDetails = await requestDomainDetails(domain, { sdkInstance: this });
+        const details = await requestDomainDetails(domain, { sdkInstance: this });
 
-        if (fetchDetails instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: fetchDetails.message }));
+        if (details instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
 
-        if (!fetchDetails)
+        if (!details)
             return errorStack(errors.domain.empty({ domain }));
 
         const isAuthentic = await this.checkAuthenticity({
             domain,
-            accountAddress: fetchDetails.address
+            accountAddress: details.address
         });
 
         if (!isAuthentic)
             return errorStack(errors.account.authenticityMismatch({ domain }));
 
-        return dataResponse({ details: fetchDetails });
+        return dataResponse(details);
 
     }
 
@@ -164,62 +164,62 @@ export default class RnsSDK {
         if (!isAuthentic)
             return errorStack(errors.account.authenticityMismatch({ domain }));
 
-        const fetchRecords = await requestRecords(domain, { sdkInstance: this });
+        const records = await requestRecords(domain, { sdkInstance: this });
 
-        if (fetchRecords instanceof Error)
-            return errorStack(errors.record.retrieval({ domain, verbose: fetchRecords.message }));
+        if (records instanceof Error)
+            return errorStack(errors.record.retrieval({ domain, verbose: records.message }));
 
-        return dataResponse({ records: fetchRecords });
+        return dataResponse(records);
 
     }
 
     @requireDependencies('read-only')
     async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseI | ErrorStackResponseI> {
 
-        const fetchDetails = await requestDomainDetails(domain, { sdkInstance: this });
-        if (fetchDetails instanceof Error)
-            return errorStack(errors.account.authenticityMismatch({ domain, verbose: fetchDetails.message }));
+        const details = await requestDomainDetails(domain, { sdkInstance: this });
+        if (details instanceof Error)
+            return errorStack(errors.account.authenticityMismatch({ domain, verbose: details.message }));
 
         const isAuthentic = await this.checkAuthenticity({
             domain,
-            accountAddress: fetchDetails.address
+            accountAddress: details.address
         });
 
         if (!isAuthentic)
             return errorStack(errors.account.authenticityMismatch({ domain }));
 
-        const fetchRecord = await resolveRecord(domain, { context: docket.context, directive: docket.directive, proven }, { sdkInstance: this });
-        if (fetchRecord instanceof Error)
-            return errorStack(errors.record.retrieval({ domain, verbose: fetchRecord.message }));
+        const record = await resolveRecord(domain, { context: docket.context, directive: docket.directive, proven }, { sdkInstance: this });
+        if (record instanceof Error)
+            return errorStack(errors.record.retrieval({ domain, verbose: record.message }));
 
-        return dataResponse({ ...fetchRecord });
+        return dataResponse(record);
 
     }
 
     @requireDependencies('read-only')
     async getAccountDomains({ accountAddress }: { accountAddress: string }): Promise<DomainListResponseT | ErrorStackResponseI> {
 
-        const fetchAccountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
+        const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
-        if (fetchAccountDomains instanceof Error)
-            return errorStack(errors.account.retrieval({ accountAddress, verbose: fetchAccountDomains.message }));
+        if (accountDomains instanceof Error)
+            return errorStack(errors.account.retrieval({ accountAddress, verbose: accountDomains.message }));
 
-        return dataResponse({ domains: fetchAccountDomains });
+        return dataResponse(accountDomains);
 
     }
 
     @requireDependencies('read-only')
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponseT | ErrorStackResponseI> {
 
-        const fetchInterests = await this.getAccountDomains({ accountAddress });
+        const accountDomains = await this.getAccountDomains({ accountAddress });
 
-        if (fetchInterests instanceof Error)
-            return errorStack(errors.account.retrieval({ accountAddress, verbose: fetchInterests.message }));
+        if (accountDomains instanceof Error)
+            return errorStack(errors.account.retrieval({ accountAddress, verbose: accountDomains.message }));
 
-        if ('errors' in fetchInterests)
-            return fetchInterests;
+        if ('errors' in accountDomains)
+            return accountDomains;
 
-        const isAuthentic = fetchInterests.data.domains?.find((interestDomain: DomainDataI) => interestDomain.name === domain)?.address === accountAddress;
+        const isAuthentic = accountDomains?.find((interestDomain: DomainDataI) => interestDomain.name === domain)?.address === accountAddress;
 
         return dataResponse({ isAuthentic });
 
@@ -303,18 +303,18 @@ export default class RnsSDK {
     @requireDependencies('full')
     async createRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
-        const fetchDetails = await this.getDomainDetails({ domain });
-        if (fetchDetails instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: fetchDetails.message }));
+        const details = await this.getDomainDetails({ domain });
+        if (details instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
 
-        if ('errors' in fetchDetails)
-            return fetchDetails;
+        if ('errors' in details)
+            return details;
 
         return dispatchRecordCreation({
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            domainDetails: fetchDetails.data.details,
+            domainDetails: details,
             docket,
             proofs,
             callbacks
@@ -325,18 +325,18 @@ export default class RnsSDK {
     @requireDependencies('full')
     async amendRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
-        const fetchDetails = await this.getDomainDetails({ domain });
-        if (fetchDetails instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: fetchDetails.message }));
+        const details = await this.getDomainDetails({ domain });
+        if (details instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
 
-        if ('errors' in fetchDetails)
-            return fetchDetails;
+        if ('errors' in details)
+            return details;
 
         return dispatchRecordAmendment({
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            domainDetails: fetchDetails.data.details,
+            domainDetails: details,
             docket,
             proofs,
             callbacks
@@ -347,18 +347,18 @@ export default class RnsSDK {
     @requireDependencies('full')
     async deleteRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserSpecificsI; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
-        const fetchDetails = await this.getDomainDetails({ domain });
-        if (fetchDetails instanceof Error)
-            return errorStack(errors.domain.generic({ domain, verbose: fetchDetails.message }));
+        const details = await this.getDomainDetails({ domain });
+        if (details instanceof Error)
+            return errorStack(errors.domain.generic({ domain, verbose: details.message }));
 
-        if ('errors' in fetchDetails)
-            return fetchDetails;
+        if ('errors' in details)
+            return details;
 
         return dispatchRecordDeletion({
             sdkInstance: this,
             rdt: this.rdt,
             userDetails,
-            domainDetails: fetchDetails.data.details,
+            domainDetails: details,
             docket,
             callbacks
         });

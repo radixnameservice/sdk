@@ -21,15 +21,13 @@ export async function dispatchDomainRegistration({
 
     try {
 
-        const attributeRequest = await sdkInstance.getDomainAttributes({ domain });
+        const attributes = await sdkInstance.getDomainAttributes({ domain });
 
-        if (attributeRequest instanceof Error)
-            throw attributeRequest;
+        if (attributes instanceof Error)
+            throw attributes;
 
-        if ('errors' in attributeRequest)
-            return attributeRequest;
-
-        const attributes = attributeRequest.data;
+        if ('errors' in attributes)
+            return attributes;
 
         if (attributes.status !== 'available')
             return errorStack(errors.domain.unavailable({ domain }));

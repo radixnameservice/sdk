@@ -27,16 +27,11 @@ export async function dispatchSubdomainCreation({
             return errorStack(subdomainValidation);
 
         const rootDomain = deriveRootDomain(normalisedSubDomain);
-        const detailsRequest = await sdkInstance.getDomainDetails({ domain: rootDomain });
+        const details = await sdkInstance.getDomainDetails({ domain: rootDomain });
 
-        if (detailsRequest instanceof Error)
-            throw detailsRequest;
-
-        if ('errors' in detailsRequest) {
-            return detailsRequest;
+        if ('errors' in details) {
+            return details;
         }
-
-        const details = detailsRequest.data.details;
 
         const manifest = await subdomainCreationManifest({
             sdkInstance,

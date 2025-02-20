@@ -26,10 +26,6 @@ export interface CommitmentStackResponseI {
     success: CommitmentSuccessI[];
 }
 
-export interface ResultI<T> {
-    data: T;
-}
-
 export interface PaginatedResponseI<T> {
     data: T[];
     next_cursor?: string;
@@ -41,27 +37,27 @@ export interface ResolvedRecordI {
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
 }
 
-export type ResolvedRecordResponseI = ResultI<{
+export type ResolvedRecordResponseI = {
     value: string;
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-} | null>;
+} | null;
 
-export type DomainAttributesResponseT = ResultI<{
+export type DomainAttributesResponseT = {
     status: string;
     verbose: string;
     price?: RawPricePairI;
-} | null>;
+} | null;
 
-export type RecordListResponseT = ResultI<{ records: RecordItemI[] | [] }>;
-export type RecordResponseT = ResultI<{ record: RecordItemI | null }>;
+export type RecordListResponseT = RecordItemI[] | [];
+export type RecordResponseT = RecordItemI | null;
 
-export type DomainListResponseT = ResultI<{ domains: DomainDataI[] | [] }>;
-export type DomainDetailsResponseT = ResultI<{ details: DomainDataI }>;
+export type DomainListResponseT = DomainDataI[] | [];
+export type DomainDetailsResponseT = DomainDataI;
 
-export type UserBadgeResponseT = ResultI<{ badgeId: string | null }>;
-export type CheckAuthenticityResponseT = ResultI<{ isAuthentic: boolean }>;
+export type UserBadgeResponseT = { badgeId: string | null };
+export type CheckAuthenticityResponseT = { isAuthentic: boolean };
 
-export type ResolvedRecordResponseT = ResultI<{
+export type ResolvedRecordResponseT = {
     value: string;
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-} | null>;
+} | null;
