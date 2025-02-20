@@ -49,7 +49,7 @@ describe('RNS - Create Subdomain', () => {
 
         const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
 
-        const details = await rns.getDomainDetails(deriveRootDomain(normaliseDomain(mocks.subdomain)));
+        const details = await rns.getDomainDetails({ domain: deriveRootDomain(mocks.subdomain) });
 
         if ('errors' in details) {
             throw new Error('Subdomain details could not be obtained');
@@ -117,7 +117,7 @@ describe('RNS - Delete Subdomain', () => {
 
         const normalisedSubDomain = normaliseDomain(mocks.subdomain)
 
-        const rootDomainDetails = await rns.getDomainDetails(deriveRootDomain(normalisedSubDomain));
+        const rootDomainDetails = await rns.getDomainDetails({ domain: deriveRootDomain(mocks.subdomain) });
 
         if ('errors' in rootDomainDetails) {
             throw new Error('Root domain details could not be obtained');

@@ -1,4 +1,4 @@
-import RnsSDK, { DomainAttributesResponseI } from '../..';
+import RnsSDK, { DomainAttributesResponseT } from '../..';
 import Decimal from 'decimal.js';
 import { matchObjectTypes } from '../utils';
 import { convertToDecimal } from '../../utils/decimal.utils';
@@ -7,9 +7,10 @@ describe('RNS - Fetch Domain Attributes', () => {
     const rns = new RnsSDK({ network: 'stokenet' });
 
     it(`should return a 'registered' or 'settlement' status and decimal / numerical denoted price.`, async () => {
-        const attributes = await rns.getDomainAttributes('radixnameservice.xrd') as unknown;
 
-        if (!matchObjectTypes<DomainAttributesResponseI>(attributes, ['status', 'verbose', 'price'])) {
+        const attributes = await rns.getDomainAttributes({ domain: 'radixnameservice.xrd' });
+
+        if (!matchObjectTypes<DomainAttributesResponseT>(attributes, ['status', 'verbose', 'price'])) {
             throw new Error('Attributes did not match expected schema');
         }
 

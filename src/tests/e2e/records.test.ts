@@ -78,7 +78,7 @@ describe('RNS - Fetch Domain Records', () => {
 
     it(`should return a corresponding record array of docket objects`, async () => {
 
-        const records = await rns.getRecords('test-records-present.xrd');
+        const records = await rns.getRecords({ domain: 'test-records-present.xrd' });
 
         if ('errors' in records) {
             throw new Error('Record list fetch failed');
@@ -95,7 +95,7 @@ describe('RNS - Fetch Domain Records', () => {
 
     it('should return a empty array', async () => {
 
-        const records = await rns.getRecords('test-records-blank.xrd');
+        const records = await rns.getRecords({ domain: 'test-records-blank.xrd' });
 
         if ('errors' in records) {
             throw new Error('Record list fetch failed');

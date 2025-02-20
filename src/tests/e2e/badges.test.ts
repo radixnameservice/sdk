@@ -82,9 +82,13 @@ describe('RNS - Fetch User Badge', () => {
 
         const rns = new RnsSDK({ network: 'stokenet' });
 
-        const userBadgeId = await rns.getUserBadge("account_tdx_2_129v4x3e4u5rgyz6239k92suwx70rarx33hwfl3prm54hv2ca9lp2kl");
+        const userBadge = await rns.getUserBadge({ accountAddress: 'account_tdx_2_129v4x3e4u5rgyz6239k92suwx70rarx33hwfl3prm54hv2ca9lp2kl' });
 
-        expect(userBadgeId).toBe("#1#");
+        if ('errors' in userBadge) {
+            throw new Error('User badge ID could not be resolved');
+        }
+
+        expect(userBadge.id).toBe("#1#");
 
     });
 
