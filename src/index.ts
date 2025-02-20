@@ -110,6 +110,50 @@ export default class RnsSDK {
         }
     }
 
+    private async dAppEntities(): Promise<EntitiesT> {
+
+        try {
+
+            if (!this.entities) {
+
+                const expandedComponents = await expandComponents(config[this.network].components, this.state);
+                this.entities = { ...config[this.network], components: expandedComponents }
+
+            }
+
+
+            return this.entities;
+
+        } catch (error) {
+            throw new Error(`RNS SDK: Could not fetch RNS entities: ${error}`);
+        }
+
+    }
+
+    private async dAppDependencies(): Promise<DependenciesI> {
+
+        try {
+
+            if (!this.dependencies) {
+
+                this.dependencies = {
+                    rates: {
+                        usdXrd: await requestXRDExchangeRate({
+                            sdkInstance: this
+                        }),
+                    },
+                };
+
+            }
+
+            return this.dependencies;
+
+        } catch (error) {
+            throw new Error(`RNS SDK: Could not fetch RNS dependencies: ${error}`);
+        }
+
+    }
+
     @requireDependencies('read-only')
     async getDomainAttributes({ domain }: { domain: string }): Promise<DomainAttributesResponseT | ErrorStackResponseI> {
 
@@ -361,50 +405,6 @@ export default class RnsSDK {
             docket,
             callbacks
         });
-
-    }
-
-    private async dAppEntities(): Promise<EntitiesT> {
-
-        try {
-
-            if (!this.entities) {
-
-                const expandedComponents = await expandComponents(config[this.network].components, this.state);
-                this.entities = { ...config[this.network], components: expandedComponents }
-
-            }
-
-
-            return this.entities;
-
-        } catch (error) {
-            throw new Error(`RNS SDK: Could not fetch RNS entities: ${error}`);
-        }
-
-    }
-
-    private async dAppDependencies(): Promise<DependenciesI> {
-
-        try {
-
-            if (!this.dependencies) {
-
-                this.dependencies = {
-                    rates: {
-                        usdXrd: await requestXRDExchangeRate({
-                            sdkInstance: this
-                        }),
-                    },
-                };
-
-            }
-
-            return this.dependencies;
-
-        } catch (error) {
-            throw new Error(`RNS SDK: Could not fetch RNS dependencies: ${error}`);
-        }
 
     }
 
