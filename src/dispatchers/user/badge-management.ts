@@ -11,7 +11,7 @@ import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/resp
 export async function dispatchUserBadgeIssuance({
     sdkInstance,
     rdt,
-    userDetails,
+    accountAddress,
     callbacks
 }: UserBadgeDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
@@ -19,7 +19,7 @@ export async function dispatchUserBadgeIssuance({
 
         const manifest = issueBadgeManifest({
             sdkInstance,
-            userDetails
+            accountAddress
         });
 
         const dispatch = await sendTransaction({
@@ -31,17 +31,17 @@ export async function dispatchUserBadgeIssuance({
         });
 
         if (!dispatch)
-            return errorStack(errors.badge.issuance({ accountAddress: userDetails.accountAddress }));
+            return errorStack(errors.badge.issuance({ accountAddress: accountAddress }));
 
 
         return successResponse({
             code: 'USER_BADGE_ISSUED',
-            details: `An RNS badge was was succesfully issued to account: ${userDetails.accountAddress}.`
+            details: `An RNS badge was was succesfully issued to account: ${accountAddress}.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.badge.issuance({ accountAddress: userDetails.accountAddress, verbose: error }));
+        return errorStack(errors.badge.issuance({ accountAddress: accountAddress, verbose: error }));
 
     }
 

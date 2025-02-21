@@ -1,14 +1,12 @@
 import RnsSDK from "../..";
 
-import { UserSpecificsI } from "../../common/user.types";
-
 
 export default function issueBadgeManifest({
     sdkInstance,
-    userDetails,
+    accountAddress,
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserSpecificsI;
+    accountAddress: string;
 }) {
 
     return `
@@ -16,7 +14,7 @@ export default function issueBadgeManifest({
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "register_user";
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "deposit_batch"
             Expression("ENTIRE_WORKTOP");
     `;

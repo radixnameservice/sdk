@@ -16,7 +16,7 @@ export interface DispatcherPropsI extends InstancePropsI {
 
 export interface UserBadgeDispatcherPropsI extends DispatcherPropsI {
 
-    userDetails: UserSpecificsI;
+    accountAddress: string;
 
 }
 
