@@ -29,6 +29,16 @@ const account = {
 
     },
 
+    invalidAddress: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
+
+        return {
+            code: "INVALID_ACCOUNT_ADDRESS",
+            error: `The Radix account address entered is invalid: ${accountAddress}.`,
+            verbose
+        };
+
+    },
+
     authenticityMismatch: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
         return {
@@ -57,7 +67,7 @@ const registration = {
 
 };
 
-export const activation = {
+const activation = {
 
     generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
@@ -71,7 +81,7 @@ export const activation = {
 
 };
 
-export const domain = {
+const domain = {
 
     generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
 
@@ -119,7 +129,7 @@ export const domain = {
 
 };
 
-export const subdomain = {
+const subdomain = {
 
     generic: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
 
@@ -178,7 +188,7 @@ export const subdomain = {
 
 };
 
-export const badge = {
+const badge = {
 
     issuance: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
 
@@ -202,7 +212,7 @@ export const badge = {
 
 };
 
-export const record = {
+const record = {
 
     creation: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketI }): ErrorI => {
 
