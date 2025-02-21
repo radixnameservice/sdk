@@ -61,7 +61,6 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                                         // Normalize the value if a normalization function is provided.
                                         if (config.normalize) {
                                             const normalizedValue = await config.normalize(argObj[key]);
-                                            console.log(`Normalizing "${key}":`, argObj[key], "->", normalizedValue);
                                             argObj[key] = normalizedValue;
                                         }
 
