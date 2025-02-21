@@ -3,6 +3,7 @@ import { ProgrammaticScryptoSborValue, ProgrammaticScryptoSborValueMap, Programm
 import { parsePricingTiers } from "./pricing.utils";
 
 import { AuctionStorageExpansionI, ComponentReferencesT, ComponentStateI, DomainStorageExpansionI, ExpandedComponentsT, ExpansionFunctionT, FeeServiceExpansionI, VersionedComponentsI } from "../common/entities.types";
+import { NetworkT } from "../common/gateway.types";
 
 
 export function getFieldValue(componentState: ComponentStateI, fieldName: string): string {
@@ -25,7 +26,8 @@ export function getFieldMap(componentState: ComponentStateI, fieldName: string):
 
 async function getActiveComponents(
     componentVersions: ProgrammaticScryptoSborValue,
-    state: State
+    state: State,
+    network: NetworkT
 ): Promise<VersionedComponentsI> {
     try {
         const versionStoreIds = await state.innerClient.keyValueStoreData({
@@ -41,10 +43,10 @@ async function getActiveComponents(
         const versionManagers = versionStoreIds.entries.map(kv => {
             return (kv.value.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
                 if ('value' in field && field.value && field.field_name) {
-                    acc[field.field_name] = field.value;
+                    return { ...acc, [field.field_name]: field.value };
                 }
                 return acc;
-            }, {} as { versions: string, current_version: string });
+            }, {} as { versions: string, current_version: string, max_version: string });
         });
 
         const logicComponents = await Promise.all(
@@ -52,7 +54,9 @@ async function getActiveComponents(
                 state.innerClient.keyValueStoreData({
                     stateKeyValueStoreDataRequest: {
                         key_value_store_address: v.versions,
-                        keys: [{ key_json: { kind: 'U64', value: v.current_version } }]
+                        keys: [
+                            { key_json: { kind: 'U64', value: network === 'stokenet' ? v.max_version : v.current_version } },
+                        ]
                     }
                 }).then(kv => (kv.entries[0].value.programmatic_json as ProgrammaticScryptoSborValueOwn).value)
             )
@@ -96,15 +100,15 @@ const expansionRouteMap: { [K in keyof ComponentReferencesT]: ExpansionFunctionT
         };
     },
 
-    coreVersionManager: async (componentDetails, state): Promise<VersionedComponentsI> => {
+    coreVersionManager: async (componentDetails, state, network): Promise<VersionedComponentsI> => {
         const componentState = componentDetails.state as ComponentStateI;
         const componentVersions = getFieldMap(componentState, "component_versions");
-        return getActiveComponents(componentVersions, state);
+        return getActiveComponents(componentVersions, state, network);
     }
 
 };
 
-export async function expandComponents(components: ComponentReferencesT, state: State): Promise<ExpandedComponentsT> {
+export async function expandComponents(components: ComponentReferencesT, state: State, network: NetworkT): Promise<ExpandedComponentsT> {
 
     try {
 
@@ -117,7 +121,8 @@ export async function expandComponents(components: ComponentReferencesT, state: 
 
                 const expandedComponent = await expansionRouteMap[componentName as keyof ComponentReferencesT](
                     aggregatedComponentDetails.items[0].details as StateEntityDetailsResponseComponentDetails,
-                    state
+                    state,
+                    network
                 );
 
                 return [componentName, { rootAddr: address, ...expandedComponent }] as const;

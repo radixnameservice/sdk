@@ -108,7 +108,7 @@ export interface FeeServiceExpansionI {
 
 export type ExpansionI = VersionedComponentsI | DomainStorageExpansionI | AuctionStorageExpansionI | FeeServiceExpansionI;
 
-export type ExpansionFunctionT<T = StateEntityDetailsResponseComponentDetails> = (componentDetails: T, state?: State) => Promise<ExpansionI> | ExpansionI;
+export type ExpansionFunctionT<T = StateEntityDetailsResponseComponentDetails> = (componentDetails: T, state?: State, network?: NetworkT) => Promise<ExpansionI> | ExpansionI;
 
 export interface ComponentStateI {
     fields: [{

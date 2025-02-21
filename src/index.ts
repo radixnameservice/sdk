@@ -117,7 +117,7 @@ export default class RnsSDK {
 
             if (!this.entities) {
 
-                const expandedComponents = await expandComponents(config[this.network].components, this.state);
+                const expandedComponents = await expandComponents(config[this.network].components, this.state, this.network);
                 this.entities = { ...config[this.network], components: expandedComponents }
 
             }
@@ -361,12 +361,12 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async issueUserBadge({ userDetails, callbacks }: { userDetails: UserSpecificsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async issueUserBadge({ accountAddress, callbacks }: { accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         return dispatchUserBadgeIssuance({
             sdkInstance: this,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             callbacks
         });
 
