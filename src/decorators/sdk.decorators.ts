@@ -36,9 +36,7 @@ export function requireDependencies(mode: 'read-only' | 'full') {
 export function ProcessParameters(mapping: ParamProcessMapT) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
         return class extends constructor {
-
             constructor(...args: any[]) {
-
                 super(...args);
                 const methodNames = Object.getOwnPropertyNames(constructor.prototype);
 
@@ -62,13 +60,14 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
 
                                         // Normalize the value if a normalization function is provided.
                                         if (config.normalize) {
-                                            const normalizedValue = config.normalize(argObj[key]);
+                                            const normalizedValue = await config.normalize(argObj[key]);
+                                            console.log(`Normalizing "${key}":`, argObj[key], "->", normalizedValue);
                                             argObj[key] = normalizedValue;
                                         }
 
                                         // Validate the value if a validation function is provided.
                                         if (config.validate) {
-                                            const result = config.validate(argObj[key]);
+                                            const result = await config.validate(argObj[key]);
                                             if (result !== true) {
                                                 validationErrors.push(result);
                                             }
@@ -86,9 +85,7 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                         Object.defineProperty(constructor.prototype, methodName, descriptor);
                     }
                 }
-
             }
-
         };
     };
 }
