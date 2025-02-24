@@ -440,14 +440,8 @@ export default class RnsSDK {
 
     public utils = {
 
-        validateDomain({ domain }: { domain: string }): true | ErrorStackResponseI {
-
-            const validationErrors = validateDomain(domain);
-            if (validationErrors !== true) {
-                return errorStack(validationErrors);
-            }
-
-            return true;
+        validateDomain({ domain }: { domain: string }): true | ErrorI {
+            return validateDomain(domain);
         }
 
     };
