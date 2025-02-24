@@ -21,7 +21,7 @@ import { parameterProcessMap } from './mappings/sdk-processors';
 
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
-import { deriveRootDomain } from './utils/domain.utils';
+import { deriveRootDomain, validateDomain } from './utils/domain.utils';
 import { dataResponse, errorStack } from './utils/response.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
@@ -437,5 +437,19 @@ export default class RnsSDK {
         });
 
     }
+
+    public utils = {
+
+        validateDomain({ domain }: { domain: string }): true | ErrorStackResponseI {
+
+            const validationErrors = validateDomain(domain);
+            if (validationErrors !== true) {
+                return errorStack(validationErrors);
+            }
+
+            return true;
+        }
+
+    };
 
 }
