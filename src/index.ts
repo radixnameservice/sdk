@@ -157,7 +157,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getDomainAttributes({ domain }: { domain: string }): Promise<DomainAttributesResponseT | ErrorStackResponseI> {
+    async getDomainStatus({ domain }: { domain: string }): Promise<DomainAttributesResponseT | ErrorStackResponseI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 

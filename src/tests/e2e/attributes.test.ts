@@ -8,7 +8,7 @@ describe('RNS - Fetch Domain Attributes', () => {
 
     it(`should return a 'registered' or 'settlement' status and decimal / numerical denoted price.`, async () => {
 
-        const attributes = await rns.getDomainAttributes({ domain: 'radixnameservice.xrd' });
+        const attributes = await rns.getDomainStatus({ domain: 'radixnameservice.xrd' });
 
         if (!matchObjectTypes<DomainAttributesResponseT>(attributes, ['status', 'verbose', 'price'])) {
             throw new Error('Attributes did not match expected schema');
