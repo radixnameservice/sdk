@@ -49,7 +49,8 @@ export {
     ProofsI,
     ErrorI,
     CommitmentStackResponseI,
-    ErrorStackResponseI
+    ErrorStackResponseI,
+    EventCallbacksI
 };
 
 interface RnsSDKConfigI {
