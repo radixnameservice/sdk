@@ -2,7 +2,7 @@ import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 import RnsSDK, { ResolvedRecordResponseI } from '../..';
 import { matchObjectTypes, normaliseManifest } from '../utils';
-import { DocketI, RecordItemI } from '../../common/record.types';
+import { RecordDocketI, RecordItemI } from '../../common/record.types';
 import { buildFungibleProofs, buildNonFungibleProofs } from '../../utils/proof.utils';
 
 const mocks = {
@@ -168,7 +168,7 @@ describe('RNS - Manage Domain Records', () => {
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket: mocks.docket as DocketI
+            docket: mocks.docket as RecordDocketI
         });
 
         if ('errors' in createRecord) {
@@ -196,9 +196,10 @@ describe('RNS - Manage Domain Records', () => {
                 "create_record"
                 NonFungibleLocalId("${anticipated.domain.rootId}")
                 "${mocks.docket.context}"
-                ${mocks.docket.directive}
-                ${mocks.docket.platformIdentifier}
+                Enum<1u8>("${mocks.docket.directive}")
+                Enum<1u8>("${mocks.docket.platformIdentifier}")
                 Array<String>()
+                "${mocks.docket.value}"
                 Proof("request_proof")
                 Enum<0u8>();
             CALL_METHOD
@@ -217,7 +218,7 @@ describe('RNS - Manage Domain Records', () => {
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket: mocks.docket as DocketI,
+            docket: mocks.docket as RecordDocketI,
             proofs: mocks.proofs
         });
 
@@ -242,7 +243,7 @@ describe('RNS - Manage Domain Records', () => {
                 "create_proof_of_non_fungibles"
                 Address("${rns.entities.resources.collections.domains}")
                 Array<NonFungibleLocalId>(
-                NonFungibleLocalId("${anticipated.domain.rootId}")
+                    NonFungibleLocalId("${anticipated.domain.rootId}")
                 );
             POP_FROM_AUTH_ZONE
                 Proof("request_proof");
@@ -251,13 +252,14 @@ describe('RNS - Manage Domain Records', () => {
                 "create_proven_record"
                 NonFungibleLocalId("${anticipated.domain.rootId}")
                 "${mocks.docket.context}"
-                ${mocks.docket.directive}
-                ${mocks.docket.platformIdentifier}
+                Enum<1u8>("${mocks.docket.directive}")
+                Enum<1u8>("${mocks.docket.platformIdentifier}")
                 Array<String>()
                 Array<Proof>(
-                ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
-                ${fungibleProofs.map(proof => proof.proofIds).join(',')}
+                    ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
+                    ${fungibleProofs.map(proof => proof.proofIds).join(',')}
                 )
+                "${mocks.docket.value}"
                 Proof("request_proof")
                 Enum<0u8>();
             CALL_METHOD
@@ -276,7 +278,7 @@ describe('RNS - Manage Domain Records', () => {
         const amendRecord = await rns.amendRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket: mocks.docket as DocketI
+            docket: mocks.docket as RecordDocketI
         });
 
         if ('errors' in amendRecord) {
@@ -303,10 +305,7 @@ describe('RNS - Manage Domain Records', () => {
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "update_record"
                 NonFungibleLocalId("${anticipated.record.id}")
-                "${mocks.docket.context}"
-                ${mocks.docket.directive}
-                ${mocks.docket.platformIdentifier}
-                Array<String>()
+                "${mocks.docket.value}"
                 Proof("requester_proof")
                 Enum<0u8>();
             CALL_METHOD
@@ -324,7 +323,7 @@ describe('RNS - Manage Domain Records', () => {
         const deleteRecord = await rns.amendRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket: mocks.docket as DocketI,
+            docket: mocks.docket as RecordDocketI,
             proofs: mocks.proofs
         });
 
@@ -357,14 +356,11 @@ describe('RNS - Manage Domain Records', () => {
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "update_proven_record"
                 NonFungibleLocalId("${anticipated.record.id}")
-                "${mocks.docket.context}"
-                ${mocks.docket.directive}
-                ${mocks.docket.platformIdentifier}
-                Array<String>()
                 Array<Proof>(
-                ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
-                ${fungibleProofs.map(proof => proof.proofIds).join(',')}
+                    ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
+                    ${fungibleProofs.map(proof => proof.proofIds).join(',')}
                 )
+                "${mocks.docket.value}"
                 Proof("requester_proof")
                 Enum<0u8>();
             CALL_METHOD
@@ -382,7 +378,7 @@ describe('RNS - Manage Domain Records', () => {
         const deleteRecord = await rns.deleteRecord({
             domain: mocks.domain.name,
             userDetails: mocks.userDetails,
-            docket: mocks.docket as DocketI
+            docket: mocks.docket as RecordDocketI
         });
 
         if ('errors' in deleteRecord) {

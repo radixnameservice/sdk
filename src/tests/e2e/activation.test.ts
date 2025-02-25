@@ -76,41 +76,41 @@ describe('RNS - Activate Domain', () => {
         const transactionManifest = sendTransactionArgs.transactionManifest;
 
         const expectedString = `
-        CALL_METHOD
-            Address("${mocks.userDetails.accountAddress}")
-            "create_proof_of_non_fungibles"
-            Address("${rns.entities.resources.collections.domains}")
-            Array<NonFungibleLocalId>(
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                    NonFungibleLocalId("${anticipated.domain.rootId}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("domain_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "update_address"
+                Proof("domain_proof")
+                Address("${mocks.userDetails.accountAddress}");
+            CALL_METHOD
+                Address("${mocks.userDetails.accountAddress}")
+                "create_proof_of_non_fungibles"
+                Address("${rns.entities.resources.collections.domains}")
+                Array<NonFungibleLocalId>(
+                    NonFungibleLocalId("${anticipated.domain.rootId}")
+                );
+            POP_FROM_AUTH_ZONE
+                Proof("requested_proof");
+            CALL_METHOD
+                Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
+                "delete_all_records_and_subdomains"
                 NonFungibleLocalId("${anticipated.domain.rootId}")
-            );
-        POP_FROM_AUTH_ZONE
-            Proof("domain_proof");
-        CALL_METHOD
-            Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
-            "update_address"
-            Proof("domain_proof")
-            Address("${mocks.userDetails.accountAddress}");
-        CALL_METHOD
-            Address("${mocks.userDetails.accountAddress}")
-            "create_proof_of_non_fungibles"
-            Address("${rns.entities.resources.collections.domains}")
-            Array<NonFungibleLocalId>(
-                NonFungibleLocalId("${anticipated.domain.rootId}")
-            );
-        POP_FROM_AUTH_ZONE
-            Proof("requested_proof");
-        CALL_METHOD
-            Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
-            "delete_all_records_and_subdomains"
-            NonFungibleLocalId("${anticipated.domain.rootId}")
-            true
-            true
-            Array<NonFungibleLocalId>(
-                ${anticipated.domain.subdomainIds.map(id => `NonFungibleLocalId("${id}")`).join(', ')}
-            )
-            Proof("requested_proof")
-            Enum<0u8>();
-        DROP_ALL_PROOFS;
+                true
+                true
+                Array<NonFungibleLocalId>(
+                    ${anticipated.domain.subdomainIds.map(id => `NonFungibleLocalId("${id}")`).join(', ')}
+                )
+                Proof("requested_proof")
+                Enum<0u8>();
+            DROP_ALL_PROOFS;        
         `;
 
         expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
