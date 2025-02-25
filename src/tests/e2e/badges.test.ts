@@ -47,7 +47,7 @@ describe('RNS - Issue User Badge', () => {
         const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
 
         const register = await rns.issueUserBadge({
-            userDetails: mocks.userDetails
+            accountAddress: mocks.userDetails.accountAddress
         }) as CommitmentStackResponseI;
 
         if ('errors' in register) {
