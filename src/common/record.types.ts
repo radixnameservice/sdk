@@ -1,10 +1,10 @@
 export type ContextT = "receivers" | "delegation" | "navigation" | "social" | "discovery" | "widgets";
 
-export interface DocketI {
+export interface RecordDocketI {
 
     context: ContextT;
     directive?: string;
-    platformIdentifier: string;
+    platformIdentifier?: string;
     value: string;
 
 }
@@ -13,7 +13,7 @@ export interface RecordItemI {
     record_id: string;
     platform_identifier: string;
     domain_id: string;
-    context: string;
+    context: ContextT;
     value: string | null;
     directive?: string;
     id_additions: string[];
