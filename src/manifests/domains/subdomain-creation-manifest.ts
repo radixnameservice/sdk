@@ -1,5 +1,5 @@
 import RnsSDK from "../..";
-import { UserSpecificsI } from "../../common/user.types";
+import { UserDetailsI } from "../../common/user.types";
 
 export default async function subdomainCreationManifest({
     sdkInstance,
@@ -8,7 +8,7 @@ export default async function subdomainCreationManifest({
     subdomain,
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserSpecificsI;
+    userDetails: UserDetailsI;
     rootDomainId: string;
     subdomain: string;
 }) {

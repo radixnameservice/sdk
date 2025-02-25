@@ -1,5 +1,5 @@
 import RnsSDK from "../..";
-import { UserSpecificsI } from "../../common/user.types";
+import { UserDetailsI } from "../../common/user.types";
 
 export function recordDeletionManifest({
     sdkInstance,
@@ -8,7 +8,7 @@ export function recordDeletionManifest({
     recordId
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserSpecificsI;
+    userDetails: UserDetailsI;
     rootDomainId: string;
     recordId: string;
 }): string {

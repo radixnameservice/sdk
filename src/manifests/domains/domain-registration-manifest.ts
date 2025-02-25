@@ -3,7 +3,7 @@ import RnsSDK from "../..";
 
 import { getWellKnownAddresses } from "../../utils/gateway.utils";
 
-import { UserSpecificsI } from "../../common/user.types";
+import { UserDetailsI } from "../../common/user.types";
 
 
 export default async function registerDomainManifest({
@@ -15,7 +15,7 @@ export default async function registerDomainManifest({
 }: {
     sdkInstance: RnsSDK;
     domain: string;
-    userDetails: UserSpecificsI;
+    userDetails: UserDetailsI;
     price: Decimal;
     durationYears: number;
 }) {
