@@ -1,6 +1,6 @@
 import { InstancePropsI } from "./entities.types";
 
-export interface UserSpecificsI {
+export interface UserDetailsI {
     badgeId: string;
     accountAddress: string;
 }
