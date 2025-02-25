@@ -1,11 +1,4 @@
-interface StatusMapsI {
-
-    [key: string]: {
-        status: string;
-        verbose: string;
-    }
-
-}
+import { StatusMapsI } from "../common/status.types";
 
 export function mapStatusInt(domain: string, status: number) {
 

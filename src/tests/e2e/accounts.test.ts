@@ -1,56 +1,60 @@
-import RnsKit from '../..';
+import RnsSDK, { CheckAuthenticityResponseT, DomainDataI } from '../..';
 import { matchObjectTypes } from '../utils';
 
-const domainsSchema = {
-    id: 'string',
-    name: 'string',
-    subdomains: 'object',
-    created_timestamp: 'number',
-    last_valid_timestamp: 'number',
-    key_image_url: 'string',
-    address: 'string'
-};
+describe('RNS - Verify Domain Owner Accounts', () => {
 
-const authenticitySchema = {
-    isAuthentic: 'boolean'
-};
-
-describe('RnsKit', () => {
-
-    const rns = new RnsKit({ network: 'stokenet' });
+    const rns = new RnsSDK({ network: 'stokenet' });
 
     it(`should return all domains within an account`, async () => {
 
-        const ownerDomains = await rns.getAccountDomains('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
+        const ownerDomains = await rns.getAccountDomains({ accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p' });
+
+        if ('errors' in ownerDomains) {
+            throw new Error('Domain list fetch failed');
+        }
 
         expect(Array.isArray(ownerDomains)).toBe(true);
         expect(ownerDomains.length).toBeGreaterThan(0);
-        expect(ownerDomains.every(domain => matchObjectTypes(domain, domainsSchema))).toBe(true);
-
+        expect(ownerDomains.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'last_valid_timestamp', 'key_image_url', 'address']))).toBe(true);
 
     });
 
     it(`should return as authentic`, async () => {
 
-        const authenticity = await rns.checkAuthenticity({
+        const checkAuthenticity = await rns.checkAuthenticity({
             domain: 'radixnameservice.xrd',
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
-        expect(authenticity.isAuthentic).toBe(true);
+        if ('errors' in checkAuthenticity) {
+            throw new Error('Authenticity check failed');
+        }
+
+
+        if (!matchObjectTypes<{ isAuthentic: boolean }>(checkAuthenticity, ['isAuthentic'])) {
+            throw new Error('Authenticity object did not match expected schema');
+        }
+
+        expect('isAuthentic' in checkAuthenticity).toBe(true);
 
     });
 
     it(`should return as inauthentic`, async () => {
 
-        const authenticity = await rns.checkAuthenticity({
+        const checkAuthenticity = await rns.checkAuthenticity({
             domain: 'i-do-not-own-this.xrd',
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        expect(matchObjectTypes(authenticity, authenticitySchema)).toBe(true);
-        expect(authenticity.isAuthentic).toBe(false);
+        if ('errors' in checkAuthenticity) {
+            throw new Error('Authenticity check failed');
+        }
+
+        if (!matchObjectTypes<{ isAuthentic: boolean }>(checkAuthenticity, ['isAuthentic'])) {
+            throw new Error('Authenticity object did not match expected schema');
+        }
+
+        expect('isAuthentic' in checkAuthenticity && checkAuthenticity.isAuthentic).toBe(false);
 
     });
 

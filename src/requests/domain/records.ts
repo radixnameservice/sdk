@@ -1,18 +1,23 @@
-import { ProgrammaticScryptoSborValueOwn, StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
-import { InstancePropsI } from "../../common/entities.types";
-import { domainToNonFungId } from "../../utils/domain.utils";
-import { RecordItem } from "../../mappings/records";
-import { requestDomainDetails } from "../address/domains";
+import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-sdk";
 
-export async function requestRecords(domainName: string, { state, entities }: InstancePropsI) {
+import { requestDomainDetails } from "../address/domains";
+import { domainToNonFungId } from "../../utils/domain.utils";
+import { docketToRecordId } from "../../utils/record.utils";
+
+import { InstancePropsI } from "../../common/entities.types";
+import { DocketPropsI, RecordItemI } from "../../common/record.types";
+import { ResolvedRecordI } from "../../common/response.types";
+
+
+export async function requestRecords(domainName: string, { sdkInstance }: InstancePropsI): Promise<RecordItemI[] | [] | Error> {
 
     try {
 
         const domainId = await domainToNonFungId(domainName);
 
-        const recordsVaultId = ((await state.innerClient.keyValueStoreData({
+        const recordsVaultId = ((await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.components.domainStorage.recordServiceStoreAddr,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.recordServiceStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         })).entries[0]?.value.programmatic_json as ProgrammaticScryptoSborValueOwn)?.value;
@@ -21,15 +26,15 @@ export async function requestRecords(domainName: string, { state, entities }: In
             return [];
         }
 
-        const recordIds = (await state.innerClient.entityNonFungibleIdsPage({
+        const recordIds = (await sdkInstance.state.innerClient.entityNonFungibleIdsPage({
             stateEntityNonFungibleIdsPageRequest: {
-                address: entities.components.domainStorage.rootAddr,
-                resource_address: entities.resources.collections.records,
+                address: sdkInstance.entities.components.domainStorage.rootAddr,
+                resource_address: sdkInstance.entities.resources.collections.records,
                 vault_address: recordsVaultId,
             }
         })).items;
 
-        return (await state.getNonFungibleData(entities.resources.collections.records, recordIds))
+        return (await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.records, recordIds))
             .map(nft => {
                 if (nft.data?.programmatic_json.kind === 'Tuple') {
                     return nft.data?.programmatic_json.fields.reduce((acc, field) => {
@@ -63,43 +68,26 @@ export async function requestRecords(domainName: string, { state, entities }: In
                         }
 
                         return acc;
-                    }, { record_id: nft.non_fungible_id } as RecordItem)
+                    }, { record_id: nft.non_fungible_id } as RecordItemI)
                 }
-                return {} as RecordItem;
+                return {} as RecordItemI;
             });
 
     } catch (e) {
 
-        console.log(e);
-        return null;
+        return e;
 
     }
 
 }
 
-interface DocketPropsI {
-
-    context?: string;
-    directive?: string;
-    proven?: boolean;
-
-}
-
-export interface ResolvedRecordResponse {
-    value: string,
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[],
-}
-
-export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { state, entities }: InstancePropsI): Promise<ResolvedRecordResponse> {
+export async function resolveRecord(domain: string, { context, directive, proven }: DocketPropsI, { sdkInstance }: InstancePropsI): Promise<ResolvedRecordI | null | Error> {
 
     try {
 
-        const domainId = await domainToNonFungId(domain);
-        const parsedContext = context ? `-${context}` : '';
-        const parsedDirective = directive ? `-${directive}` : '';
-        const recordId = await domainToNonFungId(`${domainId}${parsedContext}${parsedDirective}`);
+        const recordId = await docketToRecordId(domain, { context, directive });
 
-        const nft = await state.getNonFungibleData(entities.resources.collections.records, recordId);
+        const nft = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.records, recordId);
 
         if (nft?.data?.programmatic_json.kind === 'Tuple') {
 
@@ -126,7 +114,11 @@ export async function resolveRecord(domain: string, { context, directive, proven
                 return null;
             }
 
-            const domainDetails = await requestDomainDetails(domain, { state, entities });
+            const domainDetails = await requestDomainDetails(domain, { sdkInstance });
+
+            if (domainDetails instanceof Error) {
+                throw domainDetails;
+            }
 
             const accountAddress = domainDetails.address;
 
@@ -148,9 +140,9 @@ export async function resolveRecord(domain: string, { context, directive, proven
 
             }, []);
 
-            const fungibleResources = provenResourcesList.filter(r =>!r.ids).map(r => r.resourceAddress);
+            const fungibleResources = provenResourcesList.filter(r => !r.ids).map(r => r.resourceAddress);
 
-            const accountNonFungibleVaultIds = await state.getEntityDetailsVaultAggregated(accountAddress).then(r => {
+            const accountNonFungibleVaultIds = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress).then(r => {
                 const nonFungibleVaultIds = new Set(r.non_fungible_resources.items.map(v => v.vaults.items[0].vault_address));
 
                 const areAllResourcesProven = fungibleResources.every(resource => r.fungible_resources.items.find(v => v.resource_address === resource && parseFloat(v.vaults.items[0].amount) > 0));
@@ -162,7 +154,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
                 return new Set(nonFungibleVaultIds);
             });
 
-            const nonFungibleLocationResponse = await Promise.all(provenResourcesList.filter(r => r.ids).map(resource => state.getNonFungibleLocation(resource.resourceAddress, resource.ids)));
+            const nonFungibleLocationResponse = await Promise.all(provenResourcesList.filter(r => r.ids).map(resource => sdkInstance.state.getNonFungibleLocation(resource.resourceAddress, resource.ids)));
 
             const requiredVaultIds = [...new Set(nonFungibleLocationResponse.flatMap(r => r).map(r => r.owning_vault_address))];
 
@@ -172,7 +164,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
                 return null;
             }
 
-            const nftDataList = await Promise.all(provenResourcesList.map(r => state.getNonFungibleData(r.resourceAddress, r.ids)));
+            const nftDataList = await Promise.all(provenResourcesList.map(r => sdkInstance.state.getNonFungibleData(r.resourceAddress, r.ids)));
 
             return { value, nonFungibleDataList: nftDataList.flatMap(r => r) };
         }
@@ -182,7 +174,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
     } catch (e) {
 
         console.log(e);
-        return null;
+        return e;
 
     }
 

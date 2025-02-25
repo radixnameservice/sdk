@@ -1,6 +1,9 @@
+import RnsSDK from "..";
 import { State, StateEntityDetailsResponseComponentDetails } from "@radixdlt/babylon-gateway-api-sdk";
+
 import { parsePricingTiers } from "../utils/pricing.utils";
-import { NetworkT } from "../utils/gateway.utils";
+
+import { NetworkT } from "./gateway.types";
 
 export type ComponentReferencesT = {
 
@@ -42,16 +45,22 @@ export type EntityStructT = {
 
 };
 
+export interface InstancePropsI {
+    sdkInstance: RnsSDK;
+}
+
 export type EntitiesConfigT = {
 
     [key in NetworkT]: EntityStructT;
 
 };
 
-export interface InstancePropsI {
+export interface ComponentDetailsI {
 
-    state: State;
-    entities: EntitiesT;
+    kind: string;
+    type_name: string;
+    field_name: string;
+    value: string;
 
 }
 
@@ -99,7 +108,7 @@ export interface FeeServiceExpansionI {
 
 export type ExpansionI = VersionedComponentsI | DomainStorageExpansionI | AuctionStorageExpansionI | FeeServiceExpansionI;
 
-export type ExpansionFunctionT<T = StateEntityDetailsResponseComponentDetails> = (componentDetails: T, state?: State) => Promise<ExpansionI> | ExpansionI;
+export type ExpansionFunctionT<T = StateEntityDetailsResponseComponentDetails> = (componentDetails: T, state?: State, network?: NetworkT) => Promise<ExpansionI> | ExpansionI;
 
 export interface ComponentStateI {
     fields: [{
@@ -118,3 +127,19 @@ export type ExpandedComponentsT = {
 };
 
 export type EntitiesT = Omit<EntityStructT, "components"> & { components: ExpandedComponentsT };
+
+export interface FungibleProofItemI {
+    resourceAddress: string;
+    amount: string;
+}
+
+export interface NonFungibleProofItemI {
+    resourceAddress: string;
+    ids: string[];
+}
+
+export interface ProofsI {
+    fungibles?: FungibleProofItemI[];
+    nonFungibles?: NonFungibleProofItemI[];
+    idAdditions?: string[];
+}

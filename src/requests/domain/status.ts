@@ -1,20 +1,38 @@
 import { ProgrammaticScryptoSborValueBool, ProgrammaticScryptoSborValueEnum } from "@radixdlt/babylon-gateway-api-sdk";
-import { InstancePropsI } from "../../common/entities.types";
+
 import { DomainStatus, mapStatusInt } from "../../mappings/status";
-import { domainToNonFungId } from "../../utils/domain.utils";
 import { requestDomainDetails } from "../address/domains";
 
-export interface DomainAttributesResponse {
-    status: string;
-    verbose: string;
-}
+import { getBasePrice } from "../../utils/pricing.utils";
+import { domainToNonFungId } from "../../utils/domain.utils";
 
-export async function requestDomainStatus(domainName: string, { state, entities }: InstancePropsI) {
+import { InstancePropsI } from "../../common/entities.types";
+import { DomainAttributesResponseT } from "../../common/response.types";
 
-    const properties = await requestDomainProperties(domainName, { state, entities });
 
-    return {
-        ...mapStatusInt(domainName, properties?.status)
+export async function requestDomainStatus(domainName: string, { sdkInstance }: InstancePropsI): Promise<DomainAttributesResponseT | Error> {
+
+    try {
+
+        if (!sdkInstance.dependencies.rates.usdXrd)
+            throw new Error("RNS SDK: Price / rate based dependencies have not been resolved, but are required for this method.");
+
+        const properties = await requestDomainProperties(domainName, { sdkInstance });
+
+        if (properties instanceof Error)
+            throw properties;
+
+        const price = getBasePrice(domainName, sdkInstance.dependencies.rates.usdXrd);
+
+        return {
+            ...mapStatusInt(domainName, properties?.status),
+            ...{ price }
+        }
+
+    } catch (e) {
+
+        return e;
+
     }
 
 }
@@ -24,24 +42,22 @@ const ClaimType = {
     Sunrise: DomainStatus.Sunrise,
 }
 
-async function requestDomainProperties(domainName: string, { state, entities }: InstancePropsI) {
+async function requestDomainProperties(domainName: string, { sdkInstance }: InstancePropsI) {
 
     try {
 
         const domainId = await domainToNonFungId(domainName);
 
-        const domainExists = await state.getNonFungibleData(entities.resources.collections.domains, domainId);
-
-        const settlementKvStoreResponse = await state.innerClient.keyValueStoreData({
+        const settlementKvStoreResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.components.domainStorage.settlementConfigStoreAddr,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.settlementConfigStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
 
-        const domainClaimsResponse = await state.innerClient.keyValueStoreData({
+        const domainClaimsResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.components.domainStorage.domainEventClaimsStoreAddr,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.domainEventClaimsStoreAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -51,9 +67,9 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
             return { status: ClaimType[value.variant_name as keyof typeof ClaimType] };
         }
 
-        const tldsResponse = await state.innerClient.keyValueStoreData({
+        const tldsResponse = await sdkInstance.state.innerClient.keyValueStoreData({
             stateKeyValueStoreDataRequest: {
-                key_value_store_address: entities.components.domainStorage.domainTldConfigKVAddr,
+                key_value_store_address: sdkInstance.entities.components.domainStorage.domainTldConfigKVAddr,
                 keys: [{ key_json: { kind: 'NonFungibleLocalId', value: domainId } }]
             }
         });
@@ -83,7 +99,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
         })[0];
 
         if (auctionId) {
-            const auction = await state.getNonFungibleData(entities.resources.collections.auctions, auctionId);
+            const auction = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.auctions, auctionId);
 
             if (auction.data?.programmatic_json.kind === 'Tuple') {
                 const auctionData = auction.data.programmatic_json.fields.reduce((acc, field) => {
@@ -134,7 +150,9 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
             }
         }
 
-        const domain = await requestDomainDetails(domainName, { state, entities });
+        const domain = await requestDomainDetails(domainName, { sdkInstance });
+        if (domain instanceof Error)
+            throw new Error(domain.message);
 
         if (domain) {
             if (new Date().getTime() >= domain.last_valid_timestamp) {
@@ -155,7 +173,7 @@ async function requestDomainProperties(domainName: string, { state, entities }: 
     } catch (e) {
 
         console.log(e);
-        return null;
+        return e;
 
     }
 
