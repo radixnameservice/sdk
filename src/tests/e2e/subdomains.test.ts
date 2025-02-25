@@ -17,6 +17,13 @@ const mocks = {
     intentHash: 'txid_tdx_2_1p9j7njn5wuagry6j8mrmkvhhwvttskq2cy4e5nk2wpexhqjav2dszpptsr'
 };
 
+const dAppToolkit = RadixDappToolkit({
+    dAppDefinitionAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
+    networkId: RadixNetwork.Stokenet
+});
+
+const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
+
 jest.mock('@radixdlt/radix-dapp-toolkit', () => {
     return {
         RadixDappToolkit: jest.fn(() => ({
@@ -41,13 +48,6 @@ describe('RNS - Create Subdomain', () => {
     });
 
     it(`should return a correctly formatted manifest string`, async () => {
-
-        const dAppToolkit = RadixDappToolkit({
-            dAppDefinitionAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
-            networkId: RadixNetwork.Stokenet
-        });
-
-        const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
 
         const details = await rns.getDomainDetails({ domain: deriveRootDomain(mocks.subdomain) });
 
@@ -107,13 +107,6 @@ describe('RNS - Delete Subdomain', () => {
     });
 
     it(`should return a correctly formatted manifest string`, async () => {
-
-        const dAppToolkit = RadixDappToolkit({
-            dAppDefinitionAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
-            networkId: RadixNetwork.Stokenet
-        });
-
-        const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
 
         const normalisedSubDomain = normaliseDomain(mocks.subdomain)
 
