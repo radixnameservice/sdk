@@ -21,7 +21,6 @@ jobs:
           rm -f package-lock.json
           rm -rf node_modules
       - run: npm install
-      - run: npm ci
       - run: npm test
       - run: npm run build
       - name: Upload dist folder
