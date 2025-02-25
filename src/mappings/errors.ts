@@ -1,4 +1,4 @@
-import { DocketI, DocketPropsI } from "../common/record.types";
+import { RecordDocketI, DocketPropsI } from "../common/record.types";
 import { ErrorGenerationI, ErrorI } from "../common/response.types";
 
 const request = {
@@ -214,7 +214,7 @@ const badge = {
 
 const record = {
 
-    creation: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketI }): ErrorI => {
+    creation: ({ docket, verbose = null }: ErrorGenerationI & { docket: RecordDocketI }): ErrorI => {
 
         return {
             code: "RECORD_CREATION_FAILED",
