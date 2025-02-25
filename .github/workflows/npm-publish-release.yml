@@ -16,7 +16,12 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
-      - run: npm ci --no-optional
+      - name: Clean lockfile and modules
+        run: |
+          rm -f package-lock.json
+          rm -rf node_modules
+      - run: npm install
+      - run: npm ci
       - run: npm test
       - run: npm run build
       - name: Upload dist folder
