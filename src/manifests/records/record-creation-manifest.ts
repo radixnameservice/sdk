@@ -3,8 +3,8 @@ import RnsSDK from "../..";
 import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
 
 import { ProofsI } from "../../common/entities.types";
-import { DocketI } from "../../common/record.types";
-import { UserSpecificsI } from "../../common/user.types";
+import { RecordDocketI } from "../../common/record.types";
+import { UserDetailsI } from "../../common/user.types";
 
 export function recordCreationManifest({
     sdkInstance,
@@ -14,9 +14,9 @@ export function recordCreationManifest({
     proofs = {}
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserSpecificsI;
+    userDetails: UserDetailsI;
     rootDomainId: string;
-    recordDocket: DocketI;
+    recordDocket: RecordDocketI;
     proofs?: ProofsI;
 }): string {
 
@@ -52,15 +52,15 @@ export function recordCreationManifest({
             "${methodName}"
             NonFungibleLocalId("${rootDomainId}")
             "${recordDocket.context}"
-            ${recordDocket.directive}
-            ${recordDocket.platformIdentifier}
+            ${recordDocket.directive.trim().length > 0 ? `Enum<1u8>("${recordDocket.directive}")` : "Enum<0u8>()"}
+            ${recordDocket.platformIdentifier.trim().length > 0 ? `Enum<1u8>("${recordDocket.platformIdentifier}")` : "Enum<0u8>()"}
             Array<String>(${idAdditions.map(id => `"${id}"`).join(',')})
             ${methodName === "create_proven_record"
             ? `Array<Proof>(
                 ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                 ${fungibleProofs.map(proof => proof.proofIds).join(',')}
-            )`
-            : "" }
+            )` : ""}
+            "${recordDocket.value}"
             Proof("request_proof")
             Enum<0u8>();
         CALL_METHOD
