@@ -8,6 +8,9 @@ import { normaliseManifest } from '../utils';
 import { deriveRootDomain, normaliseDomain } from '../../utils/domain.utils';
 
 const mocks = {
+    rootDomain: {
+        id: "[52e57ee0bdd7681786e15a0dabb7bdc4]"
+    },
     subdomain: `test-subdomain.radixnameservice.xrd`,
     userDetails: {
         accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
@@ -49,12 +52,6 @@ describe('RNS - Create Subdomain', () => {
 
     it(`should return a correctly formatted manifest string`, async () => {
 
-        const details = await rns.getDomainDetails({ domain: deriveRootDomain(mocks.subdomain) });
-
-        if ('errors' in details) {
-            throw new Error('Subdomain details could not be obtained');
-        }
-
         const createSubdomain = await rns.createSubdomain({
             subdomain: mocks.subdomain,
             userDetails: mocks.userDetails
@@ -76,14 +73,14 @@ describe('RNS - Create Subdomain', () => {
                 "create_proof_of_non_fungibles"
                 Address("${rns.entities.resources.collections.domains}")
                 Array<NonFungibleLocalId>(
-                    NonFungibleLocalId("${details.id}")
+                    NonFungibleLocalId("${mocks.rootDomain.id}")
                 );
             POP_FROM_AUTH_ZONE
                 Proof("requester_proof");
             CALL_METHOD
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "register_subdomain"
-                NonFungibleLocalId("${details.id}")
+                NonFungibleLocalId("${mocks.rootDomain.id}")
                 "${mocks.subdomain}"
                 Address("${mocks.userDetails.accountAddress}")
                 Proof("requester_proof")
