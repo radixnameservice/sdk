@@ -449,6 +449,10 @@ export default class RnsSDK {
 
         validateSubdomain({ subdomain }: { subdomain: string }): true | ErrorI {
             return validateSubdomain(subdomain);
+        },
+
+        getRootFromSubdomain({ subdomain }: { subdomain: string }): string | null {
+            return deriveRootDomain(subdomain);
         }
 
     };
