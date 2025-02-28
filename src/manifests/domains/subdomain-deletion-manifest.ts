@@ -1,21 +1,20 @@
 import RnsSDK from "../..";
-import { UserDetailsI } from "../../common/user.types";
 
 export default async function subdomainDeletionManifest({
     sdkInstance,
-    userDetails,
+    accountAddress,
     rootDomainId,
     subdomainId,
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserDetailsI;
+    accountAddress: string;
     rootDomainId: string;
     subdomainId: string;
 }) {
 
     return `
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(

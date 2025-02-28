@@ -1,6 +1,5 @@
 import { RadixDappToolkit } from "@radixdlt/radix-dapp-toolkit";
 
-import { UserDetailsI } from "./user.types";
 import { EventCallbacksI } from "./transaction.types";
 import { InstancePropsI, ProofsI } from "./entities.types";
 import { RecordDocketI, DocketPropsI } from "./record.types";
@@ -24,14 +23,14 @@ export interface RegistrationDispatcherPropsI extends DispatcherPropsI {
 
     domain: string;
     durationYears: number;
-    userDetails: UserDetailsI;
+    accountAddress: string;
 
 }
 
 export interface ActivationDispatcherPropsI extends DispatcherPropsI {
 
     domainDetails: DomainDataI;
-    userDetails: UserDetailsI;
+    accountAddress: string;
 
 }
 
@@ -39,13 +38,13 @@ export interface SubdomainDispatcherPropsI extends DispatcherPropsI {
 
     subdomain: string;
     rootDomainDetails: DomainDataI;
-    userDetails: UserDetailsI;
+    accountAddress: string;
 
 }
 
 export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
 
-    userDetails: UserDetailsI;
+    accountAddress: string;
     domainDetails: DomainDataI;
     docket: RecordDocketI;
     proofs?: ProofsI;
@@ -54,7 +53,7 @@ export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
 
 export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
 
-    userDetails: UserDetailsI;
+    accountAddress: string;
     domainDetails: DomainDataI;
     docket: DocketPropsI;
 
@@ -62,7 +61,7 @@ export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
 
 export interface AmendRecordDispatcherPropsI extends DispatcherPropsI {
 
-    userDetails: UserDetailsI;
+    accountAddress: string;
     domainDetails: DomainDataI;
     docket: RecordDocketI;
     proofs?: ProofsI;

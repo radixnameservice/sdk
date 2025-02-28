@@ -6,8 +6,7 @@ import { normaliseManifest } from '../utils';
 
 const mocks = {
     userDetails: {
-        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
-        badgeId: '#1'
+        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k'
     },
     durationYears: 2,
     callbacks: {},
@@ -71,24 +70,6 @@ describe('RNS - Issue User Badge', () => {
         `;
 
         expect(normaliseManifest(transactionManifest)).toBe(normaliseManifest(expectedString));
-
-    });
-
-});
-
-describe('RNS - Fetch User Badge', () => {
-
-    it(`should return a the corresponding account user badge ID`, async () => {
-
-        const rns = new RnsSDK({ network: 'stokenet' });
-
-        const userBadge = await rns.getUserBadge({ accountAddress: 'account_tdx_2_129v4x3e4u5rgyz6239k92suwx70rarx33hwfl3prm54hv2ca9lp2kl' });
-
-        if ('errors' in userBadge) {
-            throw new Error('User badge ID could not be resolved');
-        }
-
-        expect(userBadge.id).toBe("#1#");
 
     });
 

@@ -11,7 +11,7 @@ import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
 export async function dispatchRecordCreation({
     sdkInstance,
     rdt,
-    userDetails,
+    accountAddress,
     domainDetails,
     docket,
     callbacks,
@@ -22,7 +22,7 @@ export async function dispatchRecordCreation({
 
         const manifest = recordCreationManifest({
             sdkInstance,
-            userDetails,
+            accountAddress,
             rootDomainId: domainDetails.id,
             recordDocket: docket,
             proofs

@@ -13,8 +13,7 @@ const mocks = {
     },
     subdomain: `test-subdomain.radixnameservice.xrd`,
     userDetails: {
-        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
-        badgeId: '#1'
+        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k'
     },
     callbacks: {},
     intentHash: 'txid_tdx_2_1p9j7njn5wuagry6j8mrmkvhhwvttskq2cy4e5nk2wpexhqjav2dszpptsr'
@@ -54,7 +53,7 @@ describe('RNS - Create Subdomain', () => {
 
         const createSubdomain = await rns.createSubdomain({
             subdomain: mocks.subdomain,
-            userDetails: mocks.userDetails
+            accountAddress: mocks.userDetails.accountAddress
         });
 
         if ('errors' in createSubdomain) {
@@ -121,7 +120,7 @@ describe('RNS - Delete Subdomain', () => {
 
         const deleteSubdomain = await rns.deleteSubdomain({
             subdomain: mocks.subdomain,
-            userDetails: mocks.userDetails
+            accountAddress: mocks.userDetails.accountAddress
         });
 
         if ('errors' in deleteSubdomain) {

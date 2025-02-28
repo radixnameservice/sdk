@@ -15,7 +15,7 @@ export async function dispatchSubdomainDeletion({
     subdomain,
     rootDomainDetails,
     rdt,
-    userDetails,
+    accountAddress,
     callbacks
 }: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
@@ -28,7 +28,7 @@ export async function dispatchSubdomainDeletion({
 
         const manifest = await subdomainDeletionManifest({
             sdkInstance,
-            userDetails,
+            accountAddress,
             rootDomainId: rootDomainDetails.id,
             subdomainId: subdomainDetails.id
         });

@@ -1,21 +1,20 @@
 import RnsSDK from "../..";
-import { UserDetailsI } from "../../common/user.types";
 
 export function recordDeletionManifest({
     sdkInstance,
-    userDetails,
+    accountAddress,
     rootDomainId,
     recordId
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserDetailsI;
+    accountAddress: string;
     rootDomainId: string;
     recordId: string;
 }): string {
 
     return `
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
@@ -30,7 +29,7 @@ export function recordDeletionManifest({
             Proof("requester_proof")
             Enum<0u8>();
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "deposit_batch"
             Expression("ENTIRE_WORKTOP");
     `;

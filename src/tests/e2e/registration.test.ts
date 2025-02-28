@@ -12,8 +12,7 @@ import { normaliseManifest } from '../utils';
 const mocks = {
     availableDomain: `test-registration-${(Math.random() + 1).toString(36).substring(3)}.xrd`,
     userDetails: {
-        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k',
-        badgeId: '#1'
+        accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k'
     },
     durationYears: 2,
     callbacks: {},
@@ -55,7 +54,7 @@ describe('RNS - Register Domain', () => {
         const register = await rns.registerDomain({
             domain: mocks.availableDomain,
             durationYears: mocks.durationYears,
-            userDetails: mocks.userDetails
+            accountAddress: mocks.userDetails.accountAddress
         });
 
         if ('errors' in register) {
@@ -83,22 +82,12 @@ describe('RNS - Register Domain', () => {
                 Decimal("${price}")
                 Bucket("radix_bucket");
             CALL_METHOD
-                Address("${mocks.userDetails.accountAddress}")
-                "create_proof_of_non_fungibles"
-                Address("${rns.entities.resources.badges.rnsUser}")
-                Array<NonFungibleLocalId>(
-                    NonFungibleLocalId("${mocks.userDetails.badgeId}")
-                );
-            POP_FROM_AUTH_ZONE
-                Proof("user_proof");
-            CALL_METHOD
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "register_domain"
                 "${mocks.availableDomain}"
                 Address("${mocks.userDetails.accountAddress}")
                 ${mocks.durationYears}i64
-                Bucket("radix_bucket")
-                Proof("user_proof");
+                Bucket("radix_bucket");
             CALL_METHOD
                 Address("${mocks.userDetails.accountAddress}")
                 "deposit_batch"

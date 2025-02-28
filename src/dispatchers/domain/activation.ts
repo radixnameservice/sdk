@@ -12,7 +12,7 @@ export async function dispatchDomainActivation({
     sdkInstance,
     domainDetails,
     rdt,
-    userDetails,
+    accountAddress,
     callbacks
 }: ActivationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
@@ -22,7 +22,7 @@ export async function dispatchDomainActivation({
             sdkInstance,
             rootDomainId: domainDetails.id,
             subdomainIds: domainDetails.subdomains ? domainDetails.subdomains.map(subdomain => subdomain.id) : [],
-            userDetails
+            accountAddress
         });
 
         const dispatch = await sendTransaction({

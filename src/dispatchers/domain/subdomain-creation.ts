@@ -14,7 +14,7 @@ export async function dispatchSubdomainCreation({
     subdomain,
     rootDomainDetails,
     rdt,
-    userDetails,
+    accountAddress,
     callbacks
 }: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
@@ -24,7 +24,7 @@ export async function dispatchSubdomainCreation({
             sdkInstance,
             subdomain,
             rootDomainId: rootDomainDetails.id,
-            userDetails
+            accountAddress
         });
 
         const dispatch = await sendTransaction({

@@ -1,21 +1,20 @@
 import RnsSDK from "../..";
-import { UserDetailsI } from "../../common/user.types";
 
 export default async function subdomainCreationManifest({
     sdkInstance,
-    userDetails,
+    accountAddress,
     rootDomainId,
     subdomain,
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserDetailsI;
+    accountAddress: string;
     rootDomainId: string;
     subdomain: string;
 }) {
 
     return `
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
@@ -28,11 +27,11 @@ export default async function subdomainCreationManifest({
             "register_subdomain"
             NonFungibleLocalId("${rootDomainId}")
             "${subdomain}"
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             Proof("requester_proof")
             Enum<0u8>();
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "deposit_batch"
             Expression("ENTIRE_WORKTOP");
         `;
