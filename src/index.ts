@@ -282,7 +282,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async registerDomain({ domain, durationYears = 1, accountAddress, callbacks }: { domain: string; durationYears?: number; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
@@ -296,7 +296,7 @@ export default class RnsSDK {
             domain,
             durationYears,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             callbacks
         });
 

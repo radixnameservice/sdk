@@ -15,7 +15,7 @@ export async function dispatchDomainRegistration({
     domain,
     rdt,
     durationYears,
-    userDetails,
+    accountAddress,
     callbacks
 }: RegistrationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
@@ -24,7 +24,7 @@ export async function dispatchDomainRegistration({
         const manifest = await registerDomainManifest({
             sdkInstance,
             domain,
-            userDetails,
+            accountAddress,
             durationYears,
             price: multiplyDecimal(convertToDecimal(getBasePrice(domain, sdkInstance.dependencies.rates.usdXrd).xrd), durationYears)
         });

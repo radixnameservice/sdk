@@ -24,7 +24,7 @@ export interface RegistrationDispatcherPropsI extends DispatcherPropsI {
 
     domain: string;
     durationYears: number;
-    userDetails: UserDetailsI;
+    accountAddress: string;
 
 }
 

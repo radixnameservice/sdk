@@ -9,13 +9,13 @@ import { UserDetailsI } from "../../common/user.types";
 export default async function registerDomainManifest({
     sdkInstance,
     domain,
-    userDetails,
+    accountAddress,
     price,
     durationYears
 }: {
     sdkInstance: RnsSDK;
     domain: string;
-    userDetails: UserDetailsI;
+    accountAddress: string;
     price: Decimal;
     durationYears: number;
 }) {
@@ -24,7 +24,7 @@ export default async function registerDomainManifest({
 
     return `
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "withdraw"
             Address("${xrdTokenResource}")
             Decimal("${price}");
@@ -36,11 +36,11 @@ export default async function registerDomainManifest({
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "register_domain"
             "${domain}"
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             ${durationYears}i64
             Bucket("radix_bucket");
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "deposit_batch"
             Expression("ENTIRE_WORKTOP");
     `;
