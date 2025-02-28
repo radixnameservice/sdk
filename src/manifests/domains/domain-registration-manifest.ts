@@ -3,8 +3,6 @@ import RnsSDK from "../..";
 
 import { getWellKnownAddresses } from "../../utils/gateway.utils";
 
-import { UserDetailsI } from "../../common/user.types";
-
 
 export default async function registerDomainManifest({
     sdkInstance,

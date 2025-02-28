@@ -7,8 +7,7 @@ import { normaliseManifest } from '../utils';
 
 const mocks = {
     userDetails: {
-        accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p',
-        badgeId: '#1'
+        accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
     },
     callbacks: {},
     intentHash: 'txid_tdx_2_1p9j7njn5wuagry6j8mrmkvhhwvttskq2cy4e5nk2wpexhqjav2dszpptsr'
@@ -62,7 +61,7 @@ describe('RNS - Activate Domain', () => {
 
         const activate = await rns.activateDomain({
             domain: "radixnameservice.xrd",
-            userDetails: mocks.userDetails
+            accountAddress: mocks.userDetails.accountAddress
         });
 
         if ('errors' in activate) {
