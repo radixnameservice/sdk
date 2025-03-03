@@ -31,6 +31,7 @@ import { RecordDocketI, ContextT } from './common/record.types';
 import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
+import { RegistrarDetailsI } from './common/registrar.types';
 
 export {
     RnsSDKConfigI,
@@ -48,7 +49,8 @@ export {
     ErrorI,
     CommitmentStackResponseI,
     ErrorStackResponseI,
-    EventCallbacksI
+    EventCallbacksI,
+    RegistrarDetailsI
 };
 
 interface RnsSDKConfigI {
@@ -267,7 +269,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async registerDomain({ domain, durationYears = 1, accountAddress, callbacks }: { domain: string; durationYears?: number; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async registerDomain({ domain, durationYears = 1, accountAddress, registrarDetails, callbacks }: { domain: string; durationYears?: number; accountAddress: string; registrarDetails?: RegistrarDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
