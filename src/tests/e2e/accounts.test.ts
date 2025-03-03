@@ -15,7 +15,7 @@ describe('RNS - Verify Domain Owner Accounts', () => {
 
         expect(Array.isArray(ownerDomains)).toBe(true);
         expect(ownerDomains.length).toBeGreaterThan(0);
-        expect(ownerDomains.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'last_valid_timestamp', 'key_image_url', 'address']))).toBe(true);
+        expect(ownerDomains.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'key_image_url', 'address']))).toBe(true);
 
     });
 

@@ -171,10 +171,6 @@ function filterSubdomains(
                     return { ...acc, [field.field_name]: +field.value * 1000 };
                 }
 
-                if (field.field_name === 'last_valid_timestamp' && field.kind === 'Enum' && field.variant_name !== 'None' && field.fields[0].kind === 'I64') {
-                    return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
-                }
-
                 return acc;
 
             }, { id: r.non_fungible_id } as SubDomainI);
@@ -219,10 +215,6 @@ function formatDomainList(
 
                 if (field.field_name === 'created_timestamp' && field.kind === 'I64') {
                     return { ...acc, [field.field_name]: +field.value * 1000 };
-                }
-
-                if (field.field_name === 'last_valid_timestamp' && field.kind === 'Enum' && field.variant_name !== 'None' && field.fields[0].kind === 'I64') {
-                    return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
                 }
 
                 if (field.kind === 'Enum' && field.field_name === 'address') {
@@ -340,10 +332,6 @@ export async function requestDomainDetails(
 
             if (field.field_name === 'created_timestamp' && field.kind === 'I64') {
                 return { ...acc, [field.field_name]: +field.value * 1000 };
-            }
-
-            if (field.field_name === 'last_valid_timestamp' && field.kind === 'Enum' && field.variant_name !== 'None' && field.fields[0].kind === 'I64') {
-                return { ...acc, [field.field_name]: +field.fields[0].value * 1000 };
             }
 
             if (field.field_name === 'address' && field.kind === 'Enum') {
