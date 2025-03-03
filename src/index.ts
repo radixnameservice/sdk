@@ -5,7 +5,6 @@ import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
-import { getUserBadgeId } from './requests/user/badges';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
@@ -25,7 +24,6 @@ import { deriveRootDomain, validateDomain, validateSubdomain } from './utils/dom
 import { dataResponse, errorStack } from './utils/response.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
-import { UserDetailsI } from './common/user.types';
 import { EventCallbacksI } from './common/transaction.types';
 import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
@@ -52,8 +50,7 @@ export {
     ErrorI,
     CommitmentStackResponseI,
     ErrorStackResponseI,
-    EventCallbacksI,
-    UserDetailsI
+    EventCallbacksI
 };
 
 interface RnsSDKConfigI {
@@ -271,18 +268,8 @@ export default class RnsSDK {
 
     }
 
-    @requireDependencies('read-only')
-    async getUserBadge({ accountAddress }: { accountAddress: string }): Promise<UserBadgeResponseT | ErrorStackResponseI> {
-
-        return getUserBadgeId({
-            sdkInstance: this,
-            accountAddress
-        });
-
-    }
-
     @requireDependencies('full')
-    async registerDomain({ domain, durationYears = 1, userDetails, callbacks }: { domain: string; durationYears?: number; userDetails: UserDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async registerDomain({ domain, durationYears = 1, accountAddress, callbacks }: { domain: string; durationYears?: number; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
@@ -296,14 +283,14 @@ export default class RnsSDK {
             domain,
             durationYears,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             callbacks
         });
 
     }
 
     @requireDependencies('full')
-    async activateDomain({ domain, userDetails, callbacks }: { domain: string; userDetails: UserDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async activateDomain({ domain, accountAddress, callbacks }: { domain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -315,7 +302,7 @@ export default class RnsSDK {
         return dispatchDomainActivation({
             sdkInstance: this,
             domainDetails,
-            userDetails,
+            accountAddress,
             rdt: this.rdt,
             callbacks
         });
@@ -323,7 +310,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async createSubdomain({ subdomain, accountAddress, callbacks }: { subdomain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const rootDomainDetails = await requestDomainDetails(deriveRootDomain(subdomain), { sdkInstance: this });
 
@@ -337,14 +324,14 @@ export default class RnsSDK {
             subdomain,
             rootDomainDetails,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             callbacks
         });
 
     }
 
     @requireDependencies('full')
-    async deleteSubdomain({ subdomain, userDetails, callbacks }: { subdomain: string; userDetails: UserDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async deleteSubdomain({ subdomain, accountAddress, callbacks }: { subdomain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const rootDomainDetails = await requestDomainDetails(deriveRootDomain(subdomain), { sdkInstance: this });
 
@@ -358,7 +345,7 @@ export default class RnsSDK {
             subdomain,
             rootDomainDetails,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             callbacks
         });
 
@@ -377,7 +364,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserDetailsI; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async createRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -389,7 +376,7 @@ export default class RnsSDK {
         return dispatchRecordCreation({
             sdkInstance: this,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             domainDetails,
             docket,
             proofs,
@@ -399,7 +386,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async amendRecord({ domain, userDetails, docket, proofs, callbacks }: { domain: string; userDetails: UserDetailsI; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async amendRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -411,7 +398,7 @@ export default class RnsSDK {
         return dispatchRecordAmendment({
             sdkInstance: this,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             domainDetails,
             docket,
             proofs,
@@ -421,7 +408,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async deleteRecord({ domain, userDetails, docket, callbacks }: { domain: string; userDetails: UserDetailsI; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async deleteRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -433,7 +420,7 @@ export default class RnsSDK {
         return dispatchRecordDeletion({
             sdkInstance: this,
             rdt: this.rdt,
-            userDetails,
+            accountAddress,
             domainDetails,
             docket,
             callbacks

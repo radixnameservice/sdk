@@ -14,7 +14,7 @@ import { AmendRecordDispatcherPropsI } from "../../common/dispatcher.types";
 export async function dispatchRecordAmendment({
     sdkInstance,
     rdt,
-    userDetails,
+    accountAddress,
     docket,
     domainDetails,
     callbacks,
@@ -27,7 +27,7 @@ export async function dispatchRecordAmendment({
 
         const manifest = recordUpdateManifest({
             sdkInstance,
-            userDetails,
+            accountAddress,
             recordDocket: docket,
             rootDomainId: domainDetails.id,
             recordId,

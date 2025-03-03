@@ -4,27 +4,26 @@ import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.u
 
 import { ProofsI } from "../../common/entities.types";
 import { RecordDocketI } from "../../common/record.types";
-import { UserDetailsI } from "../../common/user.types";
 
 export function recordCreationManifest({
     sdkInstance,
-    userDetails,
+    accountAddress,
     rootDomainId,
     recordDocket,
     proofs = {}
 }: {
     sdkInstance: RnsSDK;
-    userDetails: UserDetailsI;
+    accountAddress: string;
     rootDomainId: string;
     recordDocket: RecordDocketI;
     proofs?: ProofsI;
 }): string {
 
     const nonFungibleProofs = proofs.nonFungibles
-        ? buildNonFungibleProofs(proofs.nonFungibles, userDetails.accountAddress)
+        ? buildNonFungibleProofs(proofs.nonFungibles, accountAddress)
         : [];
     const fungibleProofs = proofs.fungibles
-        ? buildFungibleProofs(proofs.fungibles, userDetails.accountAddress)
+        ? buildFungibleProofs(proofs.fungibles, accountAddress)
         : [];
     const idAdditions = proofs.idAdditions || [];
 
@@ -39,7 +38,7 @@ export function recordCreationManifest({
         ${nonFungibleProofs.map(proof => proof.manifest).join('')}
         ${fungibleProofs.map(proof => proof.manifest).join('')}
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
@@ -64,7 +63,7 @@ export function recordCreationManifest({
             Proof("request_proof")
             Enum<0u8>();
         CALL_METHOD
-            Address("${userDetails.accountAddress}")
+            Address("${accountAddress}")
             "deposit_batch"
             Expression("ENTIRE_WORKTOP");
     `;

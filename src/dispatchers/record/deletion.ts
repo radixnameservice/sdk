@@ -13,7 +13,7 @@ import { docketToRecordId } from "../../utils/record.utils";
 export async function dispatchRecordDeletion({
     sdkInstance,
     rdt,
-    userDetails,
+    accountAddress,
     domainDetails,
     docket,
     callbacks
@@ -25,7 +25,7 @@ export async function dispatchRecordDeletion({
 
         const manifest = recordDeletionManifest({
             sdkInstance,
-            userDetails,
+            accountAddress,
             rootDomainId: domainDetails.id,
             recordId
         });

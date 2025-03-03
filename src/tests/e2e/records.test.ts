@@ -10,8 +10,7 @@ const mocks = {
         name: "radixnameservice.xrd"
     },
     userDetails: {
-        accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p',
-        badgeId: '#1'
+        accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
     },
     proofs: {
         nonFungibles: [
@@ -167,7 +166,7 @@ describe('RNS - Manage Domain Records', () => {
 
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
-            userDetails: mocks.userDetails,
+            accountAddress: mocks.userDetails.accountAddress,
             docket: mocks.docket as RecordDocketI
         });
 
@@ -217,7 +216,7 @@ describe('RNS - Manage Domain Records', () => {
 
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
-            userDetails: mocks.userDetails,
+            accountAddress: mocks.userDetails.accountAddress,
             docket: mocks.docket as RecordDocketI,
             proofs: mocks.proofs
         });
@@ -277,7 +276,7 @@ describe('RNS - Manage Domain Records', () => {
 
         const amendRecord = await rns.amendRecord({
             domain: mocks.domain.name,
-            userDetails: mocks.userDetails,
+            accountAddress: mocks.userDetails.accountAddress,
             docket: mocks.docket as RecordDocketI
         });
 
@@ -322,7 +321,7 @@ describe('RNS - Manage Domain Records', () => {
 
         const deleteRecord = await rns.amendRecord({
             domain: mocks.domain.name,
-            userDetails: mocks.userDetails,
+            accountAddress: mocks.userDetails.accountAddress,
             docket: mocks.docket as RecordDocketI,
             proofs: mocks.proofs
         });
@@ -377,7 +376,7 @@ describe('RNS - Manage Domain Records', () => {
 
         const deleteRecord = await rns.deleteRecord({
             domain: mocks.domain.name,
-            userDetails: mocks.userDetails,
+            accountAddress: mocks.userDetails.accountAddress,
             docket: mocks.docket as RecordDocketI
         });
 
