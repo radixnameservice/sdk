@@ -352,18 +352,6 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async issueUserBadge({ accountAddress, callbacks }: { accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
-
-        return dispatchUserBadgeIssuance({
-            sdkInstance: this,
-            rdt: this.rdt,
-            accountAddress,
-            callbacks
-        });
-
-    }
-
-    @requireDependencies('full')
     async createRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
