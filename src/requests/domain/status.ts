@@ -155,12 +155,6 @@ async function requestDomainProperties(domainName: string, { sdkInstance }: Inst
             throw new Error(domain.message);
 
         if (domain) {
-            if (new Date().getTime() >= domain.last_valid_timestamp) {
-                return {
-                    status: DomainStatus.Unclaimed
-                }
-            }
-
             return {
                 status: DomainStatus.Claimed
             };
