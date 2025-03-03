@@ -20,7 +20,7 @@ import { parameterProcessMap } from './mappings/sdk-processors';
 
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
-import { deriveRootDomain, validateDomain } from './utils/domain.utils';
+import { deriveRootDomain, validateDomain, validateSubdomain } from './utils/domain.utils';
 import { dataResponse, errorStack } from './utils/response.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
@@ -432,6 +432,14 @@ export default class RnsSDK {
 
         validateDomain({ domain }: { domain: string }): true | ErrorI {
             return validateDomain(domain);
+        },
+
+        validateSubdomain({ subdomain }: { subdomain: string }): true | ErrorI {
+            return validateSubdomain(subdomain);
+        },
+
+        getRootFromSubdomain({ subdomain }: { subdomain: string }): string | null {
+            return deriveRootDomain(subdomain);
         }
 
     };
