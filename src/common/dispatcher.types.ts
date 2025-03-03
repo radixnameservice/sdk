@@ -13,12 +13,6 @@ export interface DispatcherPropsI extends InstancePropsI {
 
 }
 
-export interface UserBadgeDispatcherPropsI extends DispatcherPropsI {
-
-    accountAddress: string;
-
-}
-
 export interface RegistrationDispatcherPropsI extends DispatcherPropsI {
 
     domain: string;

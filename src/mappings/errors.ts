@@ -188,30 +188,6 @@ const subdomain = {
 
 };
 
-const badge = {
-
-    issuance: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
-
-        return {
-            code: "USER_BADGE_ISSUANCE_FAILED",
-            error: `An error occurred when attempting to issue an RNS user badge to account: ${accountAddress}.`,
-            verbose
-        };
-
-    },
-
-    generic: ({ accountAddress, verbose = null }: ErrorGenerationI & { accountAddress: string }): ErrorI => {
-
-        return {
-            code: "USER_BADGE_REQUEST_FAILED",
-            error: `An error occurred when attempting to fetch an RNS user badge: ${accountAddress}.`,
-            verbose
-        };
-
-    }
-
-};
-
 const record = {
 
     creation: ({ docket, verbose = null }: ErrorGenerationI & { docket: RecordDocketI }): ErrorI => {
@@ -256,4 +232,4 @@ const record = {
 
 };
 
-export default { request, account, registration, activation, domain, subdomain, badge, record }
+export default { request, account, registration, activation, domain, subdomain, record }

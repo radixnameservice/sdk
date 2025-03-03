@@ -6,7 +6,6 @@ import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
-import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
 import { dispatchRecordDeletion } from './dispatchers/record/deletion';
 import { dispatchRecordAmendment } from './dispatchers/record/amendment';
@@ -29,7 +28,7 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
-import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, UserBadgeResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
+import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 
@@ -45,7 +44,6 @@ export {
     DomainDataI,
     CheckAuthenticityResponseT,
     ResolvedRecordResponseI,
-    UserBadgeResponseT,
     ProofsI,
     ErrorI,
     CommitmentStackResponseI,
