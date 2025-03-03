@@ -6,7 +6,6 @@ import { requestRecords, resolveRecord } from './requests/domain/records';
 import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
-import { dispatchUserBadgeIssuance } from './dispatchers/user/badge-management';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
 import { dispatchRecordDeletion } from './dispatchers/record/deletion';
 import { dispatchRecordAmendment } from './dispatchers/record/amendment';
@@ -29,9 +28,10 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
-import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, UserBadgeResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
+import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
+import { RegistrarDetailsI } from './common/registrar.types';
 
 export {
     RnsSDKConfigI,
@@ -45,12 +45,12 @@ export {
     DomainDataI,
     CheckAuthenticityResponseT,
     ResolvedRecordResponseI,
-    UserBadgeResponseT,
     ProofsI,
     ErrorI,
     CommitmentStackResponseI,
     ErrorStackResponseI,
-    EventCallbacksI
+    EventCallbacksI,
+    RegistrarDetailsI
 };
 
 interface RnsSDKConfigI {
@@ -269,7 +269,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async registerDomain({ domain, durationYears = 1, accountAddress, callbacks }: { domain: string; durationYears?: number; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async registerDomain({ domain, durationYears = 1, accountAddress, registrarDetails, callbacks }: { domain: string; durationYears?: number; accountAddress: string; registrarDetails?: RegistrarDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
@@ -344,18 +344,6 @@ export default class RnsSDK {
             sdkInstance: this,
             subdomain,
             rootDomainDetails,
-            rdt: this.rdt,
-            accountAddress,
-            callbacks
-        });
-
-    }
-
-    @requireDependencies('full')
-    async issueUserBadge({ accountAddress, callbacks }: { accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
-
-        return dispatchUserBadgeIssuance({
-            sdkInstance: this,
             rdt: this.rdt,
             accountAddress,
             callbacks
