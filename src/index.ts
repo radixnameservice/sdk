@@ -50,7 +50,8 @@ export {
     CommitmentStackResponseI,
     ErrorStackResponseI,
     EventCallbacksI,
-    RegistrarDetailsI
+    RegistrarDetailsI,
+    NetworkT
 };
 
 interface RnsSDKConfigI {
