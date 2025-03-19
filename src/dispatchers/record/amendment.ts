@@ -17,8 +17,7 @@ export async function dispatchRecordAmendment({
     accountAddress,
     docket,
     domainDetails,
-    callbacks,
-    proofs // Optional parameter for additional proofs
+    callbacks
 }: AmendRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {
@@ -30,8 +29,7 @@ export async function dispatchRecordAmendment({
             accountAddress,
             recordDocket: docket,
             rootDomainId: domainDetails.id,
-            recordId,
-            proofs
+            recordId
         });
 
         const dispatch = await sendTransaction({

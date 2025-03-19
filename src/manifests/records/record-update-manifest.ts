@@ -1,8 +1,6 @@
 import RnsSDK from "../..";
 
 import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
-
-import { ProofsI } from "../../common/entities.types";
 import { RecordDocketI } from "../../common/record.types";
 
 export function recordUpdateManifest({
@@ -10,23 +8,23 @@ export function recordUpdateManifest({
     accountAddress,
     rootDomainId,
     recordDocket,
-    recordId,
-    proofs = {}
+    recordId
 }: {
     sdkInstance: RnsSDK;
     accountAddress: string;
     rootDomainId: string;
     recordDocket: RecordDocketI;
     recordId: string;
-    proofs?: ProofsI;
 }): string {
 
-    const nonFungibleProofs = proofs.nonFungibles
-        ? buildNonFungibleProofs(proofs.nonFungibles, accountAddress)
-        : [];
-    const fungibleProofs = proofs.fungibles
-        ? buildFungibleProofs(proofs.fungibles, accountAddress)
-        : [];
+    let nonFungibleProofs = [];
+    let fungibleProofs = [];
+
+    if (recordDocket.proven && typeof recordDocket.value !== "string") {
+        nonFungibleProofs = buildNonFungibleProofs(recordDocket.value.nonFungibles, accountAddress);
+        fungibleProofs = buildFungibleProofs(recordDocket.value.fungibles, accountAddress);
+    }
+
     const methodName =
         nonFungibleProofs.length > 0 || fungibleProofs.length > 0
             ? "update_proven_record"
@@ -52,8 +50,7 @@ export function recordUpdateManifest({
             ? `Array<Proof>(
         ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
         ${fungibleProofs.map(proof => proof.proofIds).join(',')}
-        )`
-            : ""}
+        )` : ""}
         "${recordDocket.value}"
         Proof("requester_proof")
         Enum<0u8>();

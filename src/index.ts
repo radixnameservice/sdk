@@ -353,7 +353,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async createRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -368,14 +368,13 @@ export default class RnsSDK {
             accountAddress,
             domainDetails,
             docket,
-            proofs,
             callbacks
         });
 
     }
 
     @requireDependencies('full')
-    async amendRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async amendRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -390,7 +389,6 @@ export default class RnsSDK {
             accountAddress,
             domainDetails,
             docket,
-            proofs,
             callbacks
         });
 
