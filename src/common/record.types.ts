@@ -1,13 +1,6 @@
+import { ProofsI } from "..";
+
 export type ContextT = "receivers" | "delegation" | "navigation" | "social" | "discovery" | "widgets";
-
-export interface RecordDocketI {
-
-    context: ContextT;
-    directive?: string;
-    platformIdentifier?: string;
-    value: string;
-
-}
 
 export interface RecordItemI {
     record_id: string;
@@ -21,13 +14,20 @@ export interface RecordItemI {
 
 export interface DocketPropsI {
 
-    context?: string;
+    context: ContextT;
     directive?: string;
     proven?: boolean;
 
 }
+
+export interface RecordDocketI extends DocketPropsI {
+
+    platformIdentifier?: string;
+    value: string | ProofsI;
+
+}
+
 export interface RemovalPreferencesI {
     deleteSubdomains: boolean;
     deleteRecords: boolean;
 }
-
