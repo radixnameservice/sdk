@@ -141,5 +141,4 @@ export interface NonFungibleProofItemI {
 export interface ProofsI {
     fungibles?: FungibleProofItemI[];
     nonFungibles?: NonFungibleProofItemI[];
-    idAdditions?: string[];
 }
