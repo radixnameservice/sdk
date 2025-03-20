@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon",
-    "start": "ts-node ./src/index.ts",
+    "start": "node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node ./src/index.ts",
     "build": "tsup"
   },
   "main": "./dist/index.cjs",
@@ -30,9 +30,10 @@
   "dependencies": {
     "@radixdlt/babylon-gateway-api-sdk": "^1.9.2",
     "@radixdlt/radix-dapp-toolkit": "^2.2.1",
-    "@radixdlt/radix-engine-toolkit": "^1.0.5",
+    "bech32": "^2.0.0",
     "buffer": "^6.0.3",
-    "crypto-js": "^4.2.0"
+    "crypto-js": "^4.2.0",
+    "decimal.js": "^10.5.0"
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
@@ -41,6 +42,7 @@
     "node-fetch": "^3.3.2",
     "nodemon": "^3.0.2",
     "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.2",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   }
