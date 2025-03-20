@@ -1,5 +1,4 @@
 import Decimal from "decimal.js";
-import { Convert } from "@radixdlt/radix-engine-toolkit";
 import { ProgrammaticScryptoSborValueMap } from "@radixdlt/babylon-gateway-api-sdk";
 
 import { stripExtension } from "./domain.utils";
@@ -18,7 +17,7 @@ export function convertToNormalisedPrice(usd: number, years: number, usdXrdRate:
 
 export function normaliseXrd(xrd: number) {
 
-    return Convert.String.toDecimal(xrd.toString());
+    return convertToDecimal(xrd.toString());
 
 }
 
