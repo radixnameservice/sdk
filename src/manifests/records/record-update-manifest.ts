@@ -1,9 +1,8 @@
 import RnsSDK from "../..";
 
 import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
-
-import { ProofsI } from "../../common/entities.types";
 import { RecordDocketI } from "../../common/record.types";
+import { ProofsI } from "../../common/entities.types";
 
 export function recordUpdateManifest({
     sdkInstance,
@@ -52,8 +51,7 @@ export function recordUpdateManifest({
             ? `Array<Proof>(
         ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
         ${fungibleProofs.map(proof => proof.proofIds).join(',')}
-        )`
-            : ""}
+        )` : ""}
         "${recordDocket.value}"
         Proof("requester_proof")
         Enum<0u8>();

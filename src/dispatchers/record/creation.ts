@@ -14,8 +14,8 @@ export async function dispatchRecordCreation({
     accountAddress,
     domainDetails,
     docket,
-    callbacks,
-    proofs // Optional parameter for additional proofs
+    proofs,
+    callbacks
 }: CreateRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {

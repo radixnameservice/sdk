@@ -1,9 +1,8 @@
 import RnsSDK from "../..";
 
 import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
-
-import { ProofsI } from "../../common/entities.types";
 import { RecordDocketI } from "../../common/record.types";
+import { ProofsI } from "../../common/entities.types";
 
 export function recordCreationManifest({
     sdkInstance,
@@ -25,14 +24,11 @@ export function recordCreationManifest({
     const fungibleProofs = proofs.fungibles
         ? buildFungibleProofs(proofs.fungibles, accountAddress)
         : [];
-    const idAdditions = proofs.idAdditions || [];
-
 
     const methodName =
         nonFungibleProofs.length > 0 || fungibleProofs.length > 0
             ? "create_proven_record"
             : "create_record";
-
 
     return `
         ${nonFungibleProofs.map(proof => proof.manifest).join('')}
@@ -53,7 +49,7 @@ export function recordCreationManifest({
             "${recordDocket.context}"
             ${recordDocket.directive.trim().length > 0 ? `Enum<1u8>("${recordDocket.directive}")` : "Enum<0u8>()"}
             ${recordDocket.platformIdentifier.trim().length > 0 ? `Enum<1u8>("${recordDocket.platformIdentifier}")` : "Enum<0u8>()"}
-            Array<String>(${idAdditions.map(id => `"${id}"`).join(',')})
+            Array<String>("")
             ${methodName === "create_proven_record"
             ? `Array<Proof>(
                 ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}

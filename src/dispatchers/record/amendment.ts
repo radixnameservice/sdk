@@ -16,9 +16,9 @@ export async function dispatchRecordAmendment({
     rdt,
     accountAddress,
     docket,
+    proofs,
     domainDetails,
-    callbacks,
-    proofs // Optional parameter for additional proofs
+    callbacks
 }: AmendRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
     try {

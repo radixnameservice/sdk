@@ -48,6 +48,7 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                     if (typeof descriptor.value === 'function') {
                         const originalMethod = descriptor.value;
                         descriptor.value = async function (...methodArgs: any[]) {
+
                             // We assume the method takes a single object as its first argument.
                             if (methodArgs.length && typeof methodArgs[0] === 'object') {
                                 const argObj = methodArgs[0];
@@ -60,13 +61,13 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
 
                                         // Normalize the value if a normalization function is provided.
                                         if (config.normalize) {
-                                            const normalizedValue = await config.normalize(argObj[key]);
+                                            const normalizedValue = await config.normalize(argObj[key], this);
                                             argObj[key] = normalizedValue;
                                         }
 
                                         // Validate the value if a validation function is provided.
                                         if (config.validate) {
-                                            const result = await config.validate(argObj[key]);
+                                            const result = await config.validate(argObj[key], this);
                                             if (result !== true) {
                                                 validationErrors.push(result);
                                             }

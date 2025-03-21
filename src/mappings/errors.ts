@@ -33,7 +33,7 @@ const account = {
 
         return {
             code: "INVALID_ACCOUNT_ADDRESS",
-            error: `The Radix account address entered is invalid: ${accountAddress}.`,
+            error: `The Radix account address entered is invalid: ${accountAddress}`,
             verbose
         };
 
