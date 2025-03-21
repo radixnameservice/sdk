@@ -1,4 +1,4 @@
-import { ProofsI } from "..";
+import { ProofsI } from "../common/entities.types";
 
 export type ContextT = "receivers" | "delegation" | "navigation" | "social" | "discovery" | "widgets";
 
@@ -9,7 +9,6 @@ export interface RecordItemI {
     context: ContextT;
     value: string | null;
     directive?: string;
-    id_additions: string[];
 }
 
 export interface DocketPropsI {

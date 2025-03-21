@@ -51,11 +51,7 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
                                 return { ...acc, [field.field_name]: value }
                             }
                         }
-
-                        if (field.field_name === 'id_additions' && field.kind === 'Array') {
-                            return { ...acc, [field.field_name]: field.elements.map(e => ('value' in e && e.value) as string) }
-                        }
-
+                        
                         if (field.field_name === 'value' && field.kind === 'Enum') {
                             const value = (('fields' in field && 'value' in field.fields[0] && field.fields[0].value) || null) as string | null;
                             return { ...acc, [field.field_name]: value }
