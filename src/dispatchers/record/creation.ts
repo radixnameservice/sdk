@@ -14,6 +14,7 @@ export async function dispatchRecordCreation({
     accountAddress,
     domainDetails,
     docket,
+    proofs,
     callbacks
 }: CreateRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
 
@@ -23,7 +24,8 @@ export async function dispatchRecordCreation({
             sdkInstance,
             accountAddress,
             rootDomainId: domainDetails.id,
-            recordDocket: docket
+            recordDocket: docket,
+            proofs
         });
 
         const dispatch = await sendTransaction({

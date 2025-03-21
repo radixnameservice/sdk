@@ -2,29 +2,30 @@ import RnsSDK from "../..";
 
 import { buildFungibleProofs, buildNonFungibleProofs } from "../../utils/proof.utils";
 import { RecordDocketI } from "../../common/record.types";
+import { ProofsI } from "../../common/entities.types";
 
 export function recordUpdateManifest({
     sdkInstance,
     accountAddress,
     rootDomainId,
     recordDocket,
-    recordId
+    recordId,
+    proofs = {}
 }: {
     sdkInstance: RnsSDK;
     accountAddress: string;
     rootDomainId: string;
     recordDocket: RecordDocketI;
     recordId: string;
+    proofs?: ProofsI;
 }): string {
 
-    let nonFungibleProofs = [];
-    let fungibleProofs = [];
-
-    if (recordDocket.proven && typeof recordDocket.value !== "string") {
-        nonFungibleProofs = buildNonFungibleProofs(recordDocket.value.nonFungibles, accountAddress);
-        fungibleProofs = buildFungibleProofs(recordDocket.value.fungibles, accountAddress);
-    }
-
+    const nonFungibleProofs = proofs.nonFungibles
+        ? buildNonFungibleProofs(proofs.nonFungibles, accountAddress)
+        : [];
+    const fungibleProofs = proofs.fungibles
+        ? buildFungibleProofs(proofs.fungibles, accountAddress)
+        : [];
     const methodName =
         nonFungibleProofs.length > 0 || fungibleProofs.length > 0
             ? "update_proven_record"

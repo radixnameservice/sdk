@@ -86,7 +86,7 @@ describe('RNS - Fetch Domain Records', () => {
         expect(Array.isArray(records)).toBe(true);
         expect(records.length).toBeGreaterThan(0);
 
-        if (!matchObjectTypes<RecordItemI>(records[0], ['record_id', 'id_additions', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
+        if (!matchObjectTypes<RecordItemI>(records[0], ['record_id', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
             throw new Error('Record did not match expected schema');
         }
 
@@ -197,7 +197,7 @@ describe('RNS - Manage Domain Records', () => {
                 "${mocks.docket.context}"
                 Enum<1u8>("${mocks.docket.directive}")
                 Enum<1u8>("${mocks.docket.platformIdentifier}")
-                Array<String>()
+                Array<String>("")
                 "${mocks.docket.value}"
                 Proof("request_proof")
                 Enum<0u8>();
@@ -217,7 +217,7 @@ describe('RNS - Manage Domain Records', () => {
         const createRecord = await rns.createRecord({
             domain: mocks.domain.name,
             accountAddress: mocks.userDetails.accountAddress,
-            docket: mocks.docket as RecordDocketI,
+            docket: { ...mocks.docket, proven: true } as RecordDocketI,
             proofs: mocks.proofs
         });
 
@@ -253,7 +253,7 @@ describe('RNS - Manage Domain Records', () => {
                 "${mocks.docket.context}"
                 Enum<1u8>("${mocks.docket.directive}")
                 Enum<1u8>("${mocks.docket.platformIdentifier}")
-                Array<String>()
+                Array<String>("")
                 Array<Proof>(
                     ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                     ${fungibleProofs.map(proof => proof.proofIds).join(',')}
@@ -322,7 +322,7 @@ describe('RNS - Manage Domain Records', () => {
         const deleteRecord = await rns.amendRecord({
             domain: mocks.domain.name,
             accountAddress: mocks.userDetails.accountAddress,
-            docket: mocks.docket as RecordDocketI,
+            docket: { ...mocks.docket, proven: true } as RecordDocketI,
             proofs: mocks.proofs
         });
 

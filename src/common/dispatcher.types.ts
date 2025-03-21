@@ -1,7 +1,7 @@
 import { RadixDappToolkit } from "@radixdlt/radix-dapp-toolkit";
 
 import { EventCallbacksI } from "./transaction.types";
-import { InstancePropsI } from "./entities.types";
+import { InstancePropsI, ProofsI } from "./entities.types";
 import { RecordDocketI, DocketPropsI } from "./record.types";
 import { DomainDataI } from "./domain.types";
 
@@ -41,14 +41,7 @@ export interface CreateRecordDispatcherPropsI extends DispatcherPropsI {
     accountAddress: string;
     domainDetails: DomainDataI;
     docket: RecordDocketI;
-
-}
-
-export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
-
-    accountAddress: string;
-    domainDetails: DomainDataI;
-    docket: DocketPropsI;
+    proofs: ProofsI;
 
 }
 
@@ -57,5 +50,14 @@ export interface AmendRecordDispatcherPropsI extends DispatcherPropsI {
     accountAddress: string;
     domainDetails: DomainDataI;
     docket: RecordDocketI;
+    proofs: ProofsI;
+
+}
+
+export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
+
+    accountAddress: string;
+    domainDetails: DomainDataI;
+    docket: DocketPropsI;
 
 }
