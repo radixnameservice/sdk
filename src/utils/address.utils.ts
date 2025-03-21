@@ -3,13 +3,13 @@ import errors from "../mappings/errors";
 import { ErrorI } from "../common/response.types";
 import { NetworkT } from "../common/gateway.types";
 
-export function validateAccountAddress({ accountAddress, network }: { accountAddress: string; network?: NetworkT }): true | ErrorI {
+export function validateAccountAddress(accountAddress: string, options?: { network?: NetworkT }): true | ErrorI {
 
     if (!accountAddress.includes('account_'))
         return errors.account.invalidAddress({ accountAddress });
 
     try {
-        validateRadixAddress({ address: accountAddress, network });
+        validateRadixAddress({ address: accountAddress, network: options?.network });
     } catch (e) {
         return errors.account.invalidAddress({ accountAddress, verbose: e.message });
     }

@@ -21,6 +21,7 @@ import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
 import { deriveRootDomain, validateDomain, validateSubdomain } from './utils/domain.utils';
 import { dataResponse, errorStack } from './utils/response.utils';
+import { validateAccountAddress } from './utils/address.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
 import { EventCallbacksI } from './common/transaction.types';
@@ -353,7 +354,12 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async createRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+
+        if (docket.proven && !proofs?.fungibles && !proofs?.nonFungibles)
+            return errorStack(errors.record.creation({ docket, verbose: 'Docket is specified as "proven", however, no "proofs" value is specified.' }));
+        if (!docket.proven && (proofs?.fungibles || proofs?.nonFungibles))
+            return errorStack(errors.record.creation({ docket, verbose: 'Docket is specified as NOT "proven", however, a "proofs" value is specified.' }));
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -368,13 +374,19 @@ export default class RnsSDK {
             accountAddress,
             domainDetails,
             docket,
+            proofs,
             callbacks
         });
 
     }
 
     @requireDependencies('full')
-    async amendRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async amendRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+
+        if (docket.proven && !proofs)
+            return errorStack(errors.record.amendment({ docket, verbose: 'Docket is specified as "proven", however, no "proofs" value is specified.' }));
+        if (!docket.proven && proofs)
+            return errorStack(errors.record.amendment({ docket, verbose: 'Docket is specified as NOT "proven", however, a "proofs" value is specified.' }));
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -389,6 +401,7 @@ export default class RnsSDK {
             accountAddress,
             domainDetails,
             docket,
+            proofs,
             callbacks
         });
 
@@ -423,6 +436,10 @@ export default class RnsSDK {
 
         validateSubdomain({ subdomain }: { subdomain: string }): true | ErrorI {
             return validateSubdomain(subdomain);
+        },
+
+        validateAccountAddress({ accountAddress }: { accountAddress: string }): true | ErrorI {
+            return validateAccountAddress(accountAddress, { network: this.network });
         },
 
         getRootFromSubdomain({ subdomain }: { subdomain: string }): string | null {
