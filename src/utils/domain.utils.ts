@@ -1,21 +1,27 @@
-import * as CryptoJS from 'crypto-js';
-import { Buffer } from 'buffer';
-
 import errors from '../mappings/errors';
 
 import { ErrorI } from '../common/response.types';
 
-
 export async function domainToNonFungId(name: string, isByteId = true) {
 
-    const data = CryptoJS.enc.Utf8.parse(name);
+    if (typeof globalThis.crypto === 'undefined') {
+        try {
+            const { webcrypto } = await import('crypto');
+            globalThis.crypto = webcrypto;
+        } catch (error) {
+            throw new Error('No suitable crypto module found in this environment.');
+        }
+    }
 
-    const hash = CryptoJS.SHA256(data);
-    const hashBuffer = Buffer.from(hash.toString(CryptoJS.enc.Hex), 'hex');
+    const encoder = new TextEncoder();
+    const data = encoder.encode(name);
 
-    const truncatedHashBuffer = hashBuffer.subarray(0, 16);
+    const digest = await globalThis.crypto.subtle.digest('SHA-256', data);
+    const hashArray = new Uint8Array(digest);
 
-    const hexString = Array.from(new Uint8Array(truncatedHashBuffer))
+    const truncatedHash = hashArray.slice(0, 16);
+
+    const hexString = Array.from(truncatedHash)
         .map(byte => byte.toString(16).padStart(2, '0'))
         .reverse()
         .join('');
