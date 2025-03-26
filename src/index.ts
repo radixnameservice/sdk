@@ -3,7 +3,7 @@ import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { requestAccountDomains, requestDomainDetails } from './requests/address/domains';
+import { requestAccountDomains, requestDomainDetails, requestSubDomainDetails } from './requests/address/domains';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
@@ -29,7 +29,7 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI, SubDomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
-import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
+import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI, SubDomainDetailsResponseT } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
@@ -38,6 +38,7 @@ export {
     RnsSDKConfigI,
     DomainAttributesResponseT,
     DomainDetailsResponseT,
+    SubDomainDetailsResponseT,
     DomainListResponseT,
     RecordListResponseT,
     RecordItemI,
@@ -188,6 +189,28 @@ export default class RnsSDK {
 
         if (!isAuthentic)
             return errorStack(errors.account.authenticityMismatch({ domain }));
+
+        return dataResponse(details);
+
+    }
+
+    @requireDependencies('read-only')
+    async getSubDomainDetails({ subdomain }: { subdomain: string }): Promise<SubDomainDetailsResponseT | ErrorStackResponseI> {
+
+        const details = await requestSubDomainDetails(subdomain, { sdkInstance: this });
+
+        if (details instanceof Error)
+            return errorStack(errors.subdomain.generic({ subdomain, verbose: details.message }));
+        if (!details)
+            return errorStack(errors.subdomain.empty({ subdomain }));
+
+        const isAuthentic = await this.checkAuthenticity({
+            domain: details.root_domain.name,
+            accountAddress: details.root_domain.address
+        });
+
+        if (!isAuthentic)
+            return errorStack(errors.account.authenticityMismatch({ domain: details.root_domain.name }));
 
         return dataResponse(details);
 
