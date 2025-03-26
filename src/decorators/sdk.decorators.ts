@@ -33,7 +33,7 @@ export function requireDependencies(mode: 'read-only' | 'full') {
     };
 }
 
-export function ProcessParameters(mapping: ParamProcessMapT) {
+export function ProcessParameters(methodGuardMap: ParamProcessMapT) {
     return function <T extends { new(...args: any[]): {} }>(constructor: T) {
         return class extends constructor {
             constructor(...args: any[]) {
@@ -54,8 +54,13 @@ export function ProcessParameters(mapping: ParamProcessMapT) {
                                 const argObj = methodArgs[0];
                                 const validationErrors: ErrorI[] = [];
 
-                                for (const key in mapping) {
-                                    const config = mapping[key];
+                                // Merge the default mapping with any method-specific override.
+                                const defaultMapping = methodGuardMap._default || {};
+                                const methodSpecificMapping = methodGuardMap[methodName] || {};
+                                const mergedMapping = { ...defaultMapping, ...methodSpecificMapping };
+
+                                for (const key in mergedMapping) {
+                                    const config = mergedMapping[key];
 
                                     if (Object.prototype.hasOwnProperty.call(argObj, key)) {
 
