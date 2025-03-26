@@ -8,5 +8,6 @@ export type ParamProcessConfigT = {
 };
 
 export type ParamProcessMapT = {
-    [key: string]: ParamProcessConfigT;
+    _default?: { [key: string]: ParamProcessConfigT };
+    [methodName: string]: { [key: string]: ParamProcessConfigT } | undefined;
 };
