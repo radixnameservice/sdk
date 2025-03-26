@@ -22,6 +22,7 @@ import {
 
 import {
     DomainDataI,
+    SubDomainDataI,
     SubDomainI
 } from "../../common/domain.types";
 
@@ -206,13 +207,7 @@ function formatDomainList(
                         return rootDomain === field.value;
                     });
 
-                    const supplementedSubdomains = filteredSubdomains.map((filteredSubdomain) => {
-
-                        return { ...filteredSubdomain, root_domain: deriveRootDomain(filteredSubdomain.name ?? '') };
-
-                    });
-
-                    return { ...acc, [field.field_name]: field.value, subdomains: supplementedSubdomains };
+                    return { ...acc, [field.field_name]: field.value, subdomains: filteredSubdomains };
                 }
 
                 if (field.kind === 'String' && field.field_name) {
@@ -357,3 +352,47 @@ export async function requestDomainDetails(
     }
 }
 
+export async function requestSubDomainDetails(
+
+    subdomain: string,
+    { sdkInstance }: InstancePropsI
+
+): Promise<SubDomainDataI | Error> {
+
+    try {
+
+        const subdomainId = await domainToNonFungId(subdomain);
+
+        const nftData = await sdkInstance.state.getNonFungibleData(
+            sdkInstance.entities.resources.collections.domains,
+            subdomainId
+        );
+
+        if (!nftData) return null;
+
+        const domain = deriveRootDomain(subdomain);
+        const rootDomainData = await requestDomainDetails(domain, { sdkInstance });
+
+        return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
+            if (field.kind === 'String' && field.field_name === 'name') {
+                return { ...acc, [field.field_name]: field.value };
+            }
+
+            if (field.kind === 'String' && field.field_name) {
+                return { ...acc, [field.field_name]: field.value };
+            }
+
+            if (field.field_name === 'created_timestamp' && field.kind === 'I64') {
+                return { ...acc, [field.field_name]: +field.value * 1000 };
+            }
+
+            return acc;
+        }, { id: nftData.non_fungible_id, root_domain: rootDomainData } as SubDomainDataI);
+
+    } catch (e) {
+
+        logger.error("requestDomainDetails", e);
+        return e;
+
+    }
+}
