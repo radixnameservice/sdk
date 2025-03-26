@@ -79,6 +79,35 @@ export function validateSubdomain(subdomain: string): true | ErrorI {
     return true;
 }
 
+export function validateDomainEntity(domainEntity: string): true | ErrorI {
+
+    const domainType = deriveDomainType(domainEntity);
+
+    if (typeof domainType !== 'string' && 'error' in domainType)
+        return domainType;
+
+    if (domainType === "root")
+        return validateDomain(domainEntity);
+
+    if (domainType === "sub")
+        return validateSubdomain(domainEntity);
+
+}
+
+export function deriveDomainType(domain: string): 'root' | 'sub' | ErrorI {
+
+    const parts = domain.split('.');
+
+    if (parts.length === 2 && parts[1] === 'xrd') {
+        return 'root';
+    } else if (parts.length === 3 && parts[2] === 'xrd') {
+        return 'sub';
+    }
+
+    return errors.domain.invalid({ domain, verbose: 'Domain type is neither a valid root domain nor subdomain.' });
+}
+
+
 export function normaliseDomain(domain: string) {
 
     return domain.trim().toLowerCase();
