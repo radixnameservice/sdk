@@ -201,12 +201,18 @@ function formatDomainList(
 
                 if (field.kind === 'String' && field.field_name === 'name') {
 
-                    const filteredSubdomain = subdomains.filter((s) => {
+                    const filteredSubdomains = subdomains.filter((s) => {
                         const rootDomain = deriveRootDomain(s?.name ?? '');
                         return rootDomain === field.value;
                     });
 
-                    return { ...acc, [field.field_name]: field.value, subdomains: filteredSubdomain };
+                    const supplementedSubdomains = filteredSubdomains.map((filteredSubdomain) => {
+
+                        return { ...filteredSubdomain, root_domain: deriveRootDomain(filteredSubdomain.name ?? '') };
+
+                    });
+
+                    return { ...acc, [field.field_name]: field.value, subdomains: supplementedSubdomains };
                 }
 
                 if (field.kind === 'String' && field.field_name) {
