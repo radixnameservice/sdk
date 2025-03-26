@@ -27,7 +27,7 @@ import { ProcessParameters, requireDependencies } from './decorators/sdk.decorat
 import { EventCallbacksI } from './common/transaction.types';
 import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
-import { DomainDataI } from './common/domain.types';
+import { DomainDataI, SubDomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
 import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
@@ -44,6 +44,7 @@ export {
     RecordDocketI,
     ContextT,
     DomainDataI,
+    SubDomainDataI,
     CheckAuthenticityResponseT,
     ResolvedRecordResponseI,
     ProofsI,
