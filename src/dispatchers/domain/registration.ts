@@ -7,7 +7,7 @@ import { getBasePrice } from "../../utils/pricing.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";
 
 import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
+import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
 
 
 export async function dispatchDomainRegistration({
@@ -17,7 +17,7 @@ export async function dispatchDomainRegistration({
     durationYears,
     accountAddress,
     callbacks
-}: RegistrationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+}: RegistrationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
 
     try {
 

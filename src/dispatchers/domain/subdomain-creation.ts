@@ -6,7 +6,7 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import { errorStack, successResponse } from "../../utils/response.utils";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
+import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
 
 
 export async function dispatchSubdomainCreation({
@@ -16,7 +16,7 @@ export async function dispatchSubdomainCreation({
     rdt,
     accountAddress,
     callbacks
-}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
 
     try {
 

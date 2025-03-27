@@ -29,7 +29,7 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI, SubDomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
-import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI, SubDomainDetailsResponseT } from './common/response.types';
+import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackI, RecordListResponseT, ResolvedRecordResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI, SubDomainDetailsResponseT } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
@@ -51,7 +51,7 @@ export {
     ProofsI,
     ErrorI,
     CommitmentStackResponseI,
-    ErrorStackResponseI,
+    ErrorStackI,
     EventCallbacksI,
     RegistrarDetailsI,
     NetworkT
@@ -161,7 +161,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getDomainStatus({ domain }: { domain: string }): Promise<DomainAttributesResponseT | ErrorStackResponseI> {
+    async getDomainStatus({ domain }: { domain: string }): Promise<DomainAttributesResponseT | ErrorStackI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
@@ -173,7 +173,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getDomainDetails({ domain }: { domain: string }): Promise<DomainDetailsResponseT | ErrorStackResponseI> {
+    async getDomainDetails({ domain }: { domain: string }): Promise<DomainDetailsResponseT | ErrorStackI> {
 
         const details = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -195,7 +195,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getSubDomainDetails({ subdomain }: { subdomain: string }): Promise<SubDomainDetailsResponseT | ErrorStackResponseI> {
+    async getSubDomainDetails({ subdomain }: { subdomain: string }): Promise<SubDomainDetailsResponseT | ErrorStackI> {
 
         const details = await requestSubDomainDetails(subdomain, { sdkInstance: this });
 
@@ -217,7 +217,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getRecords({ domain }: { domain: string }): Promise<RecordListResponseT | ErrorStackResponseI> {
+    async getRecords({ domain }: { domain: string }): Promise<RecordListResponseT | ErrorStackI> {
 
         const details = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -244,7 +244,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseT | ErrorStackResponseI> {
+    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseT | ErrorStackI> {
 
         const details = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -269,7 +269,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getAccountDomains({ accountAddress }: { accountAddress: string }): Promise<DomainListResponseT | ErrorStackResponseI> {
+    async getAccountDomains({ accountAddress }: { accountAddress: string }): Promise<DomainListResponseT | ErrorStackI> {
 
         const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
@@ -281,7 +281,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponseT | ErrorStackResponseI> {
+    async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<CheckAuthenticityResponseT | ErrorStackI> {
 
         const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
@@ -295,7 +295,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async registerDomain({ domain, durationYears = 1, accountAddress, registrarDetails, callbacks }: { domain: string; durationYears?: number; accountAddress: string; registrarDetails?: RegistrarDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async registerDomain({ domain, durationYears = 1, accountAddress, registrarDetails, callbacks }: { domain: string; durationYears?: number; accountAddress: string; registrarDetails?: RegistrarDetailsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         const attributes = await requestDomainStatus(domain, { sdkInstance: this });
 
@@ -316,7 +316,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async activateDomain({ domain, accountAddress, callbacks }: { domain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async activateDomain({ domain, accountAddress, callbacks }: { domain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 
@@ -336,7 +336,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createSubdomain({ subdomain, accountAddress, callbacks }: { subdomain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async createSubdomain({ subdomain, accountAddress, callbacks }: { subdomain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         const rootDomainDetails = await requestDomainDetails(deriveRootDomain(subdomain), { sdkInstance: this });
 
@@ -357,7 +357,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async deleteSubdomain({ subdomain, accountAddress, callbacks }: { subdomain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async deleteSubdomain({ subdomain, accountAddress, callbacks }: { subdomain: string; accountAddress: string; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         const rootDomainDetails = await requestDomainDetails(deriveRootDomain(subdomain), { sdkInstance: this });
 
@@ -378,7 +378,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async createRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async createRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         if (docket.proven && !proofs?.fungibles && !proofs?.nonFungibles)
             return errorStack(errors.record.creation({ docket, verbose: 'Docket is specified as "proven", however, no "proofs" value is specified.' }));
@@ -405,7 +405,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async amendRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async amendRecord({ domain, accountAddress, docket, proofs, callbacks }: { domain: string; accountAddress: string; docket: RecordDocketI; proofs?: ProofsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         if (docket.proven && !proofs)
             return errorStack(errors.record.amendment({ docket, verbose: 'Docket is specified as "proven", however, no "proofs" value is specified.' }));
@@ -432,7 +432,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('full')
-    async deleteRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+    async deleteRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<CommitmentStackResponseI | ErrorStackI> {
 
         const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
 

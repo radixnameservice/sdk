@@ -7,7 +7,7 @@ import { errorStack, successResponse } from "../../utils/response.utils";
 import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
+import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
 
 
 export async function dispatchSubdomainDeletion({
@@ -17,7 +17,7 @@ export async function dispatchSubdomainDeletion({
     rdt,
     accountAddress,
     callbacks
-}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
 
     try {
 

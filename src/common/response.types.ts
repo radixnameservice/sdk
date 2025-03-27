@@ -3,7 +3,7 @@ import { RawPricePairI } from "./pricing.types";
 import { DomainDataI, SubDomainDataI } from "./domain.types";
 import { RecordItemI } from "./record.types";
 
-export interface ErrorStackResponseI {
+export interface ErrorStackI {
     errors: ErrorI[];
 }
 
