@@ -37,11 +37,6 @@ export interface ResolvedRecordI {
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
 }
 
-export type ResolvedRecordResponseI = {
-    value: string;
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-} | null;
-
 export type DomainAttributesResponseT = {
     status: string;
     verbose: string;
