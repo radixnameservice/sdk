@@ -1,6 +1,6 @@
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
-import RnsSDK, { ResolvedRecordResponseI } from '../..';
+import RnsSDK, { ResolvedRecordResponseT } from '../..';
 import { matchObjectTypes, normaliseManifest } from '../utils';
 import { RecordDocketI, RecordItemI } from '../../common/record.types';
 import { buildFungibleProofs, buildNonFungibleProofs } from '../../utils/proof.utils';
@@ -141,7 +141,7 @@ describe('RNS - Fetch Domain Records', () => {
 
         expect(Array.isArray(record.nonFungibleDataList)).toBe(true);
 
-        if (!matchObjectTypes<ResolvedRecordResponseI>(record, ['value', 'nonFungibleDataList'])) {
+        if (!matchObjectTypes<ResolvedRecordResponseT>(record, ['value', 'nonFungibleDataList'])) {
             throw new Error('Record value did not match expected schema');
         }
 

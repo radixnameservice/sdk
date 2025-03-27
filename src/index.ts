@@ -29,7 +29,7 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI, SubDomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
-import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseI, DomainListResponseT, DomainDetailsResponseT, ErrorI, SubDomainDetailsResponseT } from './common/response.types';
+import { CommitmentStackResponseI, CheckAuthenticityResponseT, DomainAttributesResponseT, ErrorStackResponseI, RecordListResponseT, ResolvedRecordResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI, SubDomainDetailsResponseT } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
@@ -47,7 +47,7 @@ export {
     DomainDataI,
     SubDomainDataI,
     CheckAuthenticityResponseT,
-    ResolvedRecordResponseI,
+    ResolvedRecordResponseT,
     ProofsI,
     ErrorI,
     CommitmentStackResponseI,
@@ -244,7 +244,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseI | ErrorStackResponseI> {
+    async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<ResolvedRecordResponseT | ErrorStackResponseI> {
 
         const details = await requestDomainDetails(domain, { sdkInstance: this });
 
