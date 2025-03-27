@@ -1,4 +1,4 @@
-import { errorStack } from '../utils/response.utils';
+import { errorStack, wrapResponse } from '../utils/response.utils';
 
 import { ErrorI } from '../common/response.types';
 import { ParamProcessMapT } from '../common/validation.types';
@@ -92,5 +92,24 @@ export function ProcessParameters(methodGuardMap: ParamProcessMapT) {
                 }
             }
         };
+    };
+}
+
+export function WrapResponses<T extends { new(...args: any[]): {} }>(constructor: T) {
+    return class extends constructor {
+        constructor(...args: any[]) {
+            super(...args);
+            const methodNames = Object.getOwnPropertyNames(constructor.prototype);
+            for (const methodName of methodNames) {
+                if (methodName === 'constructor') continue;
+                const originalMethod = (this as any)[methodName];
+                if (typeof originalMethod === 'function') {
+                    (this as any)[methodName] = async (...args: any[]) => {
+                        const result = await originalMethod.apply(this, args);
+                        return wrapResponse(result);
+                    };
+                }
+            }
+        }
     };
 }

@@ -22,7 +22,7 @@ import { getBasePath } from './utils/gateway.utils';
 import { deriveRootDomain, validateDomain, validateSubdomain } from './utils/domain.utils';
 import { dataResponse, errorStack } from './utils/response.utils';
 import { validateAccountAddress } from './utils/address.utils';
-import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
+import { ProcessParameters, requireDependencies, WrapResponses } from './decorators/sdk.decorators';
 
 import { EventCallbacksI } from './common/transaction.types';
 import { DocketPropsI, RecordItemI } from './common/record.types';
@@ -66,6 +66,7 @@ interface RnsSDKConfigI {
 }
 
 @ProcessParameters(parameterProcessMap)
+@WrapResponses
 export default class RnsSDK {
 
     network: NetworkT;
