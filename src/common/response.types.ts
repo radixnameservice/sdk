@@ -17,20 +17,18 @@ export interface ErrorGenerationI {
     verbose?: string | null;
 }
 
-export interface CommitmentSuccessI {
+export interface TransactionFeedbackI {
     code: string;
     details: string | null;
 }
 
-export interface CommitmentStackResponseI {
-    success: CommitmentSuccessI[];
+export interface TransactionFeedbackStackI {
+    feedback: TransactionFeedbackI[];
 }
 
-export interface PaginatedResponseI<T> {
-    data: T[];
-    next_cursor?: string;
-    total_count: number;
-}
+export type SdkResponseT<T> = | { data: T; errors?: undefined } | { data?: undefined; errors: ErrorStackI };
+
+export type SdkTransactionResponseT<T> = | { feedback: T; errors?: undefined } | { feedback?: undefined; errors: ErrorStackI };
 
 export interface ResolvedRecordI {
     value: string;
@@ -52,7 +50,4 @@ export type SubDomainDetailsResponseT = SubDomainDataI;
 
 export type CheckAuthenticityResponseT = { isAuthentic: boolean };
 
-export type ResolvedRecordResponseT = {
-    value: string;
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-} | null;
+export type ResolvedRecordResponseT = ResolvedRecordI | null;
