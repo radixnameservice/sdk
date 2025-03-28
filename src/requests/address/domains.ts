@@ -8,6 +8,7 @@ import {
 } from "@radixdlt/babylon-gateway-api-sdk";
 
 import {
+    deriveDomainType,
     deriveRootDomain,
     domainToNonFungId
 } from "../../utils/domain.utils";
@@ -395,4 +396,21 @@ export async function requestSubDomainDetails(
         return e;
 
     }
+}
+
+export async function requestDomainEntityDetails(
+
+    domain: string,
+    { sdkInstance }: InstancePropsI
+
+): Promise<DomainDataI | SubDomainDataI | Error> {
+
+    const isSubdomain = deriveDomainType(domain) === 'sub';
+
+    if (isSubdomain) {
+        return requestSubDomainDetails(domain, { sdkInstance });
+    }
+
+    return requestDomainDetails(domain, { sdkInstance });
+
 }
