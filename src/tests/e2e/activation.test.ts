@@ -64,7 +64,7 @@ describe('RNS - Activate Domain', () => {
             accountAddress: mocks.userDetails.accountAddress
         });
 
-        if ('errors' in activate) {
+        if (activate.errors) {
             throw new Error('Mock activation failed');
         }
 

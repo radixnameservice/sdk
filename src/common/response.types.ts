@@ -3,7 +3,7 @@ import { RawPricePairI } from "./pricing.types";
 import { DomainDataI } from "./domain.types";
 import { RecordItemI } from "./record.types";
 
-export interface ErrorStackResponseI {
+export interface ErrorStackI {
     errors: ErrorI[];
 }
 
@@ -17,30 +17,23 @@ export interface ErrorGenerationI {
     verbose?: string | null;
 }
 
-export interface CommitmentSuccessI {
+export interface TransactionFeedbackI {
     code: string;
     details: string | null;
 }
 
-export interface CommitmentStackResponseI {
-    success: CommitmentSuccessI[];
+export interface TransactionFeedbackStackI {
+    feedback: TransactionFeedbackI[];
 }
 
-export interface PaginatedResponseI<T> {
-    data: T[];
-    next_cursor?: string;
-    total_count: number;
-}
+export type SdkResponseT<T> = | { data: T; errors?: undefined } | { data?: undefined; errors: ErrorStackI };
+
+export type SdkTransactionResponseT<T> = | { feedback: T; errors?: undefined } | { feedback?: undefined; errors: ErrorStackI };
 
 export interface ResolvedRecordI {
     value: string;
     nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
 }
-
-export type ResolvedRecordResponseI = {
-    value: string;
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-} | null;
 
 export type DomainAttributesResponseT = {
     status: string;
@@ -52,11 +45,7 @@ export type RecordListResponseT = RecordItemI[] | [];
 export type RecordResponseT = RecordItemI | null;
 
 export type DomainListResponseT = DomainDataI[] | [];
-export type DomainDetailsResponseT = DomainDataI;
 
 export type CheckAuthenticityResponseT = { isAuthentic: boolean };
 
-export type ResolvedRecordResponseT = {
-    value: string;
-    nonFungibleDataList?: StateNonFungibleDetailsResponseItem[];
-} | null;
+export type ResolvedRecordResponseT = ResolvedRecordI | null;

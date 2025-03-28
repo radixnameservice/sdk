@@ -184,6 +184,18 @@ const subdomain = {
 
         };
 
+    },
+
+    empty: ({ subdomain, verbose = null }: ErrorGenerationI & { subdomain: string }): ErrorI => {
+
+        return {
+
+            code: 'EMPTY_SUBDOMAIN_DETAILS',
+            error: `Could not retrieve details for ${subdomain}.`,
+            verbose
+
+        };
+
     }
 
 };

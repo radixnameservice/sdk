@@ -10,7 +10,11 @@ describe('RNS - Fetch Domain Details', () => {
 
         const details = await rns.getDomainDetails({ domain: 'radixnameservice.xrd' });
 
-        if (!matchObjectTypes<RootDomainI>(details, ['id', 'name', 'address', 'created_timestamp', 'key_image_url'])) {
+        if (details.errors) {
+            throw new Error('Domain details were not returned.');
+        }
+
+        if (!matchObjectTypes<RootDomainI>(details.data, ['id', 'name', 'address', 'created_timestamp', 'key_image_url'])) {
             throw new Error('Domain object did not match expected schema');
         }
 

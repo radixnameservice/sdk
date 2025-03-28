@@ -1,5 +1,5 @@
 
-import RnsSDK from '../..';
+import RnsSDK, { DomainDataI } from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
@@ -56,7 +56,7 @@ describe('RNS - Create Subdomain', () => {
             accountAddress: mocks.userDetails.accountAddress
         });
 
-        if ('errors' in createSubdomain) {
+        if (createSubdomain.errors) {
             throw new Error('Mock subdomain creation failed');
         }
 
@@ -108,11 +108,12 @@ describe('RNS - Delete Subdomain', () => {
 
         const rootDomainDetails = await rns.getDomainDetails({ domain: deriveRootDomain(mocks.subdomain) });
 
-        if ('errors' in rootDomainDetails) {
+        if (rootDomainDetails.errors) {
             throw new Error('Root domain details could not be obtained');
         }
 
-        const subdomainDetails = rootDomainDetails.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
+        const subdomainData = rootDomainDetails.data as DomainDataI;
+        const subdomainDetails = subdomainData.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails) {
             throw new Error('Subdomain details could not be obtained');
@@ -123,7 +124,7 @@ describe('RNS - Delete Subdomain', () => {
             accountAddress: mocks.userDetails.accountAddress
         });
 
-        if ('errors' in deleteSubdomain) {
+        if (deleteSubdomain.errors) {
             throw new Error('Mock subdomain deletion failed');
         }
 
@@ -140,7 +141,7 @@ describe('RNS - Delete Subdomain', () => {
                 "create_proof_of_non_fungibles"
                 Address("${rns.entities.resources.collections.domains}")
                 Array<NonFungibleLocalId>(
-                    NonFungibleLocalId("${rootDomainDetails.id}")
+                    NonFungibleLocalId("${rootDomainDetails.data.id}")
                 );
             POP_FROM_AUTH_ZONE
                 Proof("requester_proof");

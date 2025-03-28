@@ -3,11 +3,10 @@ import subdomainDeletionManifest from "../../manifests/domains/subdomain-deletio
 import errors from "../../mappings/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { errorStack, successResponse } from "../../utils/response.utils";
-import { deriveRootDomain, normaliseDomain, validateSubdomain } from "../../utils/domain.utils";
+import { transactionError, transactionResponse } from "../../utils/response.utils";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
+import { SdkTransactionResponseT, TransactionFeedbackStackI } from "../../common/response.types";
 
 
 export async function dispatchSubdomainDeletion({
@@ -17,14 +16,14 @@ export async function dispatchSubdomainDeletion({
     rdt,
     accountAddress,
     callbacks
-}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+}: SubdomainDispatcherPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
     try {
 
         const subdomainDetails = rootDomainDetails.subdomains.find((subdomainItem) => subdomainItem.name === subdomain);
 
         if (!subdomainDetails)
-            return errorStack(errors.subdomain.doesNotExist({ subdomain }));
+            return transactionError(errors.subdomain.doesNotExist({ subdomain }));
 
         const manifest = await subdomainDeletionManifest({
             sdkInstance,
@@ -42,16 +41,16 @@ export async function dispatchSubdomainDeletion({
         });
 
         if (!dispatch)
-            return errorStack(errors.subdomain.generic({ subdomain }));
+            return transactionError(errors.subdomain.generic({ subdomain }));
 
-        return successResponse({
+        return transactionResponse({
             code: 'SUBDOMAIN_DELETION_SUCCESSFUL',
             details: `${subdomain} was succesfully deleted.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.subdomain.deletion({ subdomain, verbose: error }));
+        return transactionError(errors.subdomain.deletion({ subdomain, verbose: error }));
 
     }
 

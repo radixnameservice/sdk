@@ -4,8 +4,8 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import errors from "../../mappings/errors";
 import { recordCreationManifest } from "../../manifests/records/record-creation-manifest";
 
-import { errorStack, successResponse } from "../../utils/response.utils";
-import { ErrorStackResponseI, CommitmentStackResponseI } from "../../common/response.types";
+import { transactionError, transactionResponse } from "../../utils/response.utils";
+import { TransactionFeedbackStackI, SdkTransactionResponseT } from "../../common/response.types";
 import { CreateRecordDispatcherPropsI } from "../../common/dispatcher.types";
 
 export async function dispatchRecordCreation({
@@ -16,7 +16,7 @@ export async function dispatchRecordCreation({
     docket,
     proofs,
     callbacks
-}: CreateRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackResponseI> {
+}: CreateRecordDispatcherPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
     try {
 
@@ -37,17 +37,17 @@ export async function dispatchRecordCreation({
         });
 
         if (!dispatch) {
-            return errorStack(errors.record.creation({ docket }));
+            return transactionError(errors.record.creation({ docket }));
         }
 
-        return successResponse({
+        return transactionResponse({
             code: 'RECORD_SUCCESSFULLY_CREATED',
             details: `The domain record was successfully created.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.record.creation({ docket, verbose: error }));
+        return transactionError(errors.record.creation({ docket, verbose: error }));
 
     }
 

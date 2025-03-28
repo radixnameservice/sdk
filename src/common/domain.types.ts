@@ -4,6 +4,12 @@ export interface DomainDataI extends RootDomainI {
 
 }
 
+export interface SubDomainDataI extends SubDomainI {
+
+    root_domain: DomainDataI;
+
+}
+
 export interface RootDomainI {
 
     id: string,
