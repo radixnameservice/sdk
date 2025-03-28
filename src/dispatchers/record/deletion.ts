@@ -2,10 +2,10 @@
 import errors from "../../mappings/errors";
 import { recordDeletionManifest } from "../../manifests/records/record-deletion-manifest";
 
-import { errorStack, successResponse } from "../../utils/response.utils";
+import { transactionError, transactionResponse } from "../../utils/response.utils";
 import { sendTransaction } from "../../utils/transaction.utils";
 
-import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
+import { TransactionFeedbackStackI, SdkTransactionResponseT } from "../../common/response.types";
 import { DeleteRecordDispatcherPropsI } from "../../common/dispatcher.types";
 import { docketToRecordId } from "../../utils/record.utils";
 
@@ -17,7 +17,7 @@ export async function dispatchRecordDeletion({
     domainDetails,
     docket,
     callbacks
-}: DeleteRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
+}: DeleteRecordDispatcherPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
     try {
 
@@ -39,17 +39,17 @@ export async function dispatchRecordDeletion({
         });
 
         if (!dispatch) {
-            return errorStack(errors.record.deletion({ docket }));
+            return transactionError(errors.record.deletion({ docket }));
         }
 
-        return successResponse({
+        return transactionResponse({
             code: 'RECORD_SUCCESSFULLY_DELETED',
             details: `The domain record was successfully deleted.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.record.deletion({ docket, verbose: error }));
+        return transactionError(errors.record.deletion({ docket, verbose: error }));
 
     }
 

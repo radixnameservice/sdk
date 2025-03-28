@@ -4,10 +4,10 @@ import errors from "../../mappings/errors";
 import { sendTransaction } from "../../utils/transaction.utils";
 import { convertToDecimal, multiplyDecimal } from "../../utils/decimal.utils";
 import { getBasePrice } from "../../utils/pricing.utils";
-import { errorStack, successResponse } from "../../utils/response.utils";
+import { transactionError, transactionResponse } from "../../utils/response.utils";
 
 import { RegistrationDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
+import { SdkTransactionResponseT, TransactionFeedbackStackI } from "../../common/response.types";
 
 
 export async function dispatchDomainRegistration({
@@ -17,7 +17,7 @@ export async function dispatchDomainRegistration({
     durationYears,
     accountAddress,
     callbacks
-}: RegistrationDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
+}: RegistrationDispatcherPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
     try {
 
@@ -38,16 +38,16 @@ export async function dispatchDomainRegistration({
         });
 
         if (!dispatch)
-            return errorStack(errors.registration.generic({ domain }));
+            return transactionError(errors.registration.generic({ domain }));
 
-        return successResponse({
+        return transactionResponse({
             code: 'REGISTRATION_SUCCESSFUL',
             details: `${domain} was succesfully registered.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.registration.generic({ domain, verbose: error }));
+        return transactionError(errors.registration.generic({ domain, verbose: error }));
 
     }
 

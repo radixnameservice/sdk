@@ -3,10 +3,10 @@ import subdomainCreationManifest from "../../manifests/domains/subdomain-creatio
 import errors from "../../mappings/errors";
 
 import { sendTransaction } from "../../utils/transaction.utils";
-import { errorStack, successResponse } from "../../utils/response.utils";
+import { transactionError, transactionResponse } from "../../utils/response.utils";
 
 import { SubdomainDispatcherPropsI } from "../../common/dispatcher.types";
-import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
+import { TransactionFeedbackStackI, SdkTransactionResponseT } from "../../common/response.types";
 
 
 export async function dispatchSubdomainCreation({
@@ -16,7 +16,7 @@ export async function dispatchSubdomainCreation({
     rdt,
     accountAddress,
     callbacks
-}: SubdomainDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
+}: SubdomainDispatcherPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
     try {
 
@@ -36,16 +36,16 @@ export async function dispatchSubdomainCreation({
         });
 
         if (!dispatch)
-            return errorStack(errors.subdomain.generic({ subdomain }));
+            return transactionError(errors.subdomain.generic({ subdomain }));
 
-        return successResponse({
+        return transactionResponse({
             code: 'SUBDOMAIN_CREATION_SUCCESSFUL',
             details: `${subdomain} was succesfully created.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.subdomain.creation({ subdomain, verbose: error }));
+        return transactionError(errors.subdomain.creation({ subdomain, verbose: error }));
 
     }
 

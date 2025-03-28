@@ -4,11 +4,11 @@ import { sendTransaction } from "../../utils/transaction.utils";
 import errors from "../../mappings/errors";
 import { recordUpdateManifest } from "../../manifests/records/record-update-manifest";
 
-import { errorStack, successResponse } from "../../utils/response.utils";
+import { transactionError, transactionResponse } from "../../utils/response.utils";
 import { docketToRecordId } from "../../utils/record.utils";
 
-import { ErrorStackI, CommitmentStackResponseI } from "../../common/response.types";
 import { AmendRecordDispatcherPropsI } from "../../common/dispatcher.types";
+import { SdkTransactionResponseT, TransactionFeedbackStackI } from "../../common/response.types";
 
 
 export async function dispatchRecordAmendment({
@@ -19,7 +19,7 @@ export async function dispatchRecordAmendment({
     proofs,
     domainDetails,
     callbacks
-}: AmendRecordDispatcherPropsI): Promise<CommitmentStackResponseI | ErrorStackI> {
+}: AmendRecordDispatcherPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
     try {
 
@@ -43,17 +43,17 @@ export async function dispatchRecordAmendment({
         });
 
         if (!dispatch) {
-            return errorStack(errors.record.amendment({ docket }));
+            return transactionError(errors.record.amendment({ docket }));
         }
 
-        return successResponse({
+        return transactionResponse({
             code: 'RECORD_SUCCESSFULLY_AMENDED',
             details: `The domain record was successfully amended.`
         });
 
     } catch (error) {
 
-        return errorStack(errors.record.amendment({ docket, verbose: error }));
+        return transactionError(errors.record.amendment({ docket, verbose: error }));
 
     }
 
