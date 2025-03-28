@@ -1,5 +1,5 @@
 
-import RnsSDK from '../..';
+import RnsSDK, { DomainDataI } from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
@@ -112,7 +112,8 @@ describe('RNS - Delete Subdomain', () => {
             throw new Error('Root domain details could not be obtained');
         }
 
-        const subdomainDetails = rootDomainDetails.data.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
+        const subdomainData = rootDomainDetails.data as DomainDataI;
+        const subdomainDetails = subdomainData.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails) {
             throw new Error('Subdomain details could not be obtained');
