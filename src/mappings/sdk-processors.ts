@@ -30,5 +30,12 @@ export const parameterProcessMap: ParamProcessMapT = {
             validate: validateDomainEntity,
             missingError: errors.domain.generic
         },
+    },
+    getDomainDetails: {
+        domain: {
+            normalize: normaliseDomain,
+            validate: validateDomainEntity,
+            missingError: errors.domain.generic
+        },
     }
 };
