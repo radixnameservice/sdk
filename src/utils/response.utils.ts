@@ -1,4 +1,6 @@
+import { DomainDataI, SubDomainDataI } from "../common/domain.types";
 import { ErrorI, ErrorStackI, SdkResponseT, SdkTransactionResponseT, TransactionFeedbackI, TransactionFeedbackStackI } from "../common/response.types";
+import { deriveDomainType } from "./domain.utils";
 
 export function feedbackStack(feedback: TransactionFeedbackI | TransactionFeedbackI[]): TransactionFeedbackStackI {
 
@@ -42,4 +44,28 @@ export function transactionResponse<T>(feedback: TransactionFeedbackI | Transact
 
 export function transactionError<T>(error: ErrorI | ErrorI[]): SdkTransactionResponseT<T> {
     return { feedback: undefined, errors: errorStack(error) };
+}
+
+export function generateAuthCheckProps({ domain, details }: { domain: string; details: DomainDataI | SubDomainDataI }) {
+
+    const isSubdomain = deriveDomainType(domain) === 'sub';
+
+    if (isSubdomain) {
+
+        const { root_domain } = details as SubDomainDataI;
+
+        return {
+            domain: root_domain.name,
+            accountAddress: root_domain.address
+        };
+
+    }
+
+    const { name, address } = details as DomainDataI;
+
+    return {
+        domain: name,
+        accountAddress: address
+    };
+
 }
