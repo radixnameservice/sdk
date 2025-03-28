@@ -1,4 +1,4 @@
-import RnsSDK, { CheckAuthenticityResponseT, DomainDataI } from '../..';
+import RnsSDK, { DomainDataI } from '../..';
 import { matchObjectTypes } from '../utils';
 
 describe('RNS - Verify Domain Owner Accounts', () => {
@@ -9,13 +9,13 @@ describe('RNS - Verify Domain Owner Accounts', () => {
 
         const ownerDomains = await rns.getAccountDomains({ accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p' });
 
-        if ('errors' in ownerDomains) {
+        if (ownerDomains.errors) {
             throw new Error('Domain list fetch failed');
         }
 
-        expect(Array.isArray(ownerDomains)).toBe(true);
-        expect(ownerDomains.length).toBeGreaterThan(0);
-        expect(ownerDomains.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'key_image_url', 'address']))).toBe(true);
+        expect(Array.isArray(ownerDomains.data)).toBe(true);
+        expect(ownerDomains.data.length).toBeGreaterThan(0);
+        expect(ownerDomains.data.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'key_image_url', 'address']))).toBe(true);
 
     });
 
@@ -26,16 +26,15 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        if ('errors' in checkAuthenticity) {
+        if (checkAuthenticity.errors) {
             throw new Error('Authenticity check failed');
         }
 
-
-        if (!matchObjectTypes<{ isAuthentic: boolean }>(checkAuthenticity, ['isAuthentic'])) {
+        if (!matchObjectTypes<{ isAuthentic: boolean }>(checkAuthenticity.data, ['isAuthentic'])) {
             throw new Error('Authenticity object did not match expected schema');
         }
 
-        expect('isAuthentic' in checkAuthenticity).toBe(true);
+        expect('isAuthentic' in checkAuthenticity.data).toBe(true);
 
     });
 
@@ -46,15 +45,15 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             accountAddress: 'account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p'
         });
 
-        if ('errors' in checkAuthenticity) {
+        if (checkAuthenticity.errors) {
             throw new Error('Authenticity check failed');
         }
 
-        if (!matchObjectTypes<{ isAuthentic: boolean }>(checkAuthenticity, ['isAuthentic'])) {
+        if (!matchObjectTypes<{ isAuthentic: boolean }>(checkAuthenticity.data, ['isAuthentic'])) {
             throw new Error('Authenticity object did not match expected schema');
         }
 
-        expect('isAuthentic' in checkAuthenticity && checkAuthenticity.isAuthentic).toBe(false);
+        expect('isAuthentic' in checkAuthenticity && checkAuthenticity.data.isAuthentic).toBe(false);
 
     });
 

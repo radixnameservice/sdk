@@ -79,14 +79,14 @@ describe('RNS - Fetch Domain Records', () => {
 
         const records = await rns.getRecords({ domain: 'test-records-present.xrd' });
 
-        if ('errors' in records) {
+        if (records.errors) {
             throw new Error('Record list fetch failed');
         }
 
-        expect(Array.isArray(records)).toBe(true);
-        expect(records.length).toBeGreaterThan(0);
+        expect(Array.isArray(records.data)).toBe(true);
+        expect(records.data.length).toBeGreaterThan(0);
 
-        if (!matchObjectTypes<RecordItemI>(records[0], ['record_id', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
+        if (!matchObjectTypes<RecordItemI>(records.data[0], ['record_id', 'domain_id', 'context', 'directive', 'platform_identifier', 'value'])) {
             throw new Error('Record did not match expected schema');
         }
 
@@ -96,12 +96,12 @@ describe('RNS - Fetch Domain Records', () => {
 
         const records = await rns.getRecords({ domain: 'test-records-blank.xrd' });
 
-        if ('errors' in records) {
+        if (records.errors) {
             throw new Error('Record list fetch failed');
         }
 
-        expect(Array.isArray(records)).toBe(true);
-        expect(records.length).toBeLessThan(1);
+        expect(Array.isArray(records.data)).toBe(true);
+        expect(records.data.length).toBeLessThan(1);
 
     });
 
@@ -115,11 +115,11 @@ describe('RNS - Fetch Domain Records', () => {
             }
         });
 
-        if ('errors' in resolvedRecord) {
+        if (resolvedRecord.errors) {
             throw new Error('Record resolution failed');
         }
 
-        expect(resolvedRecord.value).toBe('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
+        expect(resolvedRecord.data.value).toBe('account_tdx_2_128jmkhrkxwd0h9vqfetw34ars7msls9kmk5y60prxsk9guwuxskn5p');
 
     });
 
@@ -135,13 +135,13 @@ describe('RNS - Fetch Domain Records', () => {
             proven: true
         });
 
-        if ('errors' in record) {
+        if (record.errors) {
             throw new Error('Record resolution failed');
         }
 
-        expect(Array.isArray(record.nonFungibleDataList)).toBe(true);
+        expect(Array.isArray(record.data.nonFungibleDataList)).toBe(true);
 
-        if (!matchObjectTypes<ResolvedRecordResponseT>(record, ['value', 'nonFungibleDataList'])) {
+        if (!matchObjectTypes<ResolvedRecordResponseT>(record.data, ['value', 'nonFungibleDataList'])) {
             throw new Error('Record value did not match expected schema');
         }
 
@@ -170,7 +170,7 @@ describe('RNS - Manage Domain Records', () => {
             docket: mocks.docket as RecordDocketI
         });
 
-        if ('errors' in createRecord) {
+        if (createRecord.errors) {
             throw new Error('Mock record creation failed');
         }
 
@@ -221,7 +221,7 @@ describe('RNS - Manage Domain Records', () => {
             proofs: mocks.proofs
         });
 
-        if ('errors' in createRecord) {
+        if (createRecord.errors) {
             throw new Error('Mock proven record creation failed');
         }
 
@@ -280,7 +280,7 @@ describe('RNS - Manage Domain Records', () => {
             docket: mocks.docket as RecordDocketI
         });
 
-        if ('errors' in amendRecord) {
+        if (amendRecord.errors) {
             throw new Error('Mock record amendment failed');
         }
 
@@ -326,7 +326,7 @@ describe('RNS - Manage Domain Records', () => {
             proofs: mocks.proofs
         });
 
-        if ('errors' in deleteRecord) {
+        if (deleteRecord.errors) {
             throw new Error('Mock record amendment failed');
         }
 
@@ -380,7 +380,7 @@ describe('RNS - Manage Domain Records', () => {
             docket: mocks.docket as RecordDocketI
         });
 
-        if ('errors' in deleteRecord) {
+        if (deleteRecord.errors) {
             throw new Error('Mock record deletion failed');
         }
 

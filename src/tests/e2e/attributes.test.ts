@@ -10,21 +10,25 @@ describe('RNS - Fetch Domain Attributes', () => {
 
         const attributes = await rns.getDomainStatus({ domain: 'radixnameservice.xrd' });
 
-        if (!matchObjectTypes<DomainAttributesResponseT>(attributes, ['status', 'verbose', 'price'])) {
+        if (attributes.errors) {
+            throw new Error('Domain status was not returned.');
+        }
+
+        if (!matchObjectTypes<DomainAttributesResponseT>(attributes.data, ['status', 'verbose', 'price'])) {
             throw new Error('Attributes did not match expected schema');
         }
 
-        expect(attributes.status).not.toBe('available');
+        expect(attributes.data.status).not.toBe('available');
         expect(
-            typeof attributes.price === 'object' &&
-            typeof attributes.price.usd === 'number' &&
-            (typeof attributes.price.xrd === 'number' || typeof attributes.price.xrd === 'object')
+            typeof attributes.data.price === 'object' &&
+            typeof attributes.data.price.usd === 'number' &&
+            (typeof attributes.data.price.xrd === 'number' || typeof attributes.data.price.xrd === 'object')
         ).toBe(true);
 
-        const xrdPriceDecimal = convertToDecimal(attributes.price.xrd);
+        const xrdPriceDecimal = convertToDecimal(attributes.data.price.xrd);
         expect(xrdPriceDecimal).toBeInstanceOf(Decimal);
         expect(xrdPriceDecimal.toNumber()).toBeGreaterThan(0);
-        expect(attributes.price.usd).toBe(4);
+        expect(attributes.data.price.usd).toBe(4);
 
     });
 });

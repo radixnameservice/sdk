@@ -57,7 +57,7 @@ describe('RNS - Register Domain', () => {
             accountAddress: mocks.userDetails.accountAddress
         });
 
-        if ('errors' in register) {
+        if (register.errors) {
             throw new Error('Mock registration failed');
         }
 
