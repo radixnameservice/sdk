@@ -3,7 +3,7 @@ import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { requestAccountDomains, requestDomainDetails, requestSubDomainDetails } from './requests/address/domains';
+import { requestAccountDomains, requestDomainDetails, requestDomainEntityDetails } from './requests/address/domains';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
@@ -20,7 +20,7 @@ import { parameterProcessMap } from './mappings/sdk-processors';
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
 import { deriveRootDomain, validateDomain, validateSubdomain } from './utils/domain.utils';
-import { retrievalError, retrievalResponse, transactionError } from './utils/response.utils';
+import { generateAuthCheckProps, retrievalError, retrievalResponse, transactionError } from './utils/response.utils';
 import { validateAccountAddress } from './utils/address.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
 
@@ -29,7 +29,7 @@ import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
 import { DomainDataI, SubDomainDataI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
-import { CheckAuthenticityResponseT, DomainAttributesResponseT, SdkTransactionResponseT, RecordListResponseT, ResolvedRecordResponseT, DomainListResponseT, DomainDetailsResponseT, ErrorI, SubDomainDetailsResponseT, SdkResponseT, TransactionFeedbackStackI, TransactionFeedbackI } from './common/response.types';
+import { CheckAuthenticityResponseT, DomainAttributesResponseT, SdkTransactionResponseT, RecordListResponseT, ResolvedRecordResponseT, ErrorI, SdkResponseT, TransactionFeedbackStackI, TransactionFeedbackI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
@@ -37,9 +37,6 @@ import { RegistrarDetailsI } from './common/registrar.types';
 export {
     RnsSDKConfigI,
     DomainAttributesResponseT,
-    DomainDetailsResponseT,
-    SubDomainDetailsResponseT,
-    DomainListResponseT,
     RecordListResponseT,
     RecordItemI,
     RecordDocketI,
@@ -176,44 +173,20 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getDomainDetails({ domain }: { domain: string }): Promise<SdkResponseT<DomainDetailsResponseT>> {
+    async getDomainDetails({ domain }: { domain: string }): Promise<SdkResponseT<DomainDataI | SubDomainDataI>> {
 
-        const details = await requestDomainDetails(domain, { sdkInstance: this });
+        const details = await requestDomainEntityDetails(domain, { sdkInstance: this });
 
         if (details instanceof Error)
             return retrievalError(errors.domain.generic({ domain, verbose: details.message }));
         if (!details)
             return retrievalError(errors.domain.empty({ domain }));
 
-        const isAuthentic = await this.checkAuthenticity({
-            domain,
-            accountAddress: details.address
-        });
+        const authCheckProps = generateAuthCheckProps({ domain, details });
+        const isAuthentic = await this.checkAuthenticity(authCheckProps);
 
         if (!isAuthentic)
-            return retrievalError(errors.account.authenticityMismatch({ domain }));
-
-        return retrievalResponse(details);
-
-    }
-
-    @requireDependencies('read-only')
-    async getSubDomainDetails({ subdomain }: { subdomain: string }): Promise<SdkResponseT<SubDomainDetailsResponseT>> {
-
-        const details = await requestSubDomainDetails(subdomain, { sdkInstance: this });
-
-        if (details instanceof Error)
-            return retrievalError(errors.subdomain.generic({ subdomain, verbose: details.message }));
-        if (!details)
-            return retrievalError(errors.subdomain.empty({ subdomain }));
-
-        const isAuthentic = await this.checkAuthenticity({
-            domain: details.root_domain.name,
-            accountAddress: details.root_domain.address
-        });
-
-        if (!isAuthentic)
-            return retrievalError(errors.account.authenticityMismatch({ domain: details.root_domain.name }));
+            return retrievalError(errors.account.authenticityMismatch({ domain: authCheckProps.domain }));
 
         return retrievalResponse(details);
 
@@ -222,20 +195,18 @@ export default class RnsSDK {
     @requireDependencies('read-only')
     async getRecords({ domain }: { domain: string }): Promise<SdkResponseT<RecordListResponseT>> {
 
-        const details = await requestDomainDetails(domain, { sdkInstance: this });
+        const details = await requestDomainEntityDetails(domain, { sdkInstance: this });
 
         if (details instanceof Error)
             return retrievalError(errors.domain.generic({ domain, verbose: details.message }));
         if (!details)
             return retrievalError(errors.domain.empty({ domain }));
 
-        const isAuthentic = await this.checkAuthenticity({
-            domain,
-            accountAddress: details.address
-        });
+        const authCheckProps = generateAuthCheckProps({ domain, details });
+        const isAuthentic = await this.checkAuthenticity(authCheckProps);
 
         if (!isAuthentic)
-            return retrievalError(errors.account.authenticityMismatch({ domain }));
+            return retrievalError(errors.account.authenticityMismatch({ domain: authCheckProps.domain }));
 
         const records = await requestRecords(domain, { sdkInstance: this });
 
@@ -249,18 +220,16 @@ export default class RnsSDK {
     @requireDependencies('read-only')
     async resolveRecord({ domain, docket, proven }: { domain: string; docket: DocketPropsI; proven?: boolean; }): Promise<SdkResponseT<ResolvedRecordResponseT>> {
 
-        const details = await requestDomainDetails(domain, { sdkInstance: this });
+        const details = await requestDomainEntityDetails(domain, { sdkInstance: this });
 
         if (details instanceof Error)
             return retrievalError(errors.account.authenticityMismatch({ domain, verbose: details.message }));
 
-        const isAuthentic = await this.checkAuthenticity({
-            domain,
-            accountAddress: details.address
-        });
+        const authCheckProps = generateAuthCheckProps({ domain, details });
+        const isAuthentic = await this.checkAuthenticity(authCheckProps);
 
         if (!isAuthentic)
-            return retrievalError(errors.account.authenticityMismatch({ domain }));
+            return retrievalError(errors.account.authenticityMismatch({ domain: authCheckProps.domain }));
 
         const record = await resolveRecord(domain, { context: docket.context, directive: docket.directive, proven }, { sdkInstance: this });
 
@@ -272,7 +241,7 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getAccountDomains({ accountAddress }: { accountAddress: string }): Promise<SdkResponseT<DomainListResponseT>> {
+    async getAccountDomains({ accountAddress }: { accountAddress: string }): Promise<SdkResponseT<DomainDataI[]>> {
 
         const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
