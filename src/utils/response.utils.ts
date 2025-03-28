@@ -1,21 +1,17 @@
-import { ErrorI, ErrorStackI, CommitmentSuccessI, CommitmentStackResponseI } from "../common/response.types";
+import { ErrorI, ErrorStackI, SdkResponseT, SdkTransactionResponseT, TransactionFeedbackI, TransactionFeedbackStackI } from "../common/response.types";
 
-export function successResponse(success: CommitmentSuccessI | CommitmentSuccessI[]): CommitmentStackResponseI {
+export function feedbackStack(feedback: TransactionFeedbackI | TransactionFeedbackI[]): TransactionFeedbackStackI {
 
-    if (Array.isArray(success)) {
+    if (Array.isArray(feedback)) {
         return {
-            success
+            feedback
         };
     }
 
     return {
-        success: [success]
+        feedback: [feedback]
     };
 
-}
-
-export function dataResponse<T>(responseData: T): T {
-    return responseData;
 }
 
 export function errorStack(errors: ErrorI | ErrorI[]): ErrorStackI {
@@ -32,30 +28,18 @@ export function errorStack(errors: ErrorI | ErrorI[]): ErrorStackI {
 
 }
 
-export function wrapResponse<T>(response: T | ErrorStackI): T & { errors?: ErrorI[] } {
+export function retrievalResponse<T>(response: T): SdkResponseT<T> {
+    return { data: response, errors: undefined };
+}
 
-    const isError = response && typeof response === "object" && "errors" in response && Array.isArray((response as any).errors);
+export function retrievalError<T>(error: ErrorI | ErrorI[]): SdkResponseT<T> {
+    return { data: undefined, errors: errorStack(error) };
+}
 
-    if (Array.isArray(response)) {
+export function transactionResponse<T>(feedback: TransactionFeedbackI | TransactionFeedbackI[]): SdkTransactionResponseT<TransactionFeedbackStackI> {
+    return { feedback: feedbackStack(feedback), errors: undefined };
+}
 
-        const newArray = response.slice();
-
-        Object.defineProperty(newArray, "errors", {
-            value: isError ? (response as any).errors : undefined,
-            enumerable: false, // so it won't show up in array iterations
-            configurable: true,
-            writable: false,
-        });
-
-        return newArray as T & { errors?: ErrorI[] };
-    } else {
-
-        const newObj = { ...(response as object) } as T & { errors?: ErrorI[] };
-
-        if (!isError) {
-            newObj.errors = undefined;
-        }
-
-        return newObj;
-    }
+export function transactionError<T>(error: ErrorI | ErrorI[]): SdkTransactionResponseT<T> {
+    return { feedback: undefined, errors: errorStack(error) };
 }
