@@ -19,7 +19,7 @@ import { parameterProcessMap } from './mappings/sdk-processors';
 
 import { expandComponents } from './utils/entity.utils';
 import { getBasePath } from './utils/gateway.utils';
-import { deriveRootDomain, validateDomain, validateSubdomain } from './utils/domain.utils';
+import { deriveDomainType, deriveRootDomain, validateDomain, validateSubdomain } from './utils/domain.utils';
 import { generateAuthCheckProps, retrievalError, retrievalResponse, transactionError } from './utils/response.utils';
 import { validateAccountAddress } from './utils/address.utils';
 import { ProcessParameters, requireDependencies } from './decorators/sdk.decorators';
@@ -440,6 +440,28 @@ export default class RnsSDK {
 
         getRootFromSubdomain({ subdomain }: { subdomain: string }): string | null {
             return deriveRootDomain(subdomain);
+        },
+
+        isSubdomain(domainEntity: string): boolean | ErrorI {
+
+            const domainType = deriveDomainType(domainEntity);
+
+            if (typeof domainType !== 'string' && 'error' in domainType) {
+                return domainType;
+            }
+
+            return deriveDomainType(domainEntity) === "sub" ? true : false;
+        },
+
+        isRootDomain(domainEntity: string): boolean | ErrorI {
+
+            const domainType = deriveDomainType(domainEntity);
+
+            if (typeof domainType !== 'string' && 'error' in domainType) {
+                return domainType;
+            }
+
+            return deriveDomainType(domainEntity) === "root" ? true : false;
         }
 
     };
