@@ -22,7 +22,12 @@ import {
 } from "../../utils/log.utils";
 
 import {
+    getBasePrice
+} from "../../utils/pricing.utils";
+
+import {
     DomainDataI,
+    RootDomainI,
     SubDomainDataI,
     SubDomainI
 } from "../../common/domain.types";
@@ -185,7 +190,7 @@ function formatDomainList(
 
     domains: StateNonFungibleDetailsResponseItem[]
 
-): DomainDataI[] {
+): RootDomainI[] {
 
     const subdomains = filterSubdomains(domains);
 
@@ -227,8 +232,28 @@ function formatDomainList(
 
                 return acc;
 
-            }, { id: r.non_fungible_id } as DomainDataI);
+            }, { id: r.non_fungible_id } as RootDomainI);
         }
+    });
+
+}
+
+function supplementDomainList(domains: RootDomainI[], { sdkInstance }: InstancePropsI): DomainDataI[] {
+
+    return domains.map((domain: DomainDataI) => {
+
+        const basePrice = getBasePrice(domain.name, sdkInstance.dependencies.rates.usdXrd);
+
+        const bond_value = {
+            xrd: basePrice.xrd.toString(),
+            usd: basePrice.usd.toString()
+        };
+
+        return {
+            ...domain,
+            bond_value
+        }
+
     });
 
 }
@@ -262,7 +287,7 @@ async function fetchDomainData(
             [...rootDomainResourceIds, ...subdomainDomainResourceIds]
         );
 
-        return formatDomainList(domains);
+        return supplementDomainList(formatDomainList(domains), { sdkInstance });
 
     } catch (error) {
 
