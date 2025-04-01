@@ -1,5 +1,8 @@
+import { PricePairI } from "./pricing.types";
+
 export interface DomainDataI extends RootDomainI {
 
+    bond_value: PricePairI;
     subdomains: SubDomainI[];
 
 }
