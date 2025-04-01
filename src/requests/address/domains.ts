@@ -245,8 +245,8 @@ function supplementDomainList(domains: RootDomainI[], { sdkInstance }: InstanceP
         const basePrice = getBasePrice(domain.name, sdkInstance.dependencies.rates.usdXrd);
 
         const bond_value = {
-            xrd: basePrice.xrd.toString(),
-            usd: basePrice.usd.toString()
+            xrd: basePrice.xrd,
+            usd: basePrice.usd
         };
 
         return {

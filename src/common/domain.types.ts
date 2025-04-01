@@ -1,8 +1,8 @@
-import { PricePairI } from "./pricing.types";
+import { RawPricePairI } from "./pricing.types";
 
 export interface DomainDataI extends RootDomainI {
 
-    bond_value: PricePairI;
+    bond_value: RawPricePairI;
     subdomains: SubDomainI[];
 
 }
