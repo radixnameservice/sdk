@@ -35,7 +35,7 @@ export function retrievalResponse<T>(response: T): SdkResponseT<T> {
 }
 
 export function retrievalError<T>(error: ErrorI | ErrorI[]): SdkResponseT<T> {
-    return { data: undefined, errors: errorStack(error) };
+    return { data: undefined, ...errorStack(error) };
 }
 
 export function transactionResponse<T>(feedback: TransactionFeedbackI | TransactionFeedbackI[]): SdkTransactionResponseT<TransactionFeedbackStackI> {
@@ -43,7 +43,7 @@ export function transactionResponse<T>(feedback: TransactionFeedbackI | Transact
 }
 
 export function transactionError<T>(error: ErrorI | ErrorI[]): SdkTransactionResponseT<T> {
-    return { feedback: undefined, errors: errorStack(error) };
+    return { feedback: undefined, ...errorStack(error) };
 }
 
 export function generateAuthCheckProps({ domain, details }: { domain: string; details: DomainDataI | SubDomainDataI }) {

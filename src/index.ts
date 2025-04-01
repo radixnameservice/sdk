@@ -33,6 +33,7 @@ import { CheckAuthenticityResponseT, DomainAttributesResponseT, SdkTransactionRe
 import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
+import { UtilValidationT } from './common/util.types';
 
 export {
     RnsSDKConfigI,
@@ -53,7 +54,8 @@ export {
     SdkTransactionResponseT,
     EventCallbacksI,
     RegistrarDetailsI,
-    NetworkT
+    NetworkT,
+    UtilValidationT
 };
 
 interface RnsSDKConfigI {
@@ -426,39 +428,84 @@ export default class RnsSDK {
 
     public utils = {
 
-        validateDomain({ domain }: { domain: string }): true | ErrorI {
-            return validateDomain(domain);
+        validateDomain({ domain }: { domain: string }): UtilValidationT {
+
+            const validate = validateDomain(domain);
+
+            if (typeof validate !== 'boolean' && 'error' in validate) {
+
+                return {
+                    isValid: false,
+                    errors: [validate]
+                };
+
+            }
+
+            return {
+                isValid: true
+            };
+
         },
 
-        validateSubdomain({ subdomain }: { subdomain: string }): true | ErrorI {
-            return validateSubdomain(subdomain);
+        validateSubdomain({ subdomain }: { subdomain: string }): UtilValidationT {
+
+            const validate = validateSubdomain(subdomain);
+
+            if (typeof validate !== 'boolean' && 'error' in validate) {
+
+                return {
+                    isValid: false,
+                    errors: [validate]
+                };
+
+            }
+
+            return {
+                isValid: true
+            };
+
         },
 
-        validateAccountAddress({ accountAddress }: { accountAddress: string }): true | ErrorI {
-            return validateAccountAddress(accountAddress, { network: this.network });
+        validateAccountAddress({ accountAddress }: { accountAddress: string }): UtilValidationT {
+
+            const validate = validateAccountAddress(accountAddress, { network: this.network });
+
+            if (typeof validate !== 'boolean' && 'error' in validate) {
+
+                return {
+                    isValid: false,
+                    errors: [validate]
+                };
+
+            }
+
+            return {
+                isValid: true
+            };
+
         },
 
         getRootFromSubdomain({ subdomain }: { subdomain: string }): string | null {
             return deriveRootDomain(subdomain);
         },
 
-        isSubdomain(domainEntity: string): boolean | ErrorI {
+        isSubdomain(domainEntity: string): boolean {
 
             const domainType = deriveDomainType(domainEntity);
 
             if (typeof domainType !== 'string' && 'error' in domainType) {
-                return domainType;
+                return false
             }
 
             return deriveDomainType(domainEntity) === "sub" ? true : false;
         },
 
-        isRootDomain(domainEntity: string): boolean | ErrorI {
+        isRootDomain(domainEntity: string): boolean {
 
             const domainType = deriveDomainType(domainEntity);
 
             if (typeof domainType !== 'string' && 'error' in domainType) {
-                return domainType;
+                return false;
             }
 
             return deriveDomainType(domainEntity) === "root" ? true : false;

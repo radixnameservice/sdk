@@ -26,9 +26,9 @@ export interface TransactionFeedbackStackI {
     feedback: TransactionFeedbackI[];
 }
 
-export type SdkResponseT<T> = | { data: T; errors?: undefined } | { data?: undefined; errors: ErrorStackI };
+export type SdkResponseT<T> = | { data: T; errors?: undefined } | { data?: undefined; errors: ErrorI[] };
 
-export type SdkTransactionResponseT<T> = | { feedback: T; errors?: undefined } | { feedback?: undefined; errors: ErrorStackI };
+export type SdkTransactionResponseT<T> = | { feedback: T; errors?: undefined } | { feedback?: undefined; errors: ErrorI[] };
 
 export interface ResolvedRecordI {
     value: string;
