@@ -34,6 +34,7 @@ import { EntitiesT, ProofsI } from './common/entities.types';
 import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
 import { UtilValidationT } from './common/util.types';
+import { RawPricePairI } from './common/pricing.types';
 
 export {
     RnsSDKConfigI,
@@ -55,7 +56,8 @@ export {
     EventCallbacksI,
     RegistrarDetailsI,
     NetworkT,
-    UtilValidationT
+    UtilValidationT,
+    RawPricePairI
 };
 
 interface RnsSDKConfigI {
