@@ -21,7 +21,7 @@ export async function dispatchRecordDeletion({
 
     try {
 
-        const recordId = await docketToRecordId(domainDetails.name, docket);
+        const recordId = await docketToRecordId(domainDetails.name, docket, true);
 
         const manifest = recordDeletionManifest({
             sdkInstance,

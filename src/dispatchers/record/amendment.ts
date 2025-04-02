@@ -23,7 +23,7 @@ export async function dispatchRecordAmendment({
 
     try {
 
-        const recordId = await docketToRecordId(domainDetails.name, docket);
+        const recordId = await docketToRecordId(domainDetails.name, docket, true);
 
         const manifest = recordUpdateManifest({
             sdkInstance,
