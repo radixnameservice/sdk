@@ -19,7 +19,7 @@ export async function sendTransaction({ manifest, rdt, transaction, callbacks, m
         if (!result || result.isErr()) {
 
             if (callbacks?.onFail) callbacks.onFail(result);
-            if (result.isErr()) throw new Error(`RNS SDK: ${result.error}`);
+            if (result.isErr()) throw new Error(`RNS SDK: ${result.error.message}`);
 
             throw new Error(`RNS SDK: ${result}`);
 
