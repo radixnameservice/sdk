@@ -25,8 +25,3 @@ export interface RecordDocketI extends DocketPropsI {
     value: string | ProofsI;
 
 }
-
-export interface RemovalPreferencesI {
-    deleteSubdomains: boolean;
-    deleteRecords: boolean;
-}

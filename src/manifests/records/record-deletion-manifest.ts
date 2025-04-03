@@ -3,12 +3,12 @@ import RnsSDK from "../..";
 export function recordDeletionManifest({
     sdkInstance,
     accountAddress,
-    targetDomainId,
+    rootDomainId,
     recordId
 }: {
     sdkInstance: RnsSDK;
     accountAddress: string;
-    targetDomainId: string;
+    rootDomainId: string;
     recordId: string;
 }): string {
 
@@ -18,7 +18,7 @@ export function recordDeletionManifest({
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
-                NonFungibleLocalId("${targetDomainId}")
+                NonFungibleLocalId("${rootDomainId}")
             );
         POP_FROM_AUTH_ZONE
             Proof("requester_proof");

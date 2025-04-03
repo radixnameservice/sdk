@@ -12,6 +12,7 @@ import { dispatchRecordAmendment } from './dispatchers/record/amendment';
 import { dispatchDomainActivation } from './dispatchers/domain/activation';
 import { dispatchSubdomainCreation } from './dispatchers/domain/subdomain-creation';
 import { dispatchSubdomainDeletion } from './dispatchers/domain/subdomain-deletion';
+import { dispatchDomainTransfer } from './dispatchers/domain/transfer';
 
 import config from './entities.config';
 import errors from './mappings/errors';
@@ -35,6 +36,7 @@ import { NetworkT } from './common/gateway.types';
 import { RegistrarDetailsI } from './common/registrar.types';
 import { UtilValidationT } from './common/util.types';
 import { RawPricePairI } from './common/pricing.types';
+import { TransferPreferencesI } from './common/dispatcher.types';
 
 export {
     RnsSDKConfigI,
@@ -57,7 +59,8 @@ export {
     RegistrarDetailsI,
     NetworkT,
     UtilValidationT,
-    RawPricePairI
+    RawPricePairI,
+    TransferPreferencesI
 };
 
 interface RnsSDKConfigI {
@@ -422,6 +425,28 @@ export default class RnsSDK {
             accountAddress,
             domainDetails,
             docket,
+            callbacks
+        });
+
+    }
+
+    @requireDependencies('full')
+    async transferDomain({ domain, fromAddress, destinationAddress, preferences, callbacks }: { domain: string; fromAddress: string; destinationAddress: string; preferences?: TransferPreferencesI; callbacks?: EventCallbacksI }): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
+
+        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
+
+        if (domainDetails instanceof Error)
+            return transactionError(errors.domain.generic({ domain, verbose: domainDetails.message }));
+        if (!domainDetails)
+            return transactionError(errors.domain.empty({ domain }));
+
+        return dispatchDomainTransfer({
+            sdkInstance: this,
+            rdt: this.rdt,
+            domainDetails,
+            fromAddress,
+            destinationAddress,
+            preferences,
             callbacks
         });
 

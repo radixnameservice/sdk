@@ -61,3 +61,19 @@ export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
     docket: DocketPropsI;
 
 }
+
+export interface TransferDispatcherPropsI extends DispatcherPropsI {
+
+    domainDetails: DomainDataI;
+    fromAddress: string;
+    destinationAddress: string;
+    preferences?: TransferPreferencesI;
+
+}
+
+export interface TransferPreferencesI {
+
+    deleteRecords?: boolean;
+    deleteSubdomains?: boolean;
+
+}

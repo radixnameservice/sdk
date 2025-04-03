@@ -200,6 +200,22 @@ const subdomain = {
 
 };
 
+const transfer = {
+
+    generic: ({ domain, verbose = null }: ErrorGenerationI & { domain: string }): ErrorI => {
+
+        return {
+
+            code: 'DOMAIN_TRANSFER_FAILED',
+            error: `Failed to transfer ${domain}.`,
+            verbose
+
+        };
+
+    }
+
+};
+
 const record = {
 
     creation: ({ docket, verbose = null }: ErrorGenerationI & { docket: RecordDocketI }): ErrorI => {
@@ -244,4 +260,4 @@ const record = {
 
 };
 
-export default { request, account, registration, activation, domain, subdomain, record }
+export default { request, account, registration, activation, domain, subdomain, transfer, record }
