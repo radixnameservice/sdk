@@ -24,13 +24,20 @@ export async function dispatchRecordAmendment({
 
     try {
 
+        let rootDomainId: string = domainDetails.id;
+
+        if (sdkInstance.utils.isSubdomain(domainDetails.name)) {
+            const subdomainDetails = domainDetails as SubDomainDataI;
+            rootDomainId = subdomainDetails.root_domain.id;
+        }
+
         const recordId = await docketToRecordId(domainDetails.name, docket, true);
 
         const manifest = recordUpdateManifest({
             sdkInstance,
             accountAddress,
             recordDocket: docket,
-            targetDomainId: domainDetails.id,
+            rootDomainId,
             recordId,
             proofs
         });
