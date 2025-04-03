@@ -26,7 +26,7 @@ export async function dispatchRecordDeletion({
         const manifest = recordDeletionManifest({
             sdkInstance,
             accountAddress,
-            rootDomainId: domainDetails.id,
+            targetDomainId: domainDetails.id,
             recordId
         });
 

@@ -9,6 +9,7 @@ import { docketToRecordId } from "../../utils/record.utils";
 
 import { AmendRecordDispatcherPropsI } from "../../common/dispatcher.types";
 import { SdkTransactionResponseT, TransactionFeedbackStackI } from "../../common/response.types";
+import { SubDomainDataI } from "../../common/domain.types";
 
 
 export async function dispatchRecordAmendment({
@@ -29,7 +30,7 @@ export async function dispatchRecordAmendment({
             sdkInstance,
             accountAddress,
             recordDocket: docket,
-            rootDomainId: domainDetails.id,
+            targetDomainId: domainDetails.id,
             recordId,
             proofs
         });

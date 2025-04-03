@@ -8,12 +8,14 @@ export function recordCreationManifest({
     sdkInstance,
     accountAddress,
     rootDomainId,
+    targetDomainId,
     recordDocket,
     proofs = {}
 }: {
     sdkInstance: RnsSDK;
     accountAddress: string;
     rootDomainId: string;
+    targetDomainId: string;
     recordDocket: RecordDocketI;
     proofs?: ProofsI;
 }): string {
@@ -45,7 +47,7 @@ export function recordCreationManifest({
         CALL_METHOD
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "${methodName}"
-            NonFungibleLocalId("${rootDomainId}")
+            NonFungibleLocalId("${targetDomainId}")
             "${recordDocket.context}"
             ${recordDocket.directive.trim().length > 0 ? `Enum<1u8>("${recordDocket.directive}")` : "Enum<0u8>()"}
             ${recordDocket.platformIdentifier.trim().length > 0 ? `Enum<1u8>("${recordDocket.platformIdentifier}")` : "Enum<0u8>()"}

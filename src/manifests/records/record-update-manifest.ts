@@ -7,14 +7,14 @@ import { ProofsI } from "../../common/entities.types";
 export function recordUpdateManifest({
     sdkInstance,
     accountAddress,
-    rootDomainId,
+    targetDomainId,
     recordDocket,
     recordId,
     proofs = {}
 }: {
     sdkInstance: RnsSDK;
     accountAddress: string;
-    rootDomainId: string;
+    targetDomainId: string;
     recordDocket: RecordDocketI;
     recordId: string;
     proofs?: ProofsI;
@@ -39,7 +39,7 @@ export function recordUpdateManifest({
         "create_proof_of_non_fungibles"
         Address("${sdkInstance.entities.resources.collections.domains}")
         Array<NonFungibleLocalId>(
-            NonFungibleLocalId("${rootDomainId}")
+            NonFungibleLocalId("${targetDomainId}")
         );
     POP_FROM_AUTH_ZONE
         Proof("requester_proof");
