@@ -37,5 +37,22 @@ export const parameterProcessMap: ParamProcessMapT = {
     createRecord: genericDomainEntityProcessor,
     amendRecord: genericDomainEntityProcessor,
     deleteRecord: genericDomainEntityProcessor,
-    getDomainDetails: genericDomainEntityProcessor
+    getDomainDetails: genericDomainEntityProcessor,
+    transferDomain: {
+        domain: {
+            normalize: normaliseDomain,
+            validate: validateDomain,
+            missingError: errors.domain.generic
+        },
+        fromAddress: {
+            normalize: (accountAddress: string) => accountAddress.toLowerCase(),
+            validate: (accountAddress: string, instance: RnsSDK) => validateAccountAddress(accountAddress, { network: instance.network }),
+            missingError: errors.account.invalidAddress
+        },
+        destinationAddress: {
+            normalize: (accountAddress: string) => accountAddress.toLowerCase(),
+            validate: (accountAddress: string, instance: RnsSDK) => validateAccountAddress(accountAddress, { network: instance.network }),
+            missingError: errors.account.invalidAddress
+        }
+    }
 };

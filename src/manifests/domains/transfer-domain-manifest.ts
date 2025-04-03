@@ -1,25 +1,26 @@
 import RnsSDK from "../..";
-import { RemovalPreferencesI } from "../../common/record.types";
+import { TransferPreferencesI } from "../../common/dispatcher.types";
 
-export default async function subdomainCreationManifest({
+
+export default async function transferDomainManifest({
     sdkInstance,
-    fromAccount,
-    toAccount,
+    fromAddress,
+    destinationAddress,
     preferences,
     rootDomainId,
     subdomainIds,
 }: {
     sdkInstance: RnsSDK;
-    fromAccount: string;
-    toAccount: string;
-    preferences: RemovalPreferencesI;
+    fromAddress: string;
+    destinationAddress: string;
+    preferences: TransferPreferencesI;
     rootDomainId: string;
     subdomainIds: string[];
 }) {
 
     return `
         CALL_METHOD
-            Address("${fromAccount}")
+            Address("${fromAddress}")
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
@@ -39,7 +40,7 @@ export default async function subdomainCreationManifest({
             Proof("requested_proof")
             Enum<0u8>();
         CALL_METHOD
-            Address("${fromAccount}")
+            Address("${fromAddress}")
             "create_proof_of_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
@@ -51,16 +52,16 @@ export default async function subdomainCreationManifest({
             Address("${sdkInstance.entities.components.coreVersionManager.rnsCoreComponent}")
             "update_address"
             Proof("domain_proof")
-            Address("${toAccount}");
+            Address("${destinationAddress}");
         CALL_METHOD
-            Address("${fromAccount}")
+            Address("${fromAddress}")
             "withdraw_non_fungibles"
             Address("${sdkInstance.entities.resources.collections.domains}")
             Array<NonFungibleLocalId>(
                 NonFungibleLocalId("${rootDomainId}")
             );
         CALL_METHOD
-            Address("${toAccount}")
+            Address("${destinationAddress}")
             "try_deposit_batch_or_refund"
             Expression("ENTIRE_WORKTOP")
             Enum<0u8>();
