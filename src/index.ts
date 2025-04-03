@@ -360,7 +360,7 @@ export default class RnsSDK {
         if (!docket.proven && (proofs?.fungibles || proofs?.nonFungibles))
             return transactionError(errors.record.creation({ docket, verbose: 'Docket is specified as NOT "proven", however, a "proofs" value is specified.' }));
 
-        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
+        const domainDetails = await requestDomainEntityDetails(domain, { sdkInstance: this });
 
         if (domainDetails instanceof Error)
             return transactionError(errors.domain.generic({ domain, verbose: domainDetails.message }));
@@ -387,7 +387,7 @@ export default class RnsSDK {
         if (!docket.proven && proofs)
             return transactionError(errors.record.amendment({ docket, verbose: 'Docket is specified as NOT "proven", however, a "proofs" value is specified.' }));
 
-        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
+        const domainDetails = await requestDomainEntityDetails(domain, { sdkInstance: this });
 
         if (domainDetails instanceof Error)
             return transactionError(errors.domain.generic({ domain, verbose: domainDetails.message }));
@@ -409,7 +409,7 @@ export default class RnsSDK {
     @requireDependencies('full')
     async deleteRecord({ domain, accountAddress, docket, callbacks }: { domain: string; accountAddress: string; docket: DocketPropsI; callbacks?: EventCallbacksI }): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
 
-        const domainDetails = await requestDomainDetails(domain, { sdkInstance: this });
+        const domainDetails = await requestDomainEntityDetails(domain, { sdkInstance: this });
 
         if (domainDetails instanceof Error)
             return transactionError(errors.domain.generic({ domain, verbose: domainDetails.message }));
