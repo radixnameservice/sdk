@@ -4,6 +4,14 @@ import { normaliseDomain, validateDomain, validateDomainEntity, validateSubdomai
 import { validateAccountAddress } from "../utils/address.utils";
 import { ParamProcessMapT } from "../common/validation.types";
 
+const genericDomainEntityProcessor = {
+    domain: {
+        normalize: normaliseDomain,
+        validate: validateDomainEntity,
+        missingError: errors.domain.generic
+    }
+};
+
 export const parameterProcessMap: ParamProcessMapT = {
     _default: {
         domain: {
@@ -24,18 +32,10 @@ export const parameterProcessMap: ParamProcessMapT = {
             missingError: errors.account.invalidAddress
         }
     },
-    getRecords: {
-        domain: {
-            normalize: normaliseDomain,
-            validate: validateDomainEntity,
-            missingError: errors.domain.generic
-        },
-    },
-    getDomainDetails: {
-        domain: {
-            normalize: normaliseDomain,
-            validate: validateDomainEntity,
-            missingError: errors.domain.generic
-        },
-    }
+    getRecords: genericDomainEntityProcessor,
+    resolveRecord: genericDomainEntityProcessor,
+    createRecord: genericDomainEntityProcessor,
+    amendRecord: genericDomainEntityProcessor,
+    deleteRecord: genericDomainEntityProcessor,
+    getDomainDetails: genericDomainEntityProcessor
 };

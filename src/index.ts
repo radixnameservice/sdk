@@ -69,7 +69,6 @@ interface RnsSDKConfigI {
 }
 
 @ProcessParameters(parameterProcessMap)
-
 export default class RnsSDK {
 
     network: NetworkT;
