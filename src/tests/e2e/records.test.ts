@@ -15,8 +15,8 @@ const mocks = {
     proofs: {
         nonFungibles: [
             {
-                resourceAddress: "abc",
-                ids: ["abc"]
+                resourceAddress: "resource_tdx_2_1n2leg5zgd0cw3766mdae43jg8dvp2h4x08rjjcrf3qrta8lhfjt7wq",
+                ids: ["[6440eca229adc52b1ee093a7eee0e71f]", "[d98c5be165f16668b89bfeb709225ac7]", "[51389d6aa8fba3e16a421179e13250f9]"]
             },
             {
                 resourceAddress: "def",
@@ -197,7 +197,7 @@ describe('RNS - Manage Domain Records', () => {
                 "${mocks.docket.context}"
                 Enum<1u8>("${mocks.docket.directive}")
                 Enum<1u8>("${mocks.docket.platformIdentifier}")
-                Array<String>("")
+                Array<String>()
                 "${mocks.docket.value}"
                 Proof("request_proof")
                 Enum<0u8>();
@@ -253,12 +253,11 @@ describe('RNS - Manage Domain Records', () => {
                 "${mocks.docket.context}"
                 Enum<1u8>("${mocks.docket.directive}")
                 Enum<1u8>("${mocks.docket.platformIdentifier}")
-                Array<String>("")
+                Array<String>()
                 Array<Proof>(
                     ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                     ${fungibleProofs.map(proof => proof.proofIds).join(',')}
                 )
-                "${mocks.docket.value}"
                 Proof("request_proof")
                 Enum<0u8>();
             CALL_METHOD
@@ -359,7 +358,6 @@ describe('RNS - Manage Domain Records', () => {
                     ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                     ${fungibleProofs.map(proof => proof.proofIds).join(',')}
                 )
-                "${mocks.docket.value}"
                 Proof("requester_proof")
                 Enum<0u8>();
             CALL_METHOD
