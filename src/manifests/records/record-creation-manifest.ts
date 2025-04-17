@@ -51,13 +51,13 @@ export function recordCreationManifest({
             "${recordDocket.context}"
             ${recordDocket.directive.trim().length > 0 ? `Enum<1u8>("${recordDocket.directive}")` : "Enum<0u8>()"}
             ${recordDocket.platformIdentifier.trim().length > 0 ? `Enum<1u8>("${recordDocket.platformIdentifier}")` : "Enum<0u8>()"}
-            Array<String>("")
+            Array<String>()
             ${methodName === "create_proven_record"
             ? `Array<Proof>(
                 ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                 ${fungibleProofs.map(proof => proof.proofIds).join(',')}
             )` : ""}
-            "${recordDocket.value}"
+            ${methodName === "create_record" ? `"${recordDocket.value}"` : ``}
             Proof("request_proof")
             Enum<0u8>();
         CALL_METHOD
