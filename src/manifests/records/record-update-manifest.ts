@@ -52,7 +52,7 @@ export function recordUpdateManifest({
         ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
         ${fungibleProofs.map(proof => proof.proofIds).join(',')}
         )` : ""}
-        "${recordDocket.value}"
+        ${methodName === "update_record" ? `"${recordDocket.value}"` : ``}
         Proof("requester_proof")
         Enum<0u8>();
     CALL_METHOD
