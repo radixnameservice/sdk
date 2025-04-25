@@ -62,6 +62,14 @@ export interface DeleteRecordDispatcherPropsI extends DispatcherPropsI {
 
 }
 
+export interface DeleteRecordDispatcherByIdPropsI extends DispatcherPropsI {
+
+    accountAddress: string;
+    domainDetails: DomainDataI | SubDomainDataI;
+    recordId: string;
+
+}
+
 export interface TransferDispatcherPropsI extends DispatcherPropsI {
 
     domainDetails: DomainDataI;
