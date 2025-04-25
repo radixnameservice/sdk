@@ -7,7 +7,7 @@ import { requestAccountDomains, requestDomainDetails, requestDomainEntityDetails
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
-import { dispatchRecordDeletion } from './dispatchers/record/deletion';
+import { dispatchRecordDeletion, dispatchRecordDeletionById } from './dispatchers/record/deletion';
 import { dispatchRecordAmendment } from './dispatchers/record/amendment';
 import { dispatchDomainActivation } from './dispatchers/domain/activation';
 import { dispatchSubdomainCreation } from './dispatchers/domain/subdomain-creation';
@@ -425,6 +425,27 @@ export default class RnsSDK {
             accountAddress,
             domainDetails,
             docket,
+            callbacks
+        });
+
+    }
+
+    @requireDependencies('full')
+    async deleteRecordById({ domain, accountAddress, recordId, callbacks }: { domain: string; accountAddress: string; recordId: string; callbacks?: EventCallbacksI }): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
+
+        const domainDetails = await requestDomainEntityDetails(domain, { sdkInstance: this });
+
+        if (domainDetails instanceof Error)
+            return transactionError(errors.domain.generic({ domain, verbose: domainDetails.message }));
+        if (!domainDetails)
+            return transactionError(errors.domain.empty({ domain }));
+
+        return dispatchRecordDeletionById({
+            sdkInstance: this,
+            rdt: this.rdt,
+            accountAddress,
+            domainDetails,
+            recordId,
             callbacks
         });
 
