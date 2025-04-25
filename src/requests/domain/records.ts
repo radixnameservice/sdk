@@ -81,7 +81,7 @@ export async function resolveRecord(domain: string, { context, directive, proven
 
     try {
 
-        const recordId = await docketToRecordId(domain, { context, directive });
+        const recordId = await docketToRecordId(domain, { context, directive }, proven);
 
         const nft = await sdkInstance.state.getNonFungibleData(sdkInstance.entities.resources.collections.records, recordId);
 
