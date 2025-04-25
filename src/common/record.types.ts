@@ -2,13 +2,11 @@ import { ProofsI } from "../common/entities.types";
 
 export type ContextT = "receivers" | "delegation" | "navigation" | "social" | "discovery" | "widgets";
 
-export interface RecordItemI {
+export interface RecordItemI extends DocketPropsI {
     record_id: string;
     platform_identifier: string;
     domain_id: string;
-    context: ContextT;
     value: string | null;
-    directive?: string;
 }
 
 export interface DocketPropsI {
