@@ -6,7 +6,7 @@ import { transactionError, transactionResponse } from "../../utils/response.util
 import { sendTransaction } from "../../utils/transaction.utils";
 
 import { TransactionFeedbackStackI, SdkTransactionResponseT } from "../../common/response.types";
-import { DeleteRecordDispatcherPropsI } from "../../common/dispatcher.types";
+import { DeleteRecordDispatcherByIdPropsI, DeleteRecordDispatcherPropsI } from "../../common/dispatcher.types";
 import { docketToRecordId } from "../../utils/record.utils";
 import { SubDomainDataI } from "../../common/domain.types";
 
@@ -29,7 +29,7 @@ export async function dispatchRecordDeletion({
             rootDomainId = subdomainDetails.root_domain.id;
         }
 
-        const recordId = await docketToRecordId(domainDetails.name, docket, !docket.proven);
+        const recordId = await docketToRecordId(domainDetails.name, docket);
 
         const manifest = recordDeletionManifest({
             sdkInstance,
@@ -58,6 +58,56 @@ export async function dispatchRecordDeletion({
     } catch (error) {
 
         return transactionError(errors.record.deletion({ docket, verbose: error }));
+
+    }
+
+}
+
+export async function dispatchRecordDeletionById({
+    sdkInstance,
+    rdt,
+    accountAddress,
+    domainDetails,
+    recordId,
+    callbacks
+}: DeleteRecordDispatcherByIdPropsI): Promise<SdkTransactionResponseT<TransactionFeedbackStackI>> {
+
+    try {
+
+        let rootDomainId: string = domainDetails.id;
+
+        if (sdkInstance.utils.isSubdomain(domainDetails.name)) {
+            const subdomainDetails = domainDetails as SubDomainDataI;
+            rootDomainId = subdomainDetails.root_domain.id;
+        }
+
+        const manifest = recordDeletionManifest({
+            sdkInstance,
+            accountAddress,
+            rootDomainId,
+            recordId
+        });
+
+        const dispatch = await sendTransaction({
+            rdt,
+            message: `Delete Domain Record`,
+            manifest,
+            transaction: sdkInstance.transaction,
+            callbacks
+        });
+
+        if (!dispatch) {
+            return transactionError(errors.record.deletionById({ recordId }));
+        }
+
+        return transactionResponse({
+            code: 'RECORD_SUCCESSFULLY_DELETED',
+            details: `The domain record was successfully deleted (by ID).`
+        });
+
+    } catch (error) {
+
+        return transactionError(errors.record.deletionById({ recordId, verbose: error }));
 
     }
 

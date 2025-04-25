@@ -238,6 +238,16 @@ const record = {
 
     },
 
+    deletionById: ({ recordId, verbose = null }: ErrorGenerationI & { recordId: string }): ErrorI => {
+
+        return {
+            code: "RECORD_DELETION_FAILED",
+            error: `An error occurred when attempting to delete a domain record ID: ${recordId}.`,
+            verbose
+        };
+
+    },
+
     amendment: ({ docket, verbose = null }: ErrorGenerationI & { docket: DocketPropsI }): ErrorI => {
 
         return {
