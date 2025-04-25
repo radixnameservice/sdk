@@ -13,3 +13,7 @@ export async function docketToRecordId(domain: string, docket: DocketPropsI, inc
     return recordId;
 
 }
+
+export function isProvenRecord(val: string): boolean {
+    return val.startsWith('(') && val.endsWith(')');
+}
