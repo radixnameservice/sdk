@@ -49,8 +49,15 @@ const anticipated = {
         rootId: "[52e57ee0bdd7681786e15a0dabb7bdc4]",
         name: "radixnameservice.xrd"
     },
-    record: {
-        id: "[23ba95b0813ed097cc5cbc45861406f3]"
+    standard: {
+        record: {
+            id: "[23ba95b0813ed097cc5cbc45861406f3]"
+        }
+    },
+    proven: {
+        record: {
+            id: "[e544ec31725d2bbd41fd42ecfb74073a]"
+        }
     }
 }
 
@@ -302,7 +309,7 @@ describe('RNS - Manage Domain Records', () => {
             CALL_METHOD
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "update_record"
-                NonFungibleLocalId("${anticipated.record.id}")
+                NonFungibleLocalId("${anticipated.standard.record.id}")
                 "${mocks.docket.value}"
                 Proof("requester_proof")
                 Enum<0u8>();
@@ -353,7 +360,7 @@ describe('RNS - Manage Domain Records', () => {
             CALL_METHOD
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "update_proven_record"
-                NonFungibleLocalId("${anticipated.record.id}")
+                NonFungibleLocalId("${anticipated.proven.record.id}")
                 Array<Proof>(
                     ${nonFungibleProofs.map(proof => proof.proofIds).join(',')}
                     ${fungibleProofs.map(proof => proof.proofIds).join(',')}
@@ -401,7 +408,7 @@ describe('RNS - Manage Domain Records', () => {
             CALL_METHOD
                 Address("${rns.entities.components.coreVersionManager.rnsCoreComponent}")
                 "delete_record"
-                NonFungibleLocalId("${anticipated.record.id}")
+                NonFungibleLocalId("${anticipated.standard.record.id}")
                 Proof("requester_proof")
                 Enum<0u8>();
             CALL_METHOD
