@@ -2,7 +2,7 @@ import { ProgrammaticScryptoSborValueOwn } from "@radixdlt/babylon-gateway-api-s
 
 import { requestDomainDetails } from "../address/domains";
 import { domainToNonFungId } from "../../utils/domain.utils";
-import { docketToRecordId } from "../../utils/record.utils";
+import { docketToRecordId, isProvenRecord } from "../../utils/record.utils";
 
 import { InstancePropsI } from "../../common/entities.types";
 import { DocketPropsI, RecordItemI } from "../../common/record.types";
@@ -38,6 +38,7 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
             .map(nft => {
                 if (nft.data?.programmatic_json.kind === 'Tuple') {
                     return nft.data?.programmatic_json.fields.reduce((acc, field) => {
+
                         if (field.type_name === 'RecordType' && field.kind === 'Enum') {
                             if (field.field_name) {
                                 return { ...acc, [field.field_name]: field.variant_name }
@@ -47,14 +48,13 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
                         if (field.type_name === 'Option' && field.kind === 'Enum' && field.field_name !== 'value') {
                             if (field.field_name) {
                                 const value = (field.fields.length && 'value' in field.fields[0]) ? field.fields[0].value : null;
-
                                 return { ...acc, [field.field_name]: value }
                             }
                         }
-                        
+
                         if (field.field_name === 'value' && field.kind === 'Enum') {
                             const value = (('fields' in field && 'value' in field.fields[0] && field.fields[0].value) || null) as string | null;
-                            return { ...acc, [field.field_name]: value }
+                            return { ...acc, [field.field_name]: value, proven: isProvenRecord(value.toString()) }
                         }
 
                         if (field.kind === 'String' || field.kind === 'NonFungibleLocalId') {

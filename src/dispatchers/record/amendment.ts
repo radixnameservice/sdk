@@ -31,7 +31,7 @@ export async function dispatchRecordAmendment({
             rootDomainId = subdomainDetails.root_domain.id;
         }
 
-        const recordId = await docketToRecordId(domainDetails.name, docket, true);
+        const recordId = await docketToRecordId(domainDetails.name, docket, !docket.proven);
 
         const manifest = recordUpdateManifest({
             sdkInstance,
