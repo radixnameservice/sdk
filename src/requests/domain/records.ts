@@ -54,7 +54,7 @@ export async function requestRecords(domainName: string, { sdkInstance }: Instan
 
                         if (field.field_name === 'value' && field.kind === 'Enum') {
                             const value = (('fields' in field && 'value' in field.fields[0] && field.fields[0].value) || null) as string | null;
-                            return { ...acc, [field.field_name]: value, proven: isProvenRecord(value.toString()) }
+                            return { ...acc, [field.field_name]: value, proven: value && isProvenRecord(value.toString()) }
                         }
 
                         if (field.kind === 'String' || field.kind === 'NonFungibleLocalId') {
