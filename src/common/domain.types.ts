@@ -4,7 +4,6 @@ export interface DomainDataI extends RootDomainI {
 
     price: RawPricePairI;
     subdomains?: SubDomainI[];
-    subdomain_count?: number;
 
 }
 

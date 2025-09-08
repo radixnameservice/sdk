@@ -324,26 +324,6 @@ function formatDomainList(
 
 }
 
-async function getSubdomainCount(
-
-    rootDomainId: string,
-    { sdkInstance }: InstancePropsI
-
-): Promise<number> {
-
-    try {
-
-        const subdomainIds = await fetchSubdomainIds([rootDomainId], { sdkInstance });
-        return subdomainIds?.length || 0;
-
-    } catch (error) {
-
-        logger.error("getSubdomainCount", error);
-        return 0;
-
-    }
-
-}
 
 function supplementDomainList(domains: RootDomainI[], { sdkInstance }: InstancePropsI): DomainDataI[] {
 
@@ -404,25 +384,15 @@ async function fetchPaginatedDomainData(
         const formattedDomains = formatDomainList(domains);
         const supplementedDomains = supplementDomainList(formattedDomains, { sdkInstance });
 
-        const domainsWithSubdomainCounts = await Promise.all(
-            supplementedDomains.map(async (domain) => {
-                const subdomainCount = await getSubdomainCount(domain.id, { sdkInstance });
-                return {
-                    ...domain,
-                    subdomain_count: subdomainCount
-                };
-            })
-        );
-
         const paginationInfo: PaginationInfoI = {
             next_page: nextCursor,
             previous_page: previousCursor,
             total_count: totalCount,
-            current_page_count: domainsWithSubdomainCounts.length
+            current_page_count: supplementedDomains.length
         };
 
         return {
-            domains: domainsWithSubdomainCounts,
+            domains: supplementedDomains,
             pagination: paginationInfo
         };
 
