@@ -52,6 +52,5 @@ export interface PaginatedSubdomainsResponseI {
 }
 
 export interface DomainPaginationParamsI {
-    maxResultLength?: number;
     page?: number;
 }
