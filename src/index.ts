@@ -3,7 +3,7 @@ import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 
 import { requestDomainStatus } from './requests/domain/status';
 import { requestRecords, resolveRecord } from './requests/domain/records';
-import { requestAccountDomains, requestDomainDetails, requestDomainEntityDetails } from './requests/address/domains';
+import { requestAccountDomains, requestDomainDetails, requestDomainEntityDetails, getSubdomains } from './requests/address/domains';
 import { requestXRDExchangeRate } from './requests/pricing/rates';
 import { dispatchDomainRegistration } from './dispatchers/domain/registration';
 import { dispatchRecordCreation } from './dispatchers/record/creation';
@@ -28,7 +28,7 @@ import { ProcessParameters, requireDependencies } from './decorators/sdk.decorat
 import { EventCallbacksI } from './common/transaction.types';
 import { DocketPropsI, RecordItemI } from './common/record.types';
 import { DependenciesI } from './common/dependencies.types';
-import { DomainDataI, SubDomainDataI } from './common/domain.types';
+import { DomainDataI, SubDomainDataI, PaginatedDomainsResponseI, PaginatedSubdomainsResponseI, DomainPaginationParamsI } from './common/domain.types';
 import { RecordDocketI, ContextT } from './common/record.types';
 import { CheckAuthenticityResponseT, DomainAttributesResponseT, SdkTransactionResponseT, RecordListResponseT, ResolvedRecordResponseT, ErrorI, SdkResponseT, TransactionFeedbackStackI, TransactionFeedbackI } from './common/response.types';
 import { EntitiesT, ProofsI } from './common/entities.types';
@@ -47,6 +47,9 @@ export {
     ContextT,
     DomainDataI,
     SubDomainDataI,
+    PaginatedDomainsResponseI,
+    PaginatedSubdomainsResponseI,
+    DomainPaginationParamsI,
     CheckAuthenticityResponseT,
     ResolvedRecordResponseT,
     ProofsI,
@@ -247,9 +250,9 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getAccountDomains({ accountAddress }: { accountAddress: string }): Promise<SdkResponseT<DomainDataI[]>> {
+    async getAccountDomains({ accountAddress, pagination }: { accountAddress: string; pagination?: DomainPaginationParamsI }): Promise<SdkResponseT<PaginatedDomainsResponseI>> {
 
-        const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
+        const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this }, pagination);
 
         if (accountDomains instanceof Error)
             return retrievalError(errors.account.retrieval({ accountAddress, verbose: accountDomains.message }));
@@ -261,14 +264,26 @@ export default class RnsSDK {
     @requireDependencies('read-only')
     async checkAuthenticity({ domain, accountAddress }: { domain: string; accountAddress: string }): Promise<SdkResponseT<CheckAuthenticityResponseT>> {
 
-        const accountDomains = await requestAccountDomains(accountAddress, { sdkInstance: this });
+        const accountDomainsResponse = await requestAccountDomains(accountAddress, { sdkInstance: this });
 
-        if (accountDomains instanceof Error)
-            return retrievalError(errors.account.retrieval({ accountAddress, verbose: accountDomains.message }));
+        if (accountDomainsResponse instanceof Error)
+            return retrievalError(errors.account.retrieval({ accountAddress, verbose: accountDomainsResponse.message }));
 
-        const isAuthentic = accountDomains?.find((interestDomain: DomainDataI) => interestDomain.name === domain)?.address === accountAddress;
+        const isAuthentic = accountDomainsResponse.domains?.find((interestDomain: DomainDataI) => interestDomain.name === domain)?.address === accountAddress;
 
         return retrievalResponse({ isAuthentic });
+
+    }
+
+    @requireDependencies('read-only')
+    async getSubdomains({ rootDomainId, pagination }: { rootDomainId: string; pagination?: DomainPaginationParamsI }): Promise<SdkResponseT<PaginatedSubdomainsResponseI>> {
+
+        const subdomains = await getSubdomains(rootDomainId, { sdkInstance: this }, pagination);
+
+        if (subdomains instanceof Error)
+            return retrievalError(errors.domain.generic({ domain: rootDomainId, verbose: subdomains.message }));
+
+        return retrievalResponse(subdomains);
 
     }
 
@@ -561,3 +576,27 @@ export default class RnsSDK {
     };
 
 }
+
+(async () => {
+
+    const rns = new RnsSDK({
+        network: 'mainnet'
+    });
+
+    // const attributes = await rns.getDomainAttributes('james2.xrd');
+    // const records = await rns.getRecords('james2.xrd');
+
+    // const resolvedRecord = await rns.resolveRecord({
+    //     domain: 'test-records-present.xrd',
+    //     context: 'funnels',
+    //     directive: 'xrd'
+    //  });
+
+    // const auction = await rns.getAuction('nft.xrd');
+    // console.log(auction);
+
+    const ownerDomains = await rns.getAccountDomains({ accountAddress: 'account_rdx16yte04k8qwdw3l49humul5wpnesfyg2ws8nea8ezceuq90nr506au0', pagination: { page: 2 } });
+
+    console.log(ownerDomains.data);
+
+})();
