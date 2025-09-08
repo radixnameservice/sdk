@@ -325,6 +325,27 @@ function formatDomainList(
 }
 
 
+async function checkSubdomainsExist(
+
+    rootDomainId: string,
+    { sdkInstance }: InstancePropsI
+
+): Promise<boolean> {
+
+    try {
+
+        const subdomainIds = await fetchSubdomainIds([rootDomainId], { sdkInstance });
+        return subdomainIds && subdomainIds.length > 0;
+
+    } catch (error) {
+
+        logger.error("checkSubdomainsExist", error);
+        return false;
+
+    }
+
+}
+
 function supplementDomainList(domains: RootDomainI[], { sdkInstance }: InstancePropsI): DomainDataI[] {
 
     return domains.map((domain: DomainDataI) => {
@@ -456,17 +477,9 @@ export async function requestDomainDetails(
 
         if (!nftData) return null;
 
-        const subdomainDomainResourceIds = await fetchSubdomainIds(
-            [domainId],
-            { sdkInstance }
-        );
+        const subdomainsExist = await checkSubdomainsExist(domainId, { sdkInstance });
 
-        const subdomains = formatSubdomainList(await sdkInstance.state.getNonFungibleData(
-            sdkInstance.entities.resources.collections.domains,
-            [...subdomainDomainResourceIds]
-        ));
-
-        return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
+        const domainData = (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
             if (field.kind === 'String' && field.field_name === 'name') {
                 return { ...acc, [field.field_name]: field.value };
             }
@@ -486,7 +499,18 @@ export async function requestDomainDetails(
             }
 
             return acc;
-        }, { id: nftData.non_fungible_id, subdomains } as DomainDataI);
+        }, { 
+            id: nftData.non_fungible_id, 
+            subdomains_exist: subdomainsExist 
+        } as DomainDataI);
+
+        const basePrice = getBasePrice(domainData.name, sdkInstance.dependencies.rates.usdXrd);
+        domainData.price = {
+            xrd: basePrice.xrd,
+            usd: basePrice.usd
+        };
+
+        return domainData;
 
     } catch (e) {
 
