@@ -198,13 +198,47 @@ function filterSubdomains(
 
 }
 
+function formatSubdomainList(
+
+    domains: StateNonFungibleDetailsResponseItem[]
+
+): SubDomainI[] {
+
+    return domains.filter(r => {
+
+        return r.data?.programmatic_json.kind === 'Tuple'
+            && r.data?.programmatic_json.fields.some(
+                field => field.field_name === 'primary_domain' && field.kind === 'Enum' && field.variant_name !== 'None'
+            );
+
+    }).map(r => {
+        if (r.data?.programmatic_json.kind === 'Tuple') {
+
+            return r.data?.programmatic_json.fields.reduce((acc, field) => {
+
+                if (field.kind === 'String' && field.field_name) {
+                    return { ...acc, [field.field_name]: field.value };
+                }
+
+                if (field.field_name === 'created_timestamp' && field.kind === 'I64') {
+                    return { ...acc, [field.field_name]: +field.value * 1000 };
+                }
+
+                return acc;
+
+            }, { id: r.non_fungible_id } as SubDomainI);
+        }
+    }).filter(Boolean) as SubDomainI[];
+
+}
+
 function formatDomainListOld(
 
     domains: StateNonFungibleDetailsResponseItem[]
 
 ): RootDomainI[] {
 
-    const subdomains = filterSubdomains(domains);
+    const subdomains = formatSubdomainList(domains);
 
     return domains.filter(r => {
 
@@ -457,7 +491,7 @@ export async function requestDomainDetails(
             { sdkInstance }
         );
 
-        const subdomains = filterSubdomains(await sdkInstance.state.getNonFungibleData(
+        const subdomains = formatSubdomainList(await sdkInstance.state.getNonFungibleData(
             sdkInstance.entities.resources.collections.domains,
             [...subdomainDomainResourceIds]
         ));
@@ -580,7 +614,7 @@ export async function getSubdomains(
             paginatedSubdomainIds
         );
 
-        const formattedSubdomains = filterSubdomains(subdomainData);
+        const formattedSubdomains = formatSubdomainList(subdomainData);
 
         // Calculate next and previous cursors
         const nextCursor = currentPage < totalPages ? currentPage + 1 : null;
