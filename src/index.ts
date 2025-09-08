@@ -276,12 +276,12 @@ export default class RnsSDK {
     }
 
     @requireDependencies('read-only')
-    async getSubdomains({ rootDomainId, pagination }: { rootDomainId: string; pagination?: DomainPaginationParamsI }): Promise<SdkResponseT<PaginatedSubdomainsResponseI>> {
+    async getSubdomains({ domain, pagination }: { domain: string; pagination?: DomainPaginationParamsI }): Promise<SdkResponseT<PaginatedSubdomainsResponseI>> {
 
-        const subdomains = await getSubdomains(rootDomainId, { sdkInstance: this }, pagination);
+        const subdomains = await getSubdomains(domain, { sdkInstance: this }, pagination);
 
         if (subdomains instanceof Error)
-            return retrievalError(errors.domain.generic({ domain: rootDomainId, verbose: subdomains.message }));
+            return retrievalError(errors.domain.generic({ domain, verbose: subdomains.message }));
 
         return retrievalResponse(subdomains);
 
@@ -576,27 +576,3 @@ export default class RnsSDK {
     };
 
 }
-
-(async () => {
-
-    const rns = new RnsSDK({
-        network: 'mainnet'
-    });
-
-    // const attributes = await rns.getDomainAttributes('james2.xrd');
-    // const records = await rns.getRecords('james2.xrd');
-
-    // const resolvedRecord = await rns.resolveRecord({
-    //     domain: 'test-records-present.xrd',
-    //     context: 'funnels',
-    //     directive: 'xrd'
-    //  });
-
-    // const auction = await rns.getAuction('nft.xrd');
-    // console.log(auction);
-
-    const ownerDomains = await rns.getAccountDomains({ accountAddress: 'account_rdx16yte04k8qwdw3l49humul5wpnesfyg2ws8nea8ezceuq90nr506au0', pagination: { page: 2 } });
-
-    console.log(ownerDomains.data);
-
-})();

@@ -573,7 +573,7 @@ export async function requestSubDomainDetails(
 
 export async function getSubdomains(
 
-    rootDomainId: string,
+    domain: string,
     { sdkInstance }: InstancePropsI,
     pagination?: DomainPaginationParamsI
 
@@ -581,10 +581,10 @@ export async function getSubdomains(
 
     try {
 
+        const rootDomainId = await domainToNonFungId(domain);
         const maxResults = pagination?.maxResultLength || 25;
         const currentPage = pagination?.page || 1;
 
-        // Get all subdomain IDs for this root domain
         const allSubdomainIds = await fetchSubdomainIds([rootDomainId], { sdkInstance });
 
         if (!allSubdomainIds || allSubdomainIds.length === 0) {
@@ -602,13 +602,11 @@ export async function getSubdomains(
 
         const totalCount = allSubdomainIds.length;
 
-        // Calculate pagination
         const totalPages = Math.ceil(totalCount / maxResults);
         const offset = (currentPage - 1) * maxResults;
 
         const paginatedSubdomainIds = allSubdomainIds.slice(offset, offset + maxResults);
 
-        // Get subdomain data
         const subdomainData = await sdkInstance.state.getNonFungibleData(
             sdkInstance.entities.resources.collections.domains,
             paginatedSubdomainIds
@@ -616,7 +614,6 @@ export async function getSubdomains(
 
         const formattedSubdomains = formatSubdomainList(subdomainData);
 
-        // Calculate next and previous cursors
         const nextCursor = currentPage < totalPages ? currentPage + 1 : null;
         const previousCursor = currentPage > 1 ? currentPage - 1 : null;
 
