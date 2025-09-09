@@ -59,6 +59,9 @@ describe('RNS - Activate Domain', () => {
 
         const rns = new RnsSDK({ network: 'stokenet', rdt: dAppToolkit });
 
+        const subdomainsResponse = await rns.getSubdomains({ domain: "radixnameservice.xrd" });
+        const actualSubdomainIds = subdomainsResponse.errors ? [] : subdomainsResponse.data.subdomains.map(sub => sub.id);
+
         const activate = await rns.activateDomain({
             domain: "radixnameservice.xrd",
             accountAddress: mocks.userDetails.accountAddress
@@ -105,7 +108,7 @@ describe('RNS - Activate Domain', () => {
                 true
                 true
                 Array<NonFungibleLocalId>(
-                    ${anticipated.domain.subdomainIds.map(id => `NonFungibleLocalId("${id}")`).join(', ')}
+                    ${actualSubdomainIds.map(id => `NonFungibleLocalId("${id}")`).join(', ')}
                 )
                 Proof("requested_proof")
                 Enum<0u8>();

@@ -1,17 +1,21 @@
 
-import RnsSDK, { DomainDataI } from '../..';
+import RnsSDK, { DomainDataI, PaginatedSubdomainsResponseI } from '../..';
 
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
 
-import { normaliseManifest } from '../utils';
+import { matchObjectTypes, normaliseManifest } from '../utils';
 import { deriveRootDomain, normaliseDomain } from '../../utils/domain.utils';
 
 const mocks = {
-    rootDomain: {
-        id: "[52e57ee0bdd7681786e15a0dabb7bdc4]"
+    domains: {
+        withSubdomains: 'subdomains.xrd',
+        withoutSubdomains: 'no-subdomains.xrd'
     },
-    subdomain: `test-subdomain.radixnameservice.xrd`,
+    rootDomain: {
+        id: "[cb1368c760c7b1a126be405c4eb3457d]"
+    },
+    subdomain: `test.subdomains.xrd`,
     userDetails: {
         accountAddress: 'account_tdx_2_129076yrjr5k4lumhp3fl2r88xt3eqgxwed6saplvf2ezz5szrhet8k'
     },
@@ -96,6 +100,79 @@ describe('RNS - Create Subdomain', () => {
 
 });
 
+describe('RNS - Get Subdomain', () => {
+
+    it('should return paginated subdomains for domain with subdomains', async () => {
+
+        const subdomainsResponse = await rns.getSubdomains({
+            domain: mocks.domains.withSubdomains
+        });
+
+        expect(subdomainsResponse.errors).toBeUndefined();
+        expect(subdomainsResponse.data).toBeDefined();
+        expect(matchObjectTypes<PaginatedSubdomainsResponseI>(subdomainsResponse.data, ['subdomains', 'pagination'])).toBe(true);
+
+        expect(subdomainsResponse.data.pagination).toBeDefined();
+        expect(matchObjectTypes(subdomainsResponse.data.pagination, ['next_page', 'previous_page', 'total_count', 'current_page_count'])).toBe(true);
+
+        expect(Array.isArray(subdomainsResponse.data.subdomains)).toBe(true);
+
+        if (subdomainsResponse.data.subdomains.length > 0) {
+            expect(subdomainsResponse.data.subdomains.every(subdomain =>
+                matchObjectTypes(subdomain, ['id', 'name', 'created_timestamp', 'key_image_url'])
+            )).toBe(true);
+        }
+    });
+
+    it('should indicate subdomain existence in domain details', async () => {
+
+        const domainDetails = await rns.getDomainDetails({
+            domain: mocks.domains.withSubdomains
+        });
+
+        const domainData = domainDetails.data as DomainDataI;
+        expect(typeof domainData.subdomains_exist).toBe('boolean');
+
+    });
+
+    it('should return empty subdomains array for domain without subdomains', async () => {
+        const subdomainsResponse = await rns.getSubdomains({
+            domain: mocks.domains.withoutSubdomains
+        });
+
+        if (!subdomainsResponse.errors) {
+            expect(subdomainsResponse.data.subdomains).toBeDefined();
+            expect(Array.isArray(subdomainsResponse.data.subdomains)).toBe(true);
+            expect(subdomainsResponse.data.subdomains.length).toBe(0);
+            expect(subdomainsResponse.data.pagination.total_count).toBe(0);
+        }
+    });
+
+    it('should handle pagination parameters correctly', async () => {
+        
+        const page1Response = await rns.getSubdomains({
+            domain: mocks.domains.withSubdomains,
+            pagination: { page: 1 }
+        });
+
+        expect(page1Response.data.pagination.previous_page).toBeNull();
+
+        if (page1Response.data.pagination.total_count > 100) {
+            expect(page1Response.data.pagination.next_page).toBe(2);
+
+            const page2Response = await rns.getSubdomains({
+                domain: mocks.domains.withSubdomains,
+                pagination: { page: 2 }
+            });
+
+            if (!page2Response.errors) {
+                expect(page2Response.data.pagination.previous_page).toBe(1);
+            }
+        }
+    });
+
+});
+
 describe('RNS - Delete Subdomain', () => {
 
     afterEach(() => {
@@ -112,8 +189,13 @@ describe('RNS - Delete Subdomain', () => {
             throw new Error('Root domain details could not be obtained');
         }
 
-        const subdomainData = rootDomainDetails.data as DomainDataI;
-        const subdomainDetails = subdomainData.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
+        const subdomainsResponse = await rns.getSubdomains({ domain: deriveRootDomain(mocks.subdomain) });
+
+        if (subdomainsResponse.errors) {
+            throw new Error('Subdomains could not be obtained');
+        }
+
+        const subdomainDetails = subdomainsResponse.data.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails) {
             throw new Error('Subdomain details could not be obtained');

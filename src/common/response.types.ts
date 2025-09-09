@@ -1,6 +1,6 @@
 import { StateNonFungibleDetailsResponseItem } from "@radixdlt/babylon-gateway-api-sdk";
 import { RawPricePairI } from "./pricing.types";
-import { DomainDataI } from "./domain.types";
+import { DomainDataI, PaginatedDomainsResponseI, PaginatedSubdomainsResponseI } from "./domain.types";
 import { RecordItemI } from "./record.types";
 
 export interface ErrorStackI {
@@ -45,6 +45,10 @@ export type RecordListResponseT = RecordItemI[] | [];
 export type RecordResponseT = RecordItemI | null;
 
 export type DomainListResponseT = DomainDataI[] | [];
+
+export type PaginatedDomainListResponseT = PaginatedDomainsResponseI | [];
+
+export type PaginatedSubdomainListResponseT = PaginatedSubdomainsResponseI | [];
 
 export type CheckAuthenticityResponseT = { isAuthentic: boolean };
 

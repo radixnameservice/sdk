@@ -20,7 +20,13 @@ export async function dispatchSubdomainDeletion({
 
     try {
 
-        const subdomainDetails = rootDomainDetails.subdomains.find((subdomainItem) => subdomainItem.name === subdomain);
+        const subdomainsResponse = await sdkInstance.getSubdomains({ domain: rootDomainDetails.name });
+        
+        if (subdomainsResponse.errors) {
+            return transactionError(errors.subdomain.generic({ subdomain }));
+        }
+
+        const subdomainDetails = subdomainsResponse.data.subdomains.find((subdomainItem) => subdomainItem.name === subdomain);
 
         if (!subdomainDetails)
             return transactionError(errors.subdomain.doesNotExist({ subdomain }));

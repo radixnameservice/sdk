@@ -29,7 +29,11 @@ import {
     DomainDataI,
     RootDomainI,
     SubDomainDataI,
-    SubDomainI
+    SubDomainI,
+    PaginatedDomainsResponseI,
+    PaginatedSubdomainsResponseI,
+    PaginationInfoI,
+    DomainPaginationParamsI
 } from "../../common/domain.types";
 
 import {
@@ -58,50 +62,127 @@ async function fetchRootDomainIds(
 
     accountAddress: string,
     accountNfts: StateEntityDetailsVaultResponseItem,
-    { sdkInstance }: InstancePropsI
+    { sdkInstance }: InstancePropsI,
+    pagination?: DomainPaginationParamsI,
 
-): Promise<string[]> {
+): Promise<{ domainIds: string[], totalCount: number, nextCursor: number | null, previousCursor: number | null }> {
 
     const accountDomainVault = filterUserDomainVault(accountNfts, sdkInstance.entities.resources.collections.domains);
-    if (!accountDomainVault?.items) return [];
 
-    let { items: domainIds, vault_address: userDomainVaultAddr } = accountDomainVault;
+    if (!accountDomainVault?.items) return { domainIds: [], totalCount: 0, nextCursor: null, previousCursor: null };
 
-    if (!accountDomainVault?.next_cursor) {
-        return domainIds;
+    const { vault_address: userDomainVaultAddr } = accountDomainVault;
+    const currentPage = pagination?.page || 1;
+
+    if (currentPage === 1) {
+
+        const totalCount = await getTotalDomainCount(accountAddress, userDomainVaultAddr, accountDomainVault, { sdkInstance });
+        
+        return {
+            domainIds: accountDomainVault.items,
+            totalCount,
+            nextCursor: accountDomainVault.next_cursor ? 2 : null,
+            previousCursor: null
+        };
     }
 
-    let cursor: string | null = null;
+    let currentCursor = accountDomainVault.next_cursor;
+    let pageNumber = 2;
 
-    do {
-
+    while (currentCursor && pageNumber < currentPage) {
         try {
-
             const ledgerStateVersion = (await sdkInstance.status.getCurrent()).ledger_state.state_version;
-
             const response = await sdkInstance.state.innerClient.entityNonFungibleIdsPage({
                 stateEntityNonFungibleIdsPageRequest: {
                     address: accountAddress,
                     resource_address: sdkInstance.entities.resources.collections.domains,
                     vault_address: userDomainVaultAddr,
-                    cursor,
+                    cursor: currentCursor,
+                    at_ledger_state: { state_version: ledgerStateVersion }
+                }
+            });
+            
+            currentCursor = response.next_cursor || null;
+            pageNumber++;
+        } catch (error) {
+            logger.error("fetchRootDomainIds", error);
+            break;
+        }
+    }
+
+    if (currentCursor && pageNumber === currentPage) {
+        try {
+            const ledgerStateVersion = (await sdkInstance.status.getCurrent()).ledger_state.state_version;
+            const response = await sdkInstance.state.innerClient.entityNonFungibleIdsPage({
+                stateEntityNonFungibleIdsPageRequest: {
+                    address: accountAddress,
+                    resource_address: sdkInstance.entities.resources.collections.domains,
+                    vault_address: userDomainVaultAddr,
+                    cursor: currentCursor,
                     at_ledger_state: { state_version: ledgerStateVersion }
                 }
             });
 
-            cursor = response?.next_cursor || null;
-            domainIds = { ...domainIds, ...response.items };
-
+            
+            return {
+                domainIds: response.items || [],
+                totalCount: null,
+                nextCursor: response.next_cursor ? currentPage + 1 : null,
+                previousCursor: currentPage > 1 ? currentPage - 1 : null
+            };
         } catch (error) {
-
             logger.error("fetchRootDomainIds", error);
-            break;
+        }
+    }
 
+    return {
+        domainIds: [],
+        totalCount: null,
+        nextCursor: null,
+        previousCursor: currentPage > 1 ? currentPage - 1 : null
+    };
+
+}
+
+async function getTotalDomainCount(
+    
+    accountAddress: string,
+    userDomainVaultAddr: string,
+    initialVault: NonFungibleResourcesCollectionItemVaultAggregatedVaultItem,
+    { sdkInstance }: InstancePropsI
+
+): Promise<number> {
+
+    try {
+
+        let totalCount = initialVault.items?.length || 0;
+        let currentCursor = initialVault.next_cursor;
+
+        while (currentCursor) {
+            const ledgerStateVersion = (await sdkInstance.status.getCurrent()).ledger_state.state_version;
+            
+            const response = await sdkInstance.state.innerClient.entityNonFungibleIdsPage({
+                stateEntityNonFungibleIdsPageRequest: {
+                    address: accountAddress,
+                    resource_address: sdkInstance.entities.resources.collections.domains,
+                    vault_address: userDomainVaultAddr,
+                    cursor: currentCursor,
+                    at_ledger_state: { state_version: ledgerStateVersion }
+                }
+            });
+
+            totalCount += response.items?.length || 0;
+            currentCursor = response.next_cursor || null;
         }
 
-    } while (cursor !== null);
+        return totalCount;
 
-    return domainIds;
+    } catch (error) {
+
+        logger.error("getTotalDomainCount", error);
+        return initialVault.items?.length || 0;
+
+    }
 
 }
 
@@ -152,13 +233,13 @@ async function fetchSubdomainIds(
 
 }
 
-function filterSubdomains(
+function formatSubdomainList(
 
-    nftData: StateNonFungibleDetailsResponseItem[]
+    domains: StateNonFungibleDetailsResponseItem[]
 
 ): SubDomainI[] {
 
-    return nftData.filter(r => {
+    return domains.filter(r => {
 
         return r.data?.programmatic_json.kind === 'Tuple'
             && r.data?.programmatic_json.fields.some(
@@ -166,10 +247,10 @@ function filterSubdomains(
             );
 
     }).map(r => {
-
         if (r.data?.programmatic_json.kind === 'Tuple') {
 
             return r.data?.programmatic_json.fields.reduce((acc, field) => {
+
                 if (field.kind === 'String' && field.field_name) {
                     return { ...acc, [field.field_name]: field.value };
                 }
@@ -182,7 +263,7 @@ function filterSubdomains(
 
             }, { id: r.non_fungible_id } as SubDomainI);
         }
-    });
+    }).filter(Boolean) as SubDomainI[];
 
 }
 
@@ -191,8 +272,6 @@ function formatDomainList(
     domains: StateNonFungibleDetailsResponseItem[]
 
 ): RootDomainI[] {
-
-    const subdomains = filterSubdomains(domains);
 
     return domains.filter(r => {
 
@@ -205,16 +284,6 @@ function formatDomainList(
         if (r.data?.programmatic_json.kind === 'Tuple') {
 
             return r.data?.programmatic_json.fields.reduce((acc, field) => {
-
-                if (field.kind === 'String' && field.field_name === 'name') {
-
-                    const filteredSubdomains = subdomains.filter((s) => {
-                        const rootDomain = deriveRootDomain(s?.name ?? '');
-                        return rootDomain === field.value;
-                    });
-
-                    return { ...acc, [field.field_name]: field.value, subdomains: filteredSubdomains };
-                }
 
                 if (field.kind === 'String' && field.field_name) {
                     return { ...acc, [field.field_name]: field.value };
@@ -235,6 +304,27 @@ function formatDomainList(
             }, { id: r.non_fungible_id } as RootDomainI);
         }
     });
+
+}
+
+async function checkSubdomainsExist(
+
+    rootDomainId: string,
+    { sdkInstance }: InstancePropsI
+
+): Promise<boolean> {
+
+    try {
+
+        const subdomainIds = await fetchSubdomainIds([rootDomainId], { sdkInstance });
+        return subdomainIds && subdomainIds.length > 0;
+
+    } catch (error) {
+
+        logger.error("checkSubdomainsExist", error);
+        return false;
+
+    }
 
 }
 
@@ -261,37 +351,57 @@ function supplementDomainList(domains: RootDomainI[], { sdkInstance }: InstanceP
 async function fetchDomainData(
 
     accountAddress: string,
-    { sdkInstance }: InstancePropsI
+    { sdkInstance }: InstancePropsI,
+    pagination?: DomainPaginationParamsI
 
-): Promise<DomainDataI[] | null> {
+): Promise<PaginatedDomainsResponseI | null> {
 
     try {
 
         const accountNfts = await sdkInstance.state.getEntityDetailsVaultAggregated(accountAddress);
 
-        const rootDomainResourceIds = await fetchRootDomainIds(
+        const { domainIds, totalCount, nextCursor, previousCursor } = await fetchRootDomainIds(
             accountAddress,
             accountNfts,
-            { sdkInstance }
+            { sdkInstance },
+            pagination
         );
 
-        if (!rootDomainResourceIds.length) return [];
-
-        const subdomainDomainResourceIds = await fetchSubdomainIds(
-            rootDomainResourceIds,
-            { sdkInstance }
-        );
+        if (!domainIds.length) {
+            return {
+                domains: [],
+                pagination: {
+                    next_page: null,
+                    previous_page: null,
+                    total_count: totalCount,
+                    current_page_count: 0
+                }
+            };
+        }
 
         const domains = await sdkInstance.state.getNonFungibleData(
             sdkInstance.entities.resources.collections.domains,
-            [...rootDomainResourceIds, ...subdomainDomainResourceIds]
+            domainIds
         );
 
-        return supplementDomainList(formatDomainList(domains), { sdkInstance });
+        const formattedDomains = formatDomainList(domains);
+        const supplementedDomains = supplementDomainList(formattedDomains, { sdkInstance });
+
+        const paginationInfo: PaginationInfoI = {
+            next_page: nextCursor,
+            previous_page: previousCursor,
+            total_count: totalCount,
+            current_page_count: supplementedDomains.length
+        };
+
+        return {
+            domains: supplementedDomains,
+            pagination: paginationInfo
+        };
 
     } catch (error) {
 
-        logger.error("fetchDomainData", error);
+        logger.error("fetchPaginatedDomainData", error);
         return null;
 
     }
@@ -301,15 +411,26 @@ async function fetchDomainData(
 export async function requestAccountDomains(
 
     accountAddress: string,
-    { sdkInstance }: InstancePropsI
+    { sdkInstance }: InstancePropsI,
+    pagination?: DomainPaginationParamsI
 
-): Promise<DomainDataI[] | Error> {
+): Promise<PaginatedDomainsResponseI | Error> {
 
-    if (!accountAddress) return [];
+    if (!accountAddress) {
+        return {
+            domains: [],
+            pagination: {
+                next_page: null,
+                previous_page: null,
+                total_count: 0,
+                current_page_count: 0
+            }
+        };
+    }
 
     try {
 
-        return await fetchDomainData(accountAddress, { sdkInstance });
+        return await fetchDomainData(accountAddress, { sdkInstance }, pagination);
 
     } catch (e) {
 
@@ -338,17 +459,9 @@ export async function requestDomainDetails(
 
         if (!nftData) return null;
 
-        const subdomainDomainResourceIds = await fetchSubdomainIds(
-            [domainId],
-            { sdkInstance }
-        );
+        const subdomainsExist = await checkSubdomainsExist(domainId, { sdkInstance });
 
-        const subdomains = filterSubdomains(await sdkInstance.state.getNonFungibleData(
-            sdkInstance.entities.resources.collections.domains,
-            [...subdomainDomainResourceIds]
-        ));
-
-        return (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
+        const domainData = (nftData.data?.programmatic_json as ProgrammaticScryptoSborValueTuple).fields.reduce((acc, field) => {
             if (field.kind === 'String' && field.field_name === 'name') {
                 return { ...acc, [field.field_name]: field.value };
             }
@@ -368,7 +481,18 @@ export async function requestDomainDetails(
             }
 
             return acc;
-        }, { id: nftData.non_fungible_id, subdomains } as DomainDataI);
+        }, { 
+            id: nftData.non_fungible_id, 
+            subdomains_exist: subdomainsExist 
+        } as DomainDataI);
+
+        const basePrice = getBasePrice(domainData.name, sdkInstance.dependencies.rates.usdXrd);
+        domainData.price = {
+            xrd: basePrice.xrd,
+            usd: basePrice.usd
+        };
+
+        return domainData;
 
     } catch (e) {
 
@@ -421,6 +545,74 @@ export async function requestSubDomainDetails(
         return e;
 
     }
+}
+
+export async function getSubdomains(
+
+    domain: string,
+    { sdkInstance }: InstancePropsI,
+    pagination?: DomainPaginationParamsI
+
+): Promise<PaginatedSubdomainsResponseI | Error> {
+
+    try {
+
+        const rootDomainId = await domainToNonFungId(domain);
+        const currentPage = pagination?.page || 1;
+
+        const allSubdomainIds = await fetchSubdomainIds([rootDomainId], { sdkInstance });
+
+        if (!allSubdomainIds || allSubdomainIds.length === 0) {
+            return {
+                subdomains: [],
+                pagination: {
+                    next_page: null,
+                    previous_page: null,
+                    total_count: 0,
+                    current_page_count: 0
+                },
+                root_domain_id: rootDomainId
+            };
+        }
+
+        const totalCount = allSubdomainIds.length;
+
+        const itemsPerPage = 100;
+        const totalPages = Math.ceil(totalCount / itemsPerPage);
+        const offset = (currentPage - 1) * itemsPerPage;
+
+        const paginatedSubdomainIds = allSubdomainIds.slice(offset, offset + itemsPerPage);
+
+        const subdomainData = await sdkInstance.state.getNonFungibleData(
+            sdkInstance.entities.resources.collections.domains,
+            paginatedSubdomainIds
+        );
+
+        const formattedSubdomains = formatSubdomainList(subdomainData);
+
+        const nextCursor = currentPage < totalPages ? currentPage + 1 : null;
+        const previousCursor = currentPage > 1 ? currentPage - 1 : null;
+
+        const paginationInfo: PaginationInfoI = {
+            next_page: nextCursor,
+            previous_page: previousCursor,
+            total_count: totalCount,
+            current_page_count: formattedSubdomains.length
+        };
+
+        return {
+            subdomains: formattedSubdomains,
+            pagination: paginationInfo,
+            root_domain_id: rootDomainId
+        };
+
+    } catch (e) {
+
+        logger.error("getSubdomains", e);
+        return e;
+
+    }
+
 }
 
 export async function requestDomainEntityDetails(
