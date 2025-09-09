@@ -59,6 +59,9 @@ describe('RNS - Transfer Domain', () => {
 
         const rootDomainData = rootDomainDetails.data as DomainDataI;
 
+        const subdomainsResponse = await rns.getSubdomains({ domain: mocks.domain.name });
+        const actualSubdomainIds = subdomainsResponse.errors ? [] : subdomainsResponse.data.subdomains.map(sub => sub.id);
+
         const transferDomain = await rns.transferDomain({
             domain: mocks.domain.name,
             fromAddress: mocks.fromAddress,
@@ -93,7 +96,7 @@ describe('RNS - Transfer Domain', () => {
                 ${mocks.preferences.deleteSubdomains}
                 ${mocks.preferences.deleteRecords}
                 Array<NonFungibleLocalId>(
-                    ${rootDomainData.subdomains.map(subdomain => `NonFungibleLocalId("${subdomain.id}")`).join(', ')}
+                    ${actualSubdomainIds.map(id => `NonFungibleLocalId("${id}")`).join(', ')}
                 )
                 Proof("requested_proof")
                 Enum<0u8>();

@@ -111,9 +111,14 @@ describe('RNS - Delete Subdomain', () => {
         if (rootDomainDetails.errors) {
             throw new Error('Root domain details could not be obtained');
         }
-
-        const subdomainData = rootDomainDetails.data as DomainDataI;
-        const subdomainDetails = subdomainData.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
+        
+        const subdomainsResponse = await rns.getSubdomains({ domain: deriveRootDomain(mocks.subdomain) });
+        
+        if (subdomainsResponse.errors) {
+            throw new Error('Subdomains could not be obtained');
+        }
+        
+        const subdomainDetails = subdomainsResponse.data.subdomains.find((subdomain) => subdomain.name === normalisedSubDomain);
 
         if (!subdomainDetails) {
             throw new Error('Subdomain details could not be obtained');

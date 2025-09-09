@@ -13,9 +13,9 @@ describe('RNS - Verify Domain Owner Accounts', () => {
             throw new Error('Domain list fetch failed');
         }
 
-        expect(Array.isArray(ownerDomains.data)).toBe(true);
-        expect(ownerDomains.data.length).toBeGreaterThan(0);
-        expect(ownerDomains.data.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'subdomains', 'created_timestamp', 'key_image_url', 'address']))).toBe(true);
+        expect(Array.isArray(ownerDomains.data.domains)).toBe(true);
+        expect(ownerDomains.data.domains.length).toBeGreaterThan(0);
+        expect(ownerDomains.data.domains.every(domain => matchObjectTypes<DomainDataI>(domain, ['id', 'name', 'created_timestamp', 'key_image_url', 'address']))).toBe(true);
 
     });
 
