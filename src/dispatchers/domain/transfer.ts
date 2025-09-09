@@ -20,6 +20,9 @@ export async function dispatchDomainTransfer({
 
     try {
 
+        const subdomainsResponse = await sdkInstance.getSubdomains({ domain: domainDetails.name });
+        const subdomainIds = subdomainsResponse.errors ? [] : subdomainsResponse.data.subdomains.map(subdomain => subdomain.id);
+
         const manifest = await transferDomainManifest({
             sdkInstance,
             rootDomainId: domainDetails.id,
@@ -29,7 +32,7 @@ export async function dispatchDomainTransfer({
                 deleteRecords: preferences?.deleteRecords ?? false,
                 deleteSubdomains: preferences?.deleteSubdomains ?? false,
             },
-            subdomainIds: domainDetails.subdomains ? domainDetails.subdomains.map(subdomain => subdomain.id) : [],
+            subdomainIds,
         });
 
         const dispatch = await sendTransaction({

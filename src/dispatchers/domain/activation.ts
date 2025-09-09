@@ -18,10 +18,13 @@ export async function dispatchDomainActivation({
 
     try {
 
+        const subdomainsResponse = await sdkInstance.getSubdomains({ domain: domainDetails.name });
+        const subdomainIds = subdomainsResponse.errors ? [] : subdomainsResponse.data.subdomains.map(subdomain => subdomain.id);
+
         const manifest = await activateDomainManifest({
             sdkInstance,
             rootDomainId: domainDetails.id,
-            subdomainIds: domainDetails.subdomains ? domainDetails.subdomains.map(subdomain => subdomain.id) : [],
+            subdomainIds,
             accountAddress
         });
 
