@@ -1,6 +1,8 @@
+import RnsSDK, { ResolvedRecordResponseT } from '../..';
+
 import { RadixDappToolkit } from '@radixdlt/radix-dapp-toolkit';
 import { RadixNetwork } from '@radixdlt/babylon-gateway-api-sdk';
-import RnsSDK, { ResolvedRecordResponseT } from '../..';
+
 import { matchObjectTypes, normaliseManifest } from '../utils';
 import { RecordDocketI, RecordItemI } from '../../common/record.types';
 import { buildFungibleProofs, buildNonFungibleProofs } from '../../utils/proof.utils';
